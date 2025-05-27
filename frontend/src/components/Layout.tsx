@@ -1,7 +1,7 @@
 import Header from "./Header";
 import { Outlet } from "react-router";
 
-const Body = () => {
+const Layout = () => {
     return (
         <div>
             <Header />
@@ -11,4 +11,4 @@ const Body = () => {
     )
 }
 
-export default Body;
+export default Layout;
