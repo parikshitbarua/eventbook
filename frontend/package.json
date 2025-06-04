@@ -19,12 +19,18 @@
     "prepare": "cd .. && husky install frontend/.husky"
   },
   "dependencies": {
+    "@reown/appkit": "^1.7.8",
+    "@reown/appkit-adapter-wagmi": "^1.7.8",
+    "@tanstack/react-query": "^5.80.3",
     "react": "^18.2.0",
-    "react-router-dom": "^7.6.1"
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^7.6.1",
+    "viem": "^2.30.6",
+    "wagmi": "^2.15.5"
   },
   "devDependencies": {
-    "@commitlint/cli": "^19.6.1",
-    "@commitlint/config-conventional": "^19.6.0",
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
     "@eslint/js": "^9.25.0",
     "@types/jest": "^29.5.14",
     "@types/react": "^18.2.0",
@@ -35,6 +41,8 @@
     "@vitest/coverage-v8": "^2.1.8",
     "@vitest/ui": "^2.1.8",
     "autoprefixer": "^10.4.17",
+    "commitlint": "^19.8.1",
+    "conventional-changelog-conventionalcommits": "^9.0.0",
     "eslint": "^9.25.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",

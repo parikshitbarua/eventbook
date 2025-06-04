@@ -8,6 +8,6 @@ no_color='\033[0m'
 
 echo -e "\n${yellow}Executing commit-msg hook...${no_color}\n"
 
-npx --no -- commitlint --edit ${1}
+npx --no -- commitlint --edit $1
 
 echo -e "${green}Git commit-msg hook was successful!${no_color}\n"
