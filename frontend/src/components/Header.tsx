@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 const Header = () => {
   return (
     <div className="bg-gradient-to-r from-slate-50 to-slate-100 shadow-sm border-b border-slate-200/50 backdrop-blur-sm">
@@ -23,7 +25,7 @@ const Header = () => {
             transition-all duration-300 hover:bg-[#d12f2e]
             border border-[#e43635]/10 flex items-center"
           >
-            Create +
+            <Link to={'/new-event'}>New Event</Link>
           </button>
           <appkit-button />
         </div>

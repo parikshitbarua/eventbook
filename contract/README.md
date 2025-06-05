@@ -11,3 +11,20 @@ REPORT_GAS=true npx hardhat test
 npx hardhat node
 npx hardhat ignition deploy ./ignition/modules/Lock.ts
 ```
+
+compile contract
+```shell
+npx hardhat compile
+```
+
+start local hardhat network
+```shell
+npx hardhat node
+```
+
+deploy contract to hardhat network
+```shell
+npx hardhat run scripts/deploy.ts --network localhost
+```
+
+
