@@ -1,13 +1,18 @@
 import { RouterProvider } from 'react-router-dom';
 import { WagmiProvider } from 'wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { wagmiAdapter } from './config/wallet.config.tsx';
 import router from './routes';
 
+const queryClient = new QueryClient();
+
 function App() {
   return (
-    <WagmiProvider config={wagmiAdapter.wagmiConfig}>
-      <RouterProvider router={router} />
-    </WagmiProvider>
+    <QueryClientProvider client={queryClient}>
+      <WagmiProvider config={wagmiAdapter.wagmiConfig}>
+        <RouterProvider router={router} />
+      </WagmiProvider>
+    </QueryClientProvider>
   );
 }
 
