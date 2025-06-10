@@ -33,6 +33,13 @@ contract EventContract is Ownable, ReentrancyGuard {
     uint256 public maxTicketsPerWallet;
     uint256 public salesStartTime;
     uint256 public salesEndTime;
+
+    struct CategoryInput {
+        string name;
+        uint256 price;
+        uint256 maxSupply;
+        string categoryURI;
+    }
     
     // Ticket categories
     struct TicketCategory {
@@ -41,6 +48,7 @@ contract EventContract is Ownable, ReentrancyGuard {
         uint256 maxSupply;
         uint256 sold;
         bool isActive;
+        string categoryURI; // IPFS URI for ticket image/metadata
     }
     
     mapping(uint256 => TicketCategory) public ticketCategories;
@@ -51,7 +59,8 @@ contract EventContract is Ownable, ReentrancyGuard {
     event EventUpdated();
     event EventDeactivated();
     event WhitelistUpdated(address indexed user, bool status);
-    event CategoryAdded(uint256 indexed categoryId, string name, uint256 price);
+    event CategoryAdded(uint256 indexed categoryId, string name, uint256 price, string categoryURI);
+    event CategoriesAdded(uint256[] categoryIds, uint256 totalAdded);
     
     modifier onlyOrganizer() {
         require(msg.sender == organizer, "Only organizer");
@@ -178,12 +187,49 @@ contract EventContract is Ownable, ReentrancyGuard {
         emit TicketPurchased(buyer, actualQuantity, totalPrice);
     }
     
+
+    function addTicketCategories(
+        CategoryInput[] memory _categories
+    ) external onlyOrganizer returns (uint256[] memory) {
+        require(_categories.length > 0, "No categories provided");
+        require(_categories.length <= 20, "Too many categories"); // Gas limit protection
+        
+        uint256[] memory categoryIds = new uint256[](_categories.length);
+        
+        for (uint256 i = 0; i < _categories.length; i++) {
+            require(_categories[i].price > 0, "Invalid price");
+            require(bytes(_categories[i].name).length > 0, "Empty name");
+            require(bytes(_categories[i].categoryURI).length > 0, "Empty URI");
+            
+            uint256 categoryId = ++categoryCount;
+            categoryIds[i] = categoryId;
+            
+            ticketCategories[categoryId] = TicketCategory({
+                name: _categories[i].name,
+                price: _categories[i].price,
+                maxSupply: _categories[i].maxSupply,
+                sold: 0,
+                isActive: true,
+                categoryURI: _categories[i].categoryURI
+            });
+            
+            emit CategoryAdded(categoryId, _categories[i].name, _categories[i].price, _categories[i].categoryURI);
+        }
+        
+        emit CategoriesAdded(categoryIds, _categories.length);
+        return categoryIds;
+    }
+
+    // Legacy function for backward compatibility (single category)
     function addTicketCategory(
         string memory _name,
         uint256 _price,
-        uint256 _maxSupply
+        uint256 _maxSupply,
+        string memory _categoryURI
     ) external onlyOrganizer returns (uint256) {
         require(_price > 0, "Invalid price");
+        require(bytes(_name).length > 0, "Empty name");
+        require(bytes(_categoryURI).length > 0, "Empty URI");
         
         uint256 categoryId = ++categoryCount;
         
@@ -192,10 +238,11 @@ contract EventContract is Ownable, ReentrancyGuard {
             price: _price,
             maxSupply: _maxSupply,
             sold: 0,
-            isActive: true
+            isActive: true,
+            categoryURI: _categoryURI
         });
         
-        emit CategoryAdded(categoryId, _name, _price);
+        emit CategoryAdded(categoryId, _name, _price, _categoryURI);
         return categoryId;
     }
     
@@ -267,6 +314,19 @@ contract EventContract is Ownable, ReentrancyGuard {
     
     function getTicketCategory(uint256 _categoryId) external view returns (TicketCategory memory) {
         return ticketCategories[_categoryId];
+    }
+    
+    function getCategoryURI(uint256 _categoryId) external view returns (string memory) {
+        require(_categoryId > 0 && _categoryId <= categoryCount, "Invalid category ID");
+        return ticketCategories[_categoryId].categoryURI;
+    }
+    
+    function getAllCategories() external view returns (TicketCategory[] memory) {
+        TicketCategory[] memory categories = new TicketCategory[](categoryCount);
+        for (uint256 i = 1; i <= categoryCount; i++) {
+            categories[i-1] = ticketCategories[i];
+        }
+        return categories;
     }
     
     function isTicketAvailable(uint256 quantity) external view returns (bool) {

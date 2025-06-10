@@ -114,12 +114,15 @@ export interface CreateEventParams {
   description: string;
   ticketPrice: string; // In ETH
   maxTickets: string;
-  eventURI: string;
   eventStartTime: string; // ISO date string
   eventEndTime: string; // ISO date string
   venue: string;
+  country: string;
+  state: string;
+  city: string;
   nftName: string;
   nftSymbol: string;
+  eventImages: File[];
 }
 
 /**
@@ -144,9 +147,12 @@ export function validateEventForm(
     eventStartTime,
     eventEndTime,
     venue,
-    eventURI,
+    country,
+    state,
+    city,
     nftName,
     nftSymbol,
+    eventImages,
   } = formData;
 
   // Required field validation
@@ -154,11 +160,14 @@ export function validateEventForm(
   if (!description.trim())
     return { isValid: false, error: 'Description is required' };
   if (!venue.trim()) return { isValid: false, error: 'Venue is required' };
-  if (!eventURI.trim())
-    return { isValid: false, error: 'Event URI is required' };
+  if (!country.trim()) return { isValid: false, error: 'Country is required' };
+  if (!state.trim()) return { isValid: false, error: 'State is required' };
+  if (!city.trim()) return { isValid: false, error: 'City is required' };
   if (!nftName.trim()) return { isValid: false, error: 'NFT name is required' };
   if (!nftSymbol.trim())
     return { isValid: false, error: 'NFT symbol is required' };
+  if (!eventImages || eventImages.length === 0)
+    return { isValid: false, error: 'At least one event image is required' };
 
   // NFT symbol validation (should be uppercase, 3-5 characters)
   if (!/^[A-Z]{2,10}$/.test(nftSymbol.trim())) {
@@ -199,13 +208,6 @@ export function validateEventForm(
 
   if (isNaN(maxTicketsNum) || maxTicketsNum <= 0) {
     return { isValid: false, error: 'Max tickets must be a positive integer' };
-  }
-
-  // URL validation for eventURI
-  try {
-    new URL(eventURI);
-  } catch {
-    return { isValid: false, error: 'Event URI must be a valid URL' };
   }
 
   return { isValid: true };
