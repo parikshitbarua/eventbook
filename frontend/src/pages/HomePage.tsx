@@ -47,7 +47,7 @@ const HomePage = () => {
                   const metadata = await metadataResponse.json();
 
                   // If metadata has an image field (IPFS directory), fetch the first image
-                  if (metadata.image) {
+                  if (metadata.image !== '') {
                     firstImageUrl = await fetchFirstImageFromIPFS(
                       metadata.image,
                     );

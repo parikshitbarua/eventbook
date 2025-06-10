@@ -1,7 +1,13 @@
 import * as React from 'react';
-import { useState, useCallback } from 'react';
-import { useWriteContract } from 'wagmi';
-import { parseEther } from 'ethers';
+import { useState, useCallback, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  useWriteContract,
+  useWaitForTransactionReceipt,
+  useAccount,
+  useChainId,
+} from 'wagmi';
+import { parseEther, keccak256, toUtf8Bytes, Interface } from 'ethers';
 import { useDropzone } from 'react-dropzone';
 import {
   CONTRACT_CONFIG,
@@ -12,6 +18,8 @@ import {
   locationData,
   getStatesForCountry,
   getCitiesForState,
+  type State,
+  type City,
 } from '../data/locations';
 import {
   uploadImagesToIPFSHelperUtil,
@@ -19,7 +27,20 @@ import {
 } from '../utils/ipfs-helper.util.ts';
 
 const NewEventPage = () => {
-  const { writeContractAsync, isPending } = useWriteContract();
+  const {
+    writeContractAsync,
+    isPending,
+    error: writeError,
+  } = useWriteContract();
+  const { address, isConnected } = useAccount();
+  const chainId = useChainId();
+  const navigate = useNavigate();
+  const [isUploading, setIsUploading] = useState(false);
+  const [buttonText, setButtonText] = useState('Create Event');
+  const [availableStates, setAvailableStates] = useState<State[]>([]);
+  const [availableCities, setAvailableCities] = useState<City[]>([]);
+  const [txHash, setTxHash] = useState<`0x${string}`>('0x');
+  const { data: receipt } = useWaitForTransactionReceipt({ hash: txHash });
 
   const [formData, setFormData] = useState<CreateEventParams>({
     title: '',
@@ -37,8 +58,115 @@ const NewEventPage = () => {
     eventImages: [],
   });
 
-  const [availableStates, setAvailableStates] = useState([]);
-  const [availableCities, setAvailableCities] = useState([]);
+  // Log write errors from wagmi
+  useEffect(() => {
+    if (writeError) {
+      console.error('Wagmi write error:', writeError);
+    }
+  }, [writeError]);
+
+  useEffect(() => {
+    if (receipt?.logs && receipt.logs.length > 0) {
+      // Calculate the correct EventCreated event topic hash
+      // EventCreated(uint256 eventId, address organizer, address eventContract, address nftContract, string title)
+      const eventCreatedSignature =
+        'EventCreated(uint256,address,address,address,string)';
+      const eventCreatedTopic = keccak256(toUtf8Bytes(eventCreatedSignature));
+
+      console.log('Looking for EventCreated topic:', eventCreatedTopic);
+
+      // Look for EventCreated event in logs
+      const eventCreatedLog = receipt.logs.find(
+        (log) =>
+          log.topics &&
+          log.topics.length > 0 &&
+          log.topics[0] === eventCreatedTopic,
+      );
+
+      if (eventCreatedLog) {
+        console.log('🎉 Event Created Successfully!');
+        console.log('Event Created Log:', eventCreatedLog);
+
+        try {
+          // Try different event signature variations to match your contract
+          const eventSignatures = [
+            'event EventCreated(uint256 indexed eventId, address indexed organizer, address eventContract, address nftContract, string title)',
+            'event EventCreated(uint256 eventId, address organizer, address eventContract, address nftContract, string title)',
+            'event EventCreated(uint256 indexed eventId, address organizer, address eventContract, address nftContract, string title)',
+          ];
+
+          let parsedLog = null;
+
+          for (const signature of eventSignatures) {
+            try {
+              const eventInterface = new Interface([signature]);
+              parsedLog = eventInterface.parseLog({
+                topics: eventCreatedLog.topics,
+                data: eventCreatedLog.data,
+              });
+              console.log('Successfully parsed with signature:', signature);
+              break;
+            } catch (error) {
+              console.log('Failed with signature:', error);
+              continue;
+            }
+          }
+
+          if (parsedLog) {
+            const { eventId, organizer, eventContract, nftContract, title } =
+              parsedLog.args;
+
+            console.log('Decoded Event Data:');
+            console.log('Event ID:', eventId.toString());
+            console.log('Organizer:', organizer);
+            console.log('Event Contract:', eventContract);
+            console.log('NFT Contract:', nftContract);
+            console.log('Title:', title);
+
+            // Navigate to add-tickets with contract addresses
+            navigate('/add-tickets', {
+              state: {
+                eventId: eventId.toString(),
+                organizer: organizer,
+                eventContract: eventContract,
+                nftContract: nftContract,
+                transactionHash: receipt.transactionHash,
+                eventTitle: formData.title,
+                eventDescription: formData.description,
+                receipt: receipt,
+                eventCreatedLog: eventCreatedLog,
+              },
+            });
+          } else {
+            throw new Error(
+              'Failed to parse EventCreated log with any known signature',
+            );
+          }
+        } catch (decodeError) {
+          console.error('Error decoding EventCreated log:', decodeError);
+          console.log('Raw log data:', eventCreatedLog.data);
+
+          // Fallback navigation without decoded data
+          navigate('/add-tickets', {
+            state: {
+              transactionHash: receipt.transactionHash,
+              eventTitle: formData.title,
+              eventDescription: formData.description,
+              receipt: receipt,
+              eventCreatedLog: eventCreatedLog,
+              error: 'Could not decode contract addresses',
+            },
+          });
+        }
+      } else {
+        console.log('EventCreated event not found in logs');
+        console.log(
+          'Available topics:',
+          receipt.logs.map((log) => log.topics?.[0]).filter(Boolean),
+        );
+      }
+    }
+  }, [receipt, navigate, formData.title, formData.description]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -105,11 +233,24 @@ const NewEventPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (isPending) return;
+    if (isPending || isUploading) return;
+
+    // Check wallet connection first
+    if (!isConnected || !address) {
+      alert('Please connect your wallet before creating an event');
+      return;
+    }
+
+    console.log('Wallet connected:', { address, chainId, isConnected });
+
+    setIsUploading(true);
+    setButtonText('Uploading Images');
 
     // Validate form data
     const validation = validateEventForm(formData);
     if (!validation.isValid) {
+      setIsUploading(false);
+      setButtonText('Create Event');
       alert(validation.error);
       return;
     }
@@ -130,14 +271,17 @@ const NewEventPage = () => {
     } = formData;
 
     try {
-      const imageDirectoryCID = await uploadImagesToIPFSHelperUtil(
-        formData.eventImages,
-      );
-      if (!imageDirectoryCID) {
-        alert('Failed to upload images. Please try again.');
-        return;
+      let imageDirectoryCID: string | undefined;
+      if (formData.eventImages && formData.eventImages.length > 0) {
+        imageDirectoryCID = await uploadImagesToIPFSHelperUtil(
+          formData.eventImages,
+        );
+        if (!imageDirectoryCID) {
+          alert('Failed to upload images. Please try again.');
+          return;
+        }
       }
-
+      setButtonText('Uploading Event Data');
       const eventURI = await createEventURIHelper(
         title,
         description,
@@ -145,7 +289,7 @@ const NewEventPage = () => {
         city,
         state,
         venue,
-        imageDirectoryCID,
+        imageDirectoryCID || '',
       );
       // Convert dates to Unix timestamps
       const startTimestamp = Math.floor(
@@ -153,7 +297,23 @@ const NewEventPage = () => {
       );
       const endTimestamp = Math.floor(new Date(eventEndTime).getTime() / 1000);
 
-      const tx = await writeContractAsync({
+      console.log('Contract Config:', CONTRACT_CONFIG);
+      console.log('Transaction Args:', {
+        title,
+        description,
+        ticketPrice: parseEther(ticketPrice).toString(),
+        maxTickets,
+        eventURI: eventURI || '',
+        startTimestamp,
+        endTimestamp,
+        venue,
+        nftName,
+        nftSymbol,
+      });
+
+      setButtonText('Creating Event');
+      console.log('Calling writeContractAsync...');
+      const tx = writeContractAsync({
         address: CONTRACT_CONFIG.address,
         abi: CONTRACT_CONFIG.abi,
         functionName: 'createEvent',
@@ -170,30 +330,15 @@ const NewEventPage = () => {
           nftSymbol,
         ],
       });
-
       console.log('Transaction successful:', tx);
-
-      // Reset form after successful submission
-      setFormData({
-        title: '',
-        description: '',
-        ticketPrice: '',
-        maxTickets: '',
-        eventStartTime: '',
-        eventEndTime: '',
-        venue: '',
-        country: '',
-        state: '',
-        city: '',
-        nftName: '',
-        nftSymbol: '',
-        eventImages: [],
-      });
-
+      setTxHash(tx as `0x${string}`);
       alert('Event created successfully!');
     } catch (err) {
       console.error('Contract call failed:', err);
-      alert('Failed to create event. Please try again.');
+      console.error('Error details:', err);
+    } finally {
+      setIsUploading(false);
+      setButtonText('Create Event');
     }
   };
 
@@ -207,6 +352,28 @@ const NewEventPage = () => {
           <p className="mt-4 text-xl text-gray-600">
             Fill in the details to create your blockchain-powered event
           </p>
+
+          {/* Wallet Connection Status (Debug) */}
+          <div className="mt-4 p-4 bg-gray-100 rounded-lg text-sm text-left max-w-md mx-auto">
+            <h3 className="font-medium mb-2">Wallet Status:</h3>
+            <p>
+              <strong>Connected:</strong> {isConnected ? '✅ Yes' : '❌ No'}
+            </p>
+            <p>
+              <strong>Address:</strong> {address || 'Not connected'}
+            </p>
+            <p>
+              <strong>Chain ID:</strong> {chainId}
+            </p>
+            <p>
+              <strong>Contract Address:</strong> {CONTRACT_CONFIG.address}
+            </p>
+            {writeError && (
+              <p className="text-red-600">
+                <strong>Error:</strong> {writeError.message}
+              </p>
+            )}
+          </div>
         </div>
 
         <form
@@ -538,10 +705,10 @@ const NewEventPage = () => {
             <div className="mt-12 pt-8 border-t border-gray-200 flex justify-end">
               <button
                 type="submit"
-                disabled={isPending}
+                disabled={isPending || isUploading}
                 className="bg-gradient-to-r from-red-600 to-red-700 text-white py-3 px-8 rounded-xl font-semibold hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
               >
-                {isPending ? (
+                {isPending || isUploading ? (
                   <div className="flex items-center justify-center">
                     <svg
                       className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
@@ -563,7 +730,7 @@ const NewEventPage = () => {
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                       ></path>
                     </svg>
-                    Creating Event...
+                    {buttonText}
                   </div>
                 ) : (
                   'Create Event'

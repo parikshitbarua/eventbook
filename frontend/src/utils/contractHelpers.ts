@@ -152,7 +152,6 @@ export function validateEventForm(
     city,
     nftName,
     nftSymbol,
-    eventImages,
   } = formData;
 
   // Required field validation
@@ -166,8 +165,8 @@ export function validateEventForm(
   if (!nftName.trim()) return { isValid: false, error: 'NFT name is required' };
   if (!nftSymbol.trim())
     return { isValid: false, error: 'NFT symbol is required' };
-  if (!eventImages || eventImages.length === 0)
-    return { isValid: false, error: 'At least one event image is required' };
+  // if (!eventImages || eventImages.length === 0)
+  //   return { isValid: false, error: 'At least one event image is required' };
 
   // NFT symbol validation (should be uppercase, 3-5 characters)
   if (!/^[A-Z]{2,10}$/.test(nftSymbol.trim())) {
