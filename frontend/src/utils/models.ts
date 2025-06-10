@@ -16,4 +16,5 @@ export interface EventData {
   eventContract: `0x${string}`;
   nftContract: `0x${string}`;
   totalRevenue: bigint;
+  eventImages: string;
 }
