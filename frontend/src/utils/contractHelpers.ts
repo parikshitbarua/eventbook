@@ -1,8 +1,10 @@
-import { JsonRpcProvider, Contract } from 'ethers';
+import { JsonRpcProvider, Contract, Signer } from 'ethers';
 import type { EventFactoryContract } from '../types/contracts';
 import EventFactoryABI from '../contracts/EventFactory.sol/EventFactory.json';
 
-const FACTORY_ADDRESS = '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512';
+const FACTORY_ADDRESS =
+  import.meta.env.FACTORY_ADDRESS ||
+  '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512';
 const RPC_URL = 'http://127.0.0.1:8545';
 
 /**
@@ -21,7 +23,7 @@ export function getEventFactoryContract(): EventFactoryContract {
  * Get an instance of the EventFactory contract with a signer for transactions
  */
 export function getEventFactoryContractWithSigner(
-  signer,
+  signer: Signer,
 ): EventFactoryContract {
   return new Contract(
     FACTORY_ADDRESS,

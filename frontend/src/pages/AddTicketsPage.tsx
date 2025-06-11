@@ -2,11 +2,15 @@ import * as React from 'react';
 import { useState, useCallback, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
+import { useWriteContract, useAccount } from 'wagmi';
+import { parseEther } from 'ethers';
+import Confetti from 'react-confetti';
 import type { AddTicketsNavigationState } from '../types/navigation';
 import {
   uploadImageToIPFSHelperUtil,
   createTicketURIHelperUtil,
 } from '../utils/ipfs-helper.util.ts';
+import EventContractABI from '../contracts/EventContract.sol/EventContract.json';
 
 interface TicketCategory {
   id: string;
@@ -17,18 +21,13 @@ interface TicketCategory {
   image?: File;
 }
 
-interface TicketCategoryInput {
-  name: string;
-  price: string;
-  maxSupply: string;
-  categoryURI: string;
-}
-
 type TicketType = 'single' | 'multi';
 
 const AddTicketsPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { writeContractAsync } = useWriteContract();
+  const { address, isConnected } = useAccount();
 
   // Get the navigation state with contract addresses and event details
   const navigationState = location.state as AddTicketsNavigationState | null;
@@ -43,15 +42,26 @@ const AddTicketsPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [buttonText, setButtonText] = useState('Add Ticket Categories');
 
-  // Single ticket form state
-  // const [singleTicket, setSingleTicket] = useState({
-  //   name: '',
-  //   description: '',
-  //   price: '',
-  //   maxSupply: '',
-  //   seatNumber: '',
-  //   image: null as File | null
-  // });
+  // Success state management
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [windowDimensions, setWindowDimensions] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+
+  // Update window dimensions for confetti
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Category management functions
   const addCategory = () => {
@@ -95,50 +105,117 @@ const AddTicketsPage = () => {
   };
 
   const handleTicketCategoriesAdded = async () => {
-    const categoryInputs: TicketCategoryInput[] = [];
     try {
       setIsSubmitting(true);
-      // TODO: Implement ticket configuration save logic
+
+      // Check wallet connection
+      if (!isConnected || !address) {
+        alert('Please connect your wallet to add ticket categories');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Check if we have an event contract address
+      if (!navigationState?.eventContract) {
+        alert('Event contract address not found');
+        setIsSubmitting(false);
+        return;
+      }
+
       if (ticketType === 'multi') {
         if (categories.length === 0) {
           alert('Please add at least one ticket category');
+          setIsSubmitting(false);
           return;
         }
-        categories.map(async (category) => {
-          let imageURI;
-          if (category.image) {
-            setButtonText('Uploading Ticket Images');
-            imageURI = await uploadImageToIPFSHelperUtil(category.image);
-          } else {
-            imageURI =
-              'https://static.vecteezy.com/system/resources/previews/002/779/812/non_2x/cartoon-illustration-of-ticket-free-vector.jpg';
-          }
-          const ticketMetadata = {
-            name: category.name,
-            description: category.description,
-            image: imageURI,
-            price: category.price,
-            maxSupply: category.maxSupply,
-            admits: 1,
-          };
-          setButtonText('Creating Ticket Metadata');
-          const ticketURI = await createTicketURIHelperUtil(ticketMetadata);
-          if (!ticketURI) {
-            alert('Failed to create ticket URI');
-            return;
-          }
-          categoryInputs.push({
-            name: category.name,
-            price: category.price,
-            maxSupply: category.maxSupply,
-            categoryURI: ticketURI,
+
+        // Process all categories using Promise.all to handle async operations properly
+        const processedCategories = await Promise.all(
+          categories.map(async (category) => {
+            let imageURI;
+            if (category.image) {
+              setButtonText('Uploading Ticket Images');
+              const imageCID = await uploadImageToIPFSHelperUtil(
+                category.image,
+              );
+              imageURI = `https://${imageCID}.ipfs.w3s.link`;
+            } else {
+              imageURI =
+                'https://static.vecteezy.com/system/resources/previews/002/779/812/non_2x/cartoon-illustration-of-ticket-free-vector.jpg';
+            }
+
+            const ticketMetadata = {
+              name: category.name,
+              description: category.description,
+              image: imageURI,
+              price: category.price,
+              maxSupply: category.maxSupply,
+              admits: 1,
+            };
+
+            setButtonText('Generating Ticket Metadata');
+            const ticketURI = await createTicketURIHelperUtil(ticketMetadata);
+            if (!ticketURI) {
+              throw new Error(
+                `Failed to create ticket URI for category: ${category.name}`,
+              );
+            }
+
+            return {
+              name: category.name,
+              price: parseEther(category.price), // Convert ETH string to Wei
+              maxSupply: BigInt(category.maxSupply),
+              categoryURI: ticketURI,
+            };
+          }),
+        );
+
+        setButtonText('Storing Ticket Details');
+
+        // Call the smart contract
+        try {
+          const result = await writeContractAsync({
+            address: navigationState.eventContract as `0x${string}`,
+            abi: EventContractABI.abi,
+            functionName: 'addTicketCategories',
+            args: [processedCategories],
           });
-        });
-        console.log(categoryInputs);
+
+          console.log('Transaction hash:', result);
+          setButtonText('Transaction Submitted');
+
+          // Show confetti and success dialog
+          setShowConfetti(true);
+          setShowSuccessDialog(true);
+
+          // Stop confetti after 5 seconds
+          setTimeout(() => {
+            setShowConfetti(false);
+          }, 5000);
+        } catch (contractError) {
+          console.error('Contract call failed:', contractError);
+          const errorMessage =
+            contractError instanceof Error
+              ? contractError.message
+              : 'Unknown contract error';
+          alert(`Failed to add ticket categories: ${errorMessage}`);
+        }
+      } else {
+        // For single ticket type, show success immediately
+        setShowConfetti(true);
+        setShowSuccessDialog(true);
+        setTimeout(() => {
+          setShowConfetti(false);
+        }, 5000);
       }
     } catch (error) {
-      console.log(error);
-      return;
+      console.error('Error processing categories:', error);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error occurred';
+      alert(`Error processing categories: ${errorMessage}`);
+    } finally {
+      setIsSubmitting(false);
+      setButtonText('Add Ticket Categories');
     }
   };
 
@@ -207,22 +284,25 @@ const AddTicketsPage = () => {
                   required
                 />
               </div>
-
-              {/* Description */}
-              {/*<div>*/}
-              {/*  <label className="block text-sm font-medium text-gray-700 mb-2">*/}
-              {/*    Description **/}
-              {/*  </label>*/}
-              {/*  <textarea*/}
-              {/*    value={formData.description}*/}
-              {/*    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}*/}
-              {/*    rows={3}*/}
-              {/*    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"*/}
-              {/*    placeholder="Describe what this ticket category includes..."*/}
-              {/*    required*/}
-              {/*  />*/}
-              {/*</div>*/}
-
+              Description
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description *
+                </label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                  }
+                  rows={3}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  placeholder="Describe what this ticket category includes..."
+                  required
+                />
+              </div>
               {/* Price and Supply */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -265,7 +345,6 @@ const AddTicketsPage = () => {
                   />
                 </div>
               </div>
-
               {/* Optional Seat Number */}
               {/*<div>*/}
               {/*  <label className="block text-sm font-medium text-gray-700 mb-2">*/}
@@ -279,7 +358,6 @@ const AddTicketsPage = () => {
               {/*    placeholder="e.g., A1-A50, General Admission"*/}
               {/*  />*/}
               {/*</div>*/}
-
               {/* Image Upload */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -360,6 +438,50 @@ const AddTicketsPage = () => {
       </div>
     );
   };
+
+  // Success Dialog Component
+  const SuccessDialog = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
+      <div className="bg-white rounded-2xl max-w-md w-full p-8 text-center">
+        {/* Success Icon */}
+        <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6">
+          <svg
+            className="w-8 h-8 text-red-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+        </div>
+
+        {/* Success Message */}
+        <h3 className="text-2xl font-bold text-gray-900 mb-2">
+          Event Has Been Successfully Created! 🎉
+        </h3>
+        <p className="text-gray-600 mb-8">
+          Your event tickets have been added to the blockchain and are ready for
+          sale.
+        </p>
+
+        {/* Action Button */}
+        <button
+          onClick={() => {
+            setShowSuccessDialog(false);
+            navigate('/');
+          }}
+          className="w-full px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors font-medium"
+        >
+          Continue to Home
+        </button>
+      </div>
+    </div>
+  );
 
   // If no state was passed, redirect back to create event
   useEffect(() => {
@@ -726,8 +848,13 @@ const AddTicketsPage = () => {
             Back
           </button>
           <button
-            onClick={() => handleTicketCategoriesAdded}
-            className="px-8 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors font-medium"
+            disabled={isSubmitting}
+            onClick={handleTicketCategoriesAdded}
+            className={`px-8 py-3 rounded-xl transition-colors font-medium ${
+              isSubmitting
+                ? 'bg-red-400 text-gray-200 cursor-not-allowed'
+                : 'bg-red-600 text-white hover:bg-red-700'
+            }`}
           >
             {isSubmitting ? (
               <div className="flex items-center justify-center">
@@ -771,6 +898,17 @@ const AddTicketsPage = () => {
           }}
         />
       )}
+
+      {/* Confetti */}
+      {showConfetti && (
+        <Confetti
+          width={windowDimensions.width}
+          height={windowDimensions.height}
+        />
+      )}
+
+      {/* Success Dialog */}
+      {showSuccessDialog && <SuccessDialog />}
     </div>
   );
 };

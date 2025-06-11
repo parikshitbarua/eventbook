@@ -1,5 +1,5 @@
-import * as React from 'react';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { JsonRpcProvider, Contract } from 'ethers';
 import type { EventData } from '../utils/models';
 import type { EventFactoryContract } from '../types/contracts';
@@ -17,6 +17,7 @@ const HomePage = () => {
   const [selectedEvent, setSelectedEvent] = useState<EventData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchData() {
@@ -98,15 +99,19 @@ const HomePage = () => {
     fetchData();
   }, []);
 
-  const handlePurchase = async (quantity: number) => {
+  const handlePurchase = async (quantity: number, categoryId?: number) => {
     if (!selectedEvent) return;
 
     try {
-      console.log('Purchasing tickets for event:', quantity);
+      console.log('Purchasing tickets for event:', {
+        quantity,
+        categoryId,
+        eventId: selectedEvent.eventId,
+      });
       // const provider = new JsonRpcProvider('http://127.0.0.1:8545');
       //
-      // // TODO: Implement the actual purchase logic here
-      // console.log(`Purchasing ${quantity} tickets for event ${selectedEvent.eventId}`);
+      // TODO: Implement the actual purchase logic here
+      // console.log(`Purchasing ${quantity} tickets for event ${selectedEvent.eventId} ${categoryId ? `category ${categoryId}` : ''}`);
     } catch (error) {
       console.error('Purchase failed:', error);
       throw error;
@@ -203,7 +208,8 @@ const HomePage = () => {
           {allEvents.map((event) => (
             <div
               key={event.eventId}
-              className="bg-white shadow-lg rounded-2xl overflow-hidden border border-gray-200 hover:shadow-xl transition-transform duration-500 ease-in-out hover:scale-105"
+              className="bg-white shadow-lg rounded-2xl overflow-hidden border border-gray-200 hover:shadow-xl transition-transform duration-500 ease-in-out hover:scale-105 cursor-pointer"
+              onClick={() => navigate(`/event/${event.eventId}`)}
             >
               <div className="relative">
                 <img
@@ -235,7 +241,8 @@ const HomePage = () => {
                   </span>
                   <button
                     className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium"
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent card click event
                       setSelectedEvent(event);
                       setIsModalOpen(true);
                     }}

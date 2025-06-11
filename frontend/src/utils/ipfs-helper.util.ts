@@ -1,4 +1,24 @@
 import { create } from '@web3-storage/w3up-client';
+
+interface TicketMetadataInput {
+  name: string;
+  description: string;
+  image: string;
+  price: string;
+  maxSupply: string;
+  admits: number;
+}
+
+interface EventMetadataInput {
+  name: string;
+  description: string;
+  country: string;
+  city: string;
+  state: string;
+  venue: string;
+  image: string;
+}
+
 export const uploadImagesToIPFSHelperUtil = async (files: File[]) => {
   try {
     if (files.length < 1) return undefined;
@@ -42,7 +62,7 @@ export const createEventURIHelper = async (
     await client.setCurrentSpace(import.meta.env.VITE_WEB3STORAGE_SPACE);
 
     // Create metadata object
-    const metadata = {
+    const metadata: EventMetadataInput = {
       name: title,
       description,
       country,
@@ -70,7 +90,9 @@ export const createEventURIHelper = async (
   }
 };
 
-export const createTicketURIHelperUtil = async (ticketMetadata) => {
+export const createTicketURIHelperUtil = async (
+  ticketMetadata: TicketMetadataInput,
+) => {
   try {
     const client = await create();
     await client.setCurrentSpace(import.meta.env.VITE_WEB3STORAGE_SPACE);
@@ -89,17 +111,16 @@ export const createTicketURIHelperUtil = async (ticketMetadata) => {
   }
 };
 
-const makeJsonFile = (filename: string, data): File => {
-  // Create a JSON blob from the data
+const makeJsonFile = (
+  filename: string,
+  data: TicketMetadataInput | EventMetadataInput,
+): File => {
   const blob = new Blob([JSON.stringify(data, null, 2)], {
     type: 'application/json',
   });
-
-  // Return a single File object
   return new File([blob], `${filename}.json`, { type: 'application/json' });
 };
 
-// Helper function to fetch the first image from an IPFS directory
 export const fetchFirstImageFromIPFS = async (
   ipfsDirectoryUrl: string,
 ): Promise<string | null> => {
@@ -139,12 +160,12 @@ export const fetchFirstImageFromIPFS = async (
             return decodeURIComponent(url);
           }
           const fileName = url.split('/').pop();
+          if (!fileName) return null;
           // Otherwise, construct the full URL
           return `${ipfsDirectoryUrl}/${decodeURIComponent(fileName)}`;
         }
       }
     }
-
     return null;
   } catch (error) {
     console.error('Error fetching first image from IPFS:', error);

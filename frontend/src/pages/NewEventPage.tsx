@@ -5,7 +5,6 @@ import {
   useWriteContract,
   useWaitForTransactionReceipt,
   useAccount,
-  useChainId,
 } from 'wagmi';
 import { parseEther, keccak256, toUtf8Bytes, Interface } from 'ethers';
 import { useDropzone } from 'react-dropzone';
@@ -33,7 +32,6 @@ const NewEventPage = () => {
     error: writeError,
   } = useWriteContract();
   const { address, isConnected } = useAccount();
-  const chainId = useChainId();
   const navigate = useNavigate();
   const [isUploading, setIsUploading] = useState(false);
   const [buttonText, setButtonText] = useState('Create Event');
@@ -241,8 +239,6 @@ const NewEventPage = () => {
       return;
     }
 
-    console.log('Wallet connected:', { address, chainId, isConnected });
-
     setIsUploading(true);
     setButtonText('Uploading Images');
 
@@ -313,7 +309,7 @@ const NewEventPage = () => {
 
       setButtonText('Creating Event');
       console.log('Calling writeContractAsync...');
-      const tx = writeContractAsync({
+      const tx = await writeContractAsync({
         address: CONTRACT_CONFIG.address,
         abi: CONTRACT_CONFIG.abi,
         functionName: 'createEvent',
@@ -354,26 +350,26 @@ const NewEventPage = () => {
           </p>
 
           {/* Wallet Connection Status (Debug) */}
-          <div className="mt-4 p-4 bg-gray-100 rounded-lg text-sm text-left max-w-md mx-auto">
-            <h3 className="font-medium mb-2">Wallet Status:</h3>
-            <p>
-              <strong>Connected:</strong> {isConnected ? '✅ Yes' : '❌ No'}
-            </p>
-            <p>
-              <strong>Address:</strong> {address || 'Not connected'}
-            </p>
-            <p>
-              <strong>Chain ID:</strong> {chainId}
-            </p>
-            <p>
-              <strong>Contract Address:</strong> {CONTRACT_CONFIG.address}
-            </p>
-            {writeError && (
-              <p className="text-red-600">
-                <strong>Error:</strong> {writeError.message}
-              </p>
-            )}
-          </div>
+          {/*<div className="mt-4 p-4 bg-gray-100 rounded-lg text-sm text-left max-w-md mx-auto">*/}
+          {/*  <h3 className="font-medium mb-2">Wallet Status:</h3>*/}
+          {/*  <p>*/}
+          {/*    <strong>Connected:</strong> {isConnected ? '✅ Yes' : '❌ No'}*/}
+          {/*  </p>*/}
+          {/*  <p>*/}
+          {/*    <strong>Address:</strong> {address || 'Not connected'}*/}
+          {/*  </p>*/}
+          {/*  <p>*/}
+          {/*    <strong>Chain ID:</strong> {chainId}*/}
+          {/*  </p>*/}
+          {/*  <p>*/}
+          {/*    <strong>Contract Address:</strong> {CONTRACT_CONFIG.address}*/}
+          {/*  </p>*/}
+          {/*  {writeError && (*/}
+          {/*    <p className="text-red-600">*/}
+          {/*      <strong>Error:</strong> {writeError.message}*/}
+          {/*    </p>*/}
+          {/*  )}*/}
+          {/*</div>*/}
         </div>
 
         <form

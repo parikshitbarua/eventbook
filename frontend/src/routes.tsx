@@ -3,6 +3,7 @@ import Layout from './components/Layout.tsx';
 import NewEventPage from './pages/NewEventPage.tsx';
 import HomePage from './pages/HomePage.tsx';
 import AddTicketsPage from './pages/AddTicketsPage.tsx';
+import EventDetailsPage from './pages/EventDetailsPage.tsx';
 
 const router = createBrowserRouter([
   {
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
       {
         path: '/add-tickets',
         element: <AddTicketsPage />,
+      },
+      {
+        path: '/event/:eventId',
+        element: <EventDetailsPage />,
       },
     ],
   },
