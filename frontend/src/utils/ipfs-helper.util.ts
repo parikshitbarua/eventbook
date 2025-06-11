@@ -1,12 +1,47 @@
 import { create } from '@web3-storage/w3up-client';
+
+interface TicketMetadataInput {
+  name: string;
+  description: string;
+  image: string;
+  price: string;
+  maxSupply: string;
+  admits: number;
+}
+
+interface EventMetadataInput {
+  name: string;
+  description: string;
+  country: string;
+  city: string;
+  state: string;
+  venue: string;
+  image: string;
+}
+
 export const uploadImagesToIPFSHelperUtil = async (files: File[]) => {
   try {
     if (files.length < 1) return undefined;
     const client = await create();
+    await client.login('parikshitb04@gmail.com');
     await client.setCurrentSpace(import.meta.env.VITE_WEB3STORAGE_SPACE);
     const imageDirectoryCID = await client.uploadDirectory(files);
     console.log('Image directory CID:', imageDirectoryCID.toString());
     return imageDirectoryCID.toString(); // Convert CID object to string
+  } catch (error) {
+    console.log('Error uploading files', error);
+    return undefined;
+  }
+};
+
+export const uploadImageToIPFSHelperUtil = async (file: File) => {
+  try {
+    const client = await create();
+    // await client.login('parikshitb04@gmail.com');
+    await client.setCurrentSpace(import.meta.env.VITE_WEB3STORAGE_SPACE);
+    const imageCID = await client.uploadFile(file);
+    console.log('Image directory CID:', imageCID.toString());
+    return imageCID.toString(); // Convert CID object to string
   } catch (error) {
     console.log('Error uploading files', error);
     return undefined;
@@ -27,7 +62,7 @@ export const createEventURIHelper = async (
     await client.setCurrentSpace(import.meta.env.VITE_WEB3STORAGE_SPACE);
 
     // Create metadata object
-    const metadata = {
+    const metadata: EventMetadataInput = {
       name: title,
       description,
       country,
@@ -43,7 +78,7 @@ export const createEventURIHelper = async (
     const jsonFile = makeJsonFile('event-metadata', metadata);
 
     // Upload the file to web3.storage
-    const eventURICID = await client.uploadFile(jsonFile);
+    const eventURICID = await client.uploadFile(jsonFile as Blob);
 
     console.log('Event metadata CID:', eventURICID);
 
@@ -55,17 +90,37 @@ export const createEventURIHelper = async (
   }
 };
 
-function makeJsonFile(filename: string, data): File {
-  // Create a JSON blob from the data
+export const createTicketURIHelperUtil = async (
+  ticketMetadata: TicketMetadataInput,
+) => {
+  try {
+    const client = await create();
+    await client.setCurrentSpace(import.meta.env.VITE_WEB3STORAGE_SPACE);
+    // Create a single JSON file
+    const jsonFile = makeJsonFile('event-metadata', ticketMetadata);
+
+    // Upload the file to web3.storage
+    const ticketURICID = await client.uploadFile(jsonFile as Blob);
+
+    console.log('Event metadata CID:', ticketURICID);
+
+    // Return the IPFS URL
+    return `https://${ticketURICID.toString()}.ipfs.w3s.link`;
+  } catch (error) {
+    console.log('Error creating ticket URI', error);
+  }
+};
+
+const makeJsonFile = (
+  filename: string,
+  data: TicketMetadataInput | EventMetadataInput,
+): File => {
   const blob = new Blob([JSON.stringify(data, null, 2)], {
     type: 'application/json',
   });
-
-  // Return a single File object
   return new File([blob], `${filename}.json`, { type: 'application/json' });
-}
+};
 
-// Helper function to fetch the first image from an IPFS directory
 export const fetchFirstImageFromIPFS = async (
   ipfsDirectoryUrl: string,
 ): Promise<string | null> => {
@@ -105,12 +160,12 @@ export const fetchFirstImageFromIPFS = async (
             return decodeURIComponent(url);
           }
           const fileName = url.split('/').pop();
+          if (!fileName) return null;
           // Otherwise, construct the full URL
           return `${ipfsDirectoryUrl}/${decodeURIComponent(fileName)}`;
         }
       }
     }
-
     return null;
   } catch (error) {
     console.error('Error fetching first image from IPFS:', error);

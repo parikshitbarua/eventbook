@@ -58,6 +58,6 @@ export interface EventFactoryContract {
   ): Promise<ContractTransaction>;
 
   // Events (for listening to contract events)
-  on(event: string, listener: (...args) => void): void;
-  off(event: string, listener: (...args) => void): void;
+  on(event: string, listener: (...args: unknown[]) => void): void;
+  off(event: string, listener: (...args: unknown[]) => void): void;
 }
