@@ -22,13 +22,16 @@ library EventFactoryLib {
         uint256 eventEndTime,
         string memory venue,
         string memory nftName,
-        string memory nftSymbol
+        string memory nftSymbol,
+        uint256 eventId,
+        address factory
     ) external returns (address eventContract, address nftContract) {
         
         // Deploy EventContract
         eventContract = address(new EventContract(
             title, description, organizer, ticketPrice, maxTickets,
-            eventURI, eventStartTime, eventEndTime, venue
+            eventURI, eventStartTime, eventEndTime, venue,
+            eventId, factory
         ));
         
         // Deploy EventTicketNFT

@@ -86,9 +86,14 @@
           "type": "string[]"
         },
         {
-          "internalType": "uint256",
-          "name": "categoryId",
-          "type": "uint256"
+          "internalType": "uint256[]",
+          "name": "categoryIds",
+          "type": "uint256[]"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "quantities",
+          "type": "uint256[]"
         }
       ],
       "name": "batchMintTickets",
@@ -250,14 +255,14 @@
     {
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "quantity",
-          "type": "uint256"
+          "internalType": "uint256[]",
+          "name": "quantities",
+          "type": "uint256[]"
         },
         {
-          "internalType": "uint256",
-          "name": "categoryId",
-          "type": "uint256"
+          "internalType": "uint256[]",
+          "name": "categoryIds",
+          "type": "uint256[]"
         },
         {
           "internalType": "string[]",

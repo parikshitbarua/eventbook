@@ -3,6 +3,15 @@ import { Dialog, Transition } from '@headlessui/react';
 import { Contract, JsonRpcProvider, formatEther } from 'ethers';
 import type { EventData } from '../utils/models';
 import EventContractABI from '../contracts/EventContract.sol/EventContract.json';
+import {
+  createTicketURIHelperUtil,
+  fetchFirstImageFromIPFS,
+  TicketPurchaseInput,
+} from '../utils/ipfs-helper.util.ts';
+import {
+  purchaseSingleTicket,
+  purchaseCategoryTickets,
+} from '../utils/contractInteractions';
 
 interface TicketCategory {
   name: string;
@@ -23,14 +32,12 @@ interface TicketPurchaseModalProps {
   isOpen: boolean;
   onClose: () => void;
   event: EventData;
-  onPurchase: (quantity: number, categoryId?: number) => Promise<void>;
 }
 
 const TicketPurchaseModal = ({
   isOpen,
   onClose,
   event,
-  onPurchase,
 }: TicketPurchaseModalProps) => {
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -111,10 +118,18 @@ const TicketPurchaseModal = ({
 
   // Fetch categories when modal opens
   useEffect(() => {
+    console.log('event data', event);
     if (isOpen && event.eventContract) {
       fetchCategories();
     }
   }, [isOpen, event.eventContract, fetchCategories]);
+
+  useEffect(() => {
+    if (event) {
+      setCategories(event.categories || []);
+      setHasCategories(event.categories && event.categories.length > 0);
+    }
+  }, [event]);
 
   const updateCategoryQuantity = (
     categoryIndex: number,
@@ -137,7 +152,9 @@ const TicketPurchaseModal = ({
     return categorySelections.reduce((total, selection) => {
       if (selection.quantity > 0) {
         const category = categories[selection.categoryIndex];
-        return total + Number(formatEther(category.price)) * selection.quantity;
+        // Use BigInt for precise calculation
+        const priceInWei = category.price * BigInt(selection.quantity);
+        return total + Number(priceInWei) / 1e18;
       }
       return total;
     }, 0);
@@ -156,22 +173,150 @@ const TicketPurchaseModal = ({
       setIsLoading(true);
 
       if (!hasCategories) {
-        // Original single ticket purchase
-        await onPurchase(quantity);
+        // Single ticket purchase
+        const eventPrimaryImage = await fetchFirstImageFromIPFS(
+          event.eventImages,
+        );
+        const ticketMetadata: TicketPurchaseInput = {
+          description: event.title || 'eventbook',
+          external_url: `https://localhost:5173/event/${event.eventId}`,
+          image:
+            eventPrimaryImage ||
+            'https://static.vecteezy.com/system/resources/previews/002/779/812/non_2x/cartoon-illustration-of-ticket-free-vector.jpg',
+          name: event.title || 'eventbook',
+          attributes: [
+            {
+              trait_type: 'Ticket Type',
+              value: 'General Admission',
+            },
+            {
+              trait_type: 'Admits',
+              value: '1',
+            },
+          ],
+        };
+        const ticketURI = await createTicketURIHelperUtil(ticketMetadata);
+        if (!ticketURI) {
+          throw new Error('Failed to create ticket URI');
+        }
+
+        // Calculate total price in wei
+        if (!event.ticketPrice) {
+          throw new Error('Event ticket price not found');
+        }
+        if (!event.nftContract) {
+          throw new Error('NFT contract address not found');
+        }
+
+        // Log the contract address and price for verification
+        console.log('Using NFT Contract:', event.nftContract);
+        console.log('Ticket Price:', event.ticketPrice);
+        console.log('Quantity:', quantity);
+
+        const totalPriceInWei = BigInt(event.ticketPrice) * BigInt(quantity);
+        console.log('Total Price in Wei:', totalPriceInWei.toString());
+
+        // Call purchaseSingleTicket directly
+        const hash = await purchaseSingleTicket({
+          nftContractAddress: event.nftContract,
+          quantity,
+          tokenURI: ticketURI,
+          totalPrice: totalPriceInWei.toString(),
+        });
+
+        console.log('Single ticket purchase hash:', hash);
       } else {
-        // Category-based purchase - handle the first selected category for now
-        const selectedCategory = categorySelections.find((s) => s.quantity > 0);
-        if (selectedCategory) {
-          await onPurchase(
-            selectedCategory.quantity,
-            selectedCategory.categoryIndex + 1,
-          ); // Categories are 1-indexed in contract
+        // Category-based purchase
+        const selectedCategories = categorySelections.filter(
+          (s) => s.quantity > 0,
+        );
+        if (selectedCategories.length === 0) {
+          throw new Error('No tickets selected');
+        }
+
+        console.log('Starting ticket purchase process...');
+        console.log('Selected categories:', selectedCategories);
+
+        const quantities: number[] = [];
+        const categoryIds: number[] = [];
+        const tokenURIs: string[] = [];
+        let totalPriceInWei = 0n;
+
+        for (const selection of selectedCategories) {
+          console.log('Processing category selection:', selection);
+          const category = categories[selection.categoryIndex];
+          console.log('Category details:', category);
+
+          const eventPrimaryImage = category.image;
+          const ticketMetadata: TicketPurchaseInput = {
+            description: `${event.title} - ${category.name}`,
+            external_url: `https://localhost:5173/event/${event.eventId}`,
+            image:
+              eventPrimaryImage ||
+              'https://static.vecteezy.com/system/resources/previews/002/779/812/non_2x/cartoon-illustration-of-ticket-free-vector.jpg',
+            name: `${event.title} - ${category.name}`,
+            attributes: [
+              {
+                trait_type: 'Ticket Type',
+                value: category.name,
+              },
+              {
+                trait_type: 'Admits',
+                value: '1',
+              },
+            ],
+          };
+          console.log('Created ticket metadata:', ticketMetadata);
+
+          const ticketURI = await createTicketURIHelperUtil(ticketMetadata);
+          console.log('Generated ticket URI:', ticketURI);
+
+          if (!ticketURI) {
+            throw new Error('Failed to create ticket URI');
+          }
+
+          quantities.push(selection.quantity);
+          categoryIds.push(selection.categoryIndex + 1); // Categories are 1-indexed in contract
+          tokenURIs.push(ticketURI);
+          totalPriceInWei += category.price * BigInt(selection.quantity);
+
+          console.log('Updated purchase arrays:', {
+            quantities,
+            categoryIds,
+            tokenURIs,
+            totalPriceInWei: totalPriceInWei.toString(),
+          });
+        }
+
+        console.log('Final purchase parameters:', {
+          nftContractAddress: event.nftContract,
+          quantities,
+          categoryIds,
+          tokenURIs,
+          totalPrice: totalPriceInWei.toString(),
+        });
+
+        // Call purchaseCategoryTickets directly
+        try {
+          console.log('Calling purchaseCategoryTickets...');
+          const hash = await purchaseCategoryTickets({
+            nftContractAddress: event.nftContract,
+            quantities,
+            categoryIds,
+            tokenURIs,
+            totalPrice: totalPriceInWei.toString(),
+          });
+          console.log('Category tickets purchase successful! Hash:', hash);
+        } catch (error) {
+          console.error('Error in purchaseCategoryTickets:', error);
+          throw error;
         }
       }
 
       onClose();
     } catch (error) {
       console.error('Purchase failed:', error);
+      throw error;
     } finally {
       setIsLoading(false);
     }

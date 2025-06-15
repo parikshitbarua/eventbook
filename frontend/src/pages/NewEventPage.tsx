@@ -24,6 +24,7 @@ import {
   uploadImagesToIPFSHelperUtil,
   createEventURIHelper,
 } from '../utils/ipfs-helper.util.ts';
+import Confetti from 'react-confetti';
 
 const NewEventPage = () => {
   const {
@@ -39,6 +40,12 @@ const NewEventPage = () => {
   const [availableCities, setAvailableCities] = useState<City[]>([]);
   const [txHash, setTxHash] = useState<`0x${string}`>('0x');
   const { data: receipt } = useWaitForTransactionReceipt({ hash: txHash });
+  const [hasSingleCategory, setHasSingleCategory] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [windowDimensions, setWindowDimensions] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
 
   const [formData, setFormData] = useState<CreateEventParams>({
     title: '',
@@ -65,15 +72,10 @@ const NewEventPage = () => {
 
   useEffect(() => {
     if (receipt?.logs && receipt.logs.length > 0) {
-      // Calculate the correct EventCreated event topic hash
-      // EventCreated(uint256 eventId, address organizer, address eventContract, address nftContract, string title)
       const eventCreatedSignature =
         'EventCreated(uint256,address,address,address,string)';
       const eventCreatedTopic = keccak256(toUtf8Bytes(eventCreatedSignature));
 
-      console.log('Looking for EventCreated topic:', eventCreatedTopic);
-
-      // Look for EventCreated event in logs
       const eventCreatedLog = receipt.logs.find(
         (log) =>
           log.topics &&
@@ -82,89 +84,58 @@ const NewEventPage = () => {
       );
 
       if (eventCreatedLog) {
-        console.log('🎉 Event Created Successfully!');
-        console.log('Event Created Log:', eventCreatedLog);
-
         try {
-          // Try different event signature variations to match your contract
-          const eventSignatures = [
-            'event EventCreated(uint256 indexed eventId, address indexed organizer, address eventContract, address nftContract, string title)',
-            'event EventCreated(uint256 eventId, address organizer, address eventContract, address nftContract, string title)',
-            'event EventCreated(uint256 indexed eventId, address organizer, address eventContract, address nftContract, string title)',
-          ];
-
-          let parsedLog = null;
-
-          for (const signature of eventSignatures) {
-            try {
-              const eventInterface = new Interface([signature]);
-              parsedLog = eventInterface.parseLog({
-                topics: eventCreatedLog.topics,
-                data: eventCreatedLog.data,
-              });
-              console.log('Successfully parsed with signature:', signature);
-              break;
-            } catch (error) {
-              console.log('Failed with signature:', error);
-              continue;
-            }
-          }
+          const parsedLog = new Interface(CONTRACT_CONFIG.abi).parseLog({
+            topics: eventCreatedLog.topics as string[],
+            data: eventCreatedLog.data,
+          });
 
           if (parsedLog) {
-            const { eventId, organizer, eventContract, nftContract, title } =
+            const { eventId, organizer, eventContract, nftContract } =
               parsedLog.args;
 
-            console.log('Decoded Event Data:');
-            console.log('Event ID:', eventId.toString());
-            console.log('Organizer:', organizer);
-            console.log('Event Contract:', eventContract);
-            console.log('NFT Contract:', nftContract);
-            console.log('Title:', title);
-
-            // Navigate to add-tickets with contract addresses
-            navigate('/add-tickets', {
-              state: {
-                eventId: eventId.toString(),
-                organizer: organizer,
-                eventContract: eventContract,
-                nftContract: nftContract,
-                transactionHash: receipt.transactionHash,
-                eventTitle: formData.title,
-                eventDescription: formData.description,
-                receipt: receipt,
-                eventCreatedLog: eventCreatedLog,
-              },
-            });
-          } else {
-            throw new Error(
-              'Failed to parse EventCreated log with any known signature',
-            );
+            if (!hasSingleCategory) {
+              // Navigate to add-tickets only if not single category
+              navigate('/add-tickets', {
+                state: {
+                  eventId: eventId.toString(),
+                  organizer: organizer,
+                  eventContract: eventContract,
+                  nftContract: nftContract,
+                  transactionHash: receipt.transactionHash,
+                  eventTitle: formData.title,
+                  eventDescription: formData.description,
+                  receipt: receipt,
+                  eventCreatedLog: eventCreatedLog,
+                },
+              });
+            }
           }
         } catch (decodeError) {
           console.error('Error decoding EventCreated log:', decodeError);
-          console.log('Raw log data:', eventCreatedLog.data);
-
-          // Fallback navigation without decoded data
-          navigate('/add-tickets', {
-            state: {
-              transactionHash: receipt.transactionHash,
-              eventTitle: formData.title,
-              eventDescription: formData.description,
-              receipt: receipt,
-              eventCreatedLog: eventCreatedLog,
-              error: 'Could not decode contract addresses',
-            },
-          });
         }
-      } else {
-        console.log('EventCreated event not found in logs');
-        console.log(
-          'Available topics:',
-          receipt.logs.map((log) => log.topics?.[0]).filter(Boolean),
-        );
       }
     }
-  }, [receipt, navigate, formData.title, formData.description]);
+  }, [
+    receipt,
+    navigate,
+    formData.title,
+    formData.description,
+    hasSingleCategory,
+  ]);
+
+  // Update window dimensions for confetti
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -243,7 +214,7 @@ const NewEventPage = () => {
     setButtonText('Uploading Images');
 
     // Validate form data
-    const validation = validateEventForm(formData);
+    const validation = validateEventForm(formData, hasSingleCategory);
     if (!validation.isValid) {
       setIsUploading(false);
       setButtonText('Create Event');
@@ -293,12 +264,24 @@ const NewEventPage = () => {
       );
       const endTimestamp = Math.floor(new Date(eventEndTime).getTime() / 1000);
 
+      // Add detailed logging for maxTickets
+      console.log('maxTickets value at different stages:');
+      console.log('1. Raw form value:', maxTickets);
+      console.log('2. After parseInt:', parseInt(maxTickets));
+      console.log('3. After BigInt conversion:', BigInt(maxTickets).toString());
+      console.log('4. Type of maxTickets:', typeof maxTickets);
+
       console.log('Contract Config:', CONTRACT_CONFIG);
       console.log('Transaction Args:', {
         title,
         description,
-        ticketPrice: parseEther(ticketPrice).toString(),
-        maxTickets,
+        ticketPrice: hasSingleCategory
+          ? parseEther(ticketPrice).toString()
+          : '0',
+        maxTickets: hasSingleCategory ? maxTickets : '0',
+        maxTicketsBigInt: hasSingleCategory
+          ? BigInt(maxTickets).toString()
+          : '0',
         eventURI: eventURI || '',
         startTimestamp,
         endTimestamp,
@@ -316,9 +299,9 @@ const NewEventPage = () => {
         args: [
           title,
           description,
-          parseEther(ticketPrice),
-          BigInt(maxTickets),
-          eventURI || '', // Empty eventURI
+          hasSingleCategory ? parseEther(ticketPrice) : BigInt(0),
+          hasSingleCategory ? BigInt(maxTickets) : BigInt(0),
+          eventURI || '',
           BigInt(startTimestamp),
           BigInt(endTimestamp),
           venue,
@@ -328,18 +311,76 @@ const NewEventPage = () => {
       });
       console.log('Transaction successful:', tx);
       setTxHash(tx as `0x${string}`);
-      alert('Event created successfully!');
+
+      if (hasSingleCategory) {
+        setShowSuccessDialog(true);
+      }
     } catch (err) {
       console.error('Contract call failed:', err);
       console.error('Error details:', err);
-    } finally {
       setIsUploading(false);
       setButtonText('Create Event');
     }
   };
 
+  // Success Dialog Component
+  const SuccessDialog = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
+      <div className="bg-white rounded-2xl max-w-md w-full p-8 text-center">
+        {/* Success Icon */}
+        <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6">
+          <svg
+            className="w-8 h-8 text-red-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+        </div>
+
+        {/* Success Message */}
+        <h3 className="text-2xl font-bold text-gray-900 mb-2">
+          Event Has Been Successfully Created! 🎉
+        </h3>
+        <p className="text-gray-600 mb-8">
+          Your event has been created on the blockchain and is ready to go.
+        </p>
+
+        {/* Action Button */}
+        <button
+          onClick={() => {
+            setShowSuccessDialog(false);
+            navigate('/');
+          }}
+          className="w-full px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors font-medium"
+        >
+          Continue to Home
+        </button>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+      {/* Confetti */}
+      {showSuccessDialog && (
+        <Confetti
+          width={windowDimensions.width}
+          height={windowDimensions.height}
+          recycle={false}
+          numberOfPieces={500}
+        />
+      )}
+
+      {/* Success Dialog */}
+      {showSuccessDialog && <SuccessDialog />}
+
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl">
@@ -418,39 +459,57 @@ const NewEventPage = () => {
                   </div>
 
                   {/* Pricing */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Ticket Price (ETH) *
-                      </label>
-                      <input
-                        type="number"
-                        name="ticketPrice"
-                        value={formData.ticketPrice}
-                        onChange={handleChange}
-                        step="0.001"
-                        min="0"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
-                        placeholder="0.1"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Max Tickets *
-                      </label>
-                      <input
-                        type="number"
-                        name="maxTickets"
-                        value={formData.maxTickets}
-                        onChange={handleChange}
-                        min="1"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
-                        placeholder="1000"
-                        required
-                      />
-                    </div>
+                  <div className="flex items-center mb-4">
+                    <input
+                      type="checkbox"
+                      id="singleCategory"
+                      checked={hasSingleCategory}
+                      onChange={(e) => setHasSingleCategory(e.target.checked)}
+                      className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                    />
+                    <label
+                      htmlFor="singleCategory"
+                      className="ml-2 block text-sm font-medium text-gray-700"
+                    >
+                      This event has only one ticket category
+                    </label>
                   </div>
+
+                  {hasSingleCategory && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Ticket Price (ETH) *
+                        </label>
+                        <input
+                          type="number"
+                          name="ticketPrice"
+                          value={formData.ticketPrice}
+                          onChange={handleChange}
+                          step="0.001"
+                          min="0"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
+                          placeholder="0.1"
+                          required={hasSingleCategory}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Max Tickets *
+                        </label>
+                        <input
+                          type="number"
+                          name="maxTickets"
+                          value={formData.maxTickets}
+                          onChange={handleChange}
+                          min="1"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
+                          placeholder="1000"
+                          required={hasSingleCategory}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Date & Time */}

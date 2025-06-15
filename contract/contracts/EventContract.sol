@@ -27,6 +27,10 @@ contract EventContract is Ownable, ReentrancyGuard {
     // Associated NFT contract
     address public nftContract;
     
+    // Factory reference
+    uint256 public eventId;
+    address public factory;
+    
     // Advanced event features
     mapping(address => bool) public whitelist;
     bool public whitelistEnabled;
@@ -56,11 +60,20 @@ contract EventContract is Ownable, ReentrancyGuard {
     
     // Events
     event TicketPurchased(address indexed buyer, uint256 quantity, uint256 totalPrice);
+    event CategoryTicketPurchased(address indexed buyer, uint256 categoryId, uint256 quantity, uint256 totalPrice);
     event EventUpdated();
     event EventDeactivated();
     event WhitelistUpdated(address indexed user, bool status);
     event CategoryAdded(uint256 indexed categoryId, string name, uint256 price, string categoryURI);
     event CategoriesAdded(uint256[] categoryIds, uint256 totalAdded);
+    
+    // Debug events
+    event PurchaseStarted(address indexed buyer, uint256[] quantities, uint256[] categoryIds);
+    event CategoryProcessed(uint256 categoryId, uint256 quantity, uint256 price, uint256 totalPrice);
+    event PurchaseCompleted(uint256 totalTicketsSold, uint256 totalRevenue);
+    event FactoryUpdateAttempted(uint256 eventId, uint256 ticketsSold, uint256 revenue);
+    event FactoryUpdateResult(bool success);
+    event MaxTicketsSet(uint256 maxTickets, uint256 rawInput);
     
     modifier onlyOrganizer() {
         require(msg.sender == organizer, "Only organizer");
@@ -87,25 +100,30 @@ contract EventContract is Ownable, ReentrancyGuard {
         string memory _eventURI,
         uint256 _eventStartTime,
         uint256 _eventEndTime,
-        string memory _venue
+        string memory _venue,
+        uint256 _eventId,
+        address _factory
     ) Ownable(_organizer) {
         require(bytes(_eventTitle).length > 0, "Empty title");
-        require(_ticketPrice > 0, "Invalid price");
         require(_organizer != address(0), "Invalid organizer");
         require(_eventStartTime > block.timestamp, "Past event");
         require(_eventEndTime > _eventStartTime, "Invalid times");
+        require(_factory != address(0), "Invalid factory");
         
         eventTitle = _eventTitle;
         eventDescription = _eventDescription;
         organizer = _organizer;
         ticketPrice = _ticketPrice;
         maxTickets = _maxTickets;
+        emit MaxTicketsSet(maxTickets, _maxTickets);
         isActive = true;
         eventURI = _eventURI;
         createdAt = block.timestamp;
         eventStartTime = _eventStartTime;
         eventEndTime = _eventEndTime;
         venue = _venue;
+        eventId = _eventId;
+        factory = _factory;
         
         salesStartTime = block.timestamp;
         salesEndTime = _eventStartTime;
@@ -118,76 +136,224 @@ contract EventContract is Ownable, ReentrancyGuard {
         nftContract = _nftContract;
     }
     
-    function purchaseTickets(
-        address buyer, 
-        uint256 quantity, 
-        uint256 categoryId
-    ) external payable onlyActiveEvent onlyDuringSales nonReentrant {
+    // State-changing functions
+    function purchaseSingleTicket(address buyer, uint256 quantity) external payable onlyActiveEvent onlyDuringSales nonReentrant {
         require(msg.sender == nftContract, "Only NFT contract");
+        require(buyer != address(0), "Invalid buyer address");
         require(quantity > 0, "Invalid quantity");
+        require(quantity <= 100, "Too many tickets");
+        
+        uint256 totalPrice;
+        unchecked {
+            totalPrice = ticketPrice * quantity;
+        }
+        require(msg.value >= totalPrice, "Insufficient payment");
         
         if (whitelistEnabled) {
             require(whitelist[buyer], "Not whitelisted");
         }
         
-        uint256 totalPrice;
-        uint256 actualQuantity = quantity;
-        
-        if (categoryId == 0) {
-            require(msg.value >= ticketPrice * quantity, "Insufficient payment");
-            totalPrice = ticketPrice * quantity;
-            
-            if (maxTickets > 0) {
-                uint256 available = maxTickets - ticketsSold;
-                require(available > 0, "Sold out");
-                if (quantity > available) {
-                    actualQuantity = available;
-                    totalPrice = ticketPrice * actualQuantity;
-                }
+        // Check ticket availability
+        if (maxTickets > 0) {
+            uint256 available;
+            unchecked {
+                available = maxTickets - ticketsSold;
             }
-            
-            ticketsSold += actualQuantity;
-        } else {
-            TicketCategory storage category = ticketCategories[categoryId];
-            require(category.isActive, "Category inactive");
-            require(msg.value >= category.price * quantity, "Insufficient payment");
-            
-            totalPrice = category.price * quantity;
-            
-            if (category.maxSupply > 0) {
-                uint256 available = category.maxSupply - category.sold;
-                require(available > 0, "Category sold out");
-                if (quantity > available) {
-                    actualQuantity = available;
-                    totalPrice = category.price * actualQuantity;
-                }
-            }
-            
-            category.sold += actualQuantity;
-            ticketsSold += actualQuantity;
+            require(available >= quantity, "Not enough tickets");
         }
         
+        // Check wallet limit
         if (maxTicketsPerWallet > 0) {
             IEventTicketNFT nft = IEventTicketNFT(nftContract);
-            require(nft.balanceOf(buyer) + actualQuantity <= maxTicketsPerWallet, "Wallet limit");
+            uint256 currentBalance = nft.balanceOf(buyer);
+            uint256 newBalance;
+            unchecked {
+                newBalance = currentBalance + quantity;
+            }
+            require(newBalance <= maxTicketsPerWallet, "Wallet limit exceeded");
         }
         
+        // Update state
+        unchecked {
+            ticketsSold += quantity;
+        }
+        
+        // Process payment
         (bool success, ) = payable(organizer).call{value: totalPrice}("");
-        require(success, "Payment failed");
+        require(success, "Payment transfer failed");
         
+        // Refund excess payment
         if (msg.value > totalPrice) {
-            (bool refundSuccess, ) = payable(buyer).call{value: msg.value - totalPrice}("");
-            require(refundSuccess, "Refund failed");
+            uint256 refundAmount;
+            unchecked {
+                refundAmount = msg.value - totalPrice;
+            }
+            (bool refundSuccess, ) = payable(buyer).call{value: refundAmount}("");
+            require(refundSuccess, "Refund transfer failed");
         }
         
-        if (owner() != address(0)) {
-            try IEventFactory(owner()).updateEventStats(0, ticketsSold, totalPrice) {} catch {}
-        }
+        emit TicketPurchased(buyer, quantity, totalPrice);
         
-        emit TicketPurchased(buyer, actualQuantity, totalPrice);
+        // Update factory stats
+        try IEventFactory(factory).updateEventStats(eventId, ticketsSold, totalPrice) {} catch {}
     }
     
+    function purchaseCategoryTickets(
+        address buyer, 
+        uint256[] memory quantities, 
+        uint256[] memory categoryIds
+    ) external payable onlyActiveEvent onlyDuringSales nonReentrant {
+        require(msg.sender == nftContract, "Only NFT contract");
+        require(quantities.length > 0, "Invalid quantity");
+        require(quantities.length == categoryIds.length, "Array length mismatch");
+        require(buyer != address(0), "Invalid buyer address");
+        
+        emit PurchaseStarted(buyer, quantities, categoryIds);
+        
+        if (whitelistEnabled) {
+            require(whitelist[buyer], "Not whitelisted");
+        }
+        
+        // Calculate total price and validate quantities upfront
+        uint256 totalPrice;
+        uint256[] memory actualQuantities = new uint256[](quantities.length);
+        
+        for (uint256 i = 0; i < quantities.length; i++) {
+            uint256 quantity = quantities[i];
+            uint256 categoryId = categoryIds[i];
+            uint256 categoryPrice;
+            
+            require(quantity > 0, "Zero quantity not allowed");
+            require(categoryId > 0 && categoryId <= categoryCount, "Invalid category ID");
+            
+            TicketCategory storage category = ticketCategories[categoryId];
+            require(category.isActive, "Category inactive");
+            
+            // Check category availability
+            if (category.maxSupply > 0) {
+                uint256 available;
+                unchecked {
+                    available = category.maxSupply - category.sold;
+                }
+                require(available > 0, "Category sold out");
+                if (quantity > available) {
+                    quantity = available;
+                }
+            }
+            
+            unchecked {
+                categoryPrice = category.price * quantity;
+                totalPrice += categoryPrice;
+            }
+            actualQuantities[i] = quantity;
+            
+            emit CategoryProcessed(categoryId, quantity, category.price, categoryPrice);
+            
+            // Check wallet limit
+            if (maxTicketsPerWallet > 0) {
+                IEventTicketNFT nft = IEventTicketNFT(nftContract);
+                uint256 currentBalance = nft.balanceOf(buyer);
+                uint256 newBalance;
+                unchecked {
+                    newBalance = currentBalance + quantity;
+                }
+                require(newBalance <= maxTicketsPerWallet, "Wallet limit exceeded");
+            }
+        }
+        
+        // Validate total payment
+        require(msg.value >= totalPrice, "Insufficient payment");
+        
+        // Process payments and update state
+        for (uint256 i = 0; i < quantities.length; i++) {
+            uint256 categoryId = categoryIds[i];
+            uint256 quantity = actualQuantities[i];
+            TicketCategory storage category = ticketCategories[categoryId];
+            
+            unchecked {
+                category.sold += quantity;
+                ticketsSold += quantity;
+            }
+        }
+        
+        // Process payment
+        (bool success, ) = payable(organizer).call{value: totalPrice}("");
+        require(success, "Payment transfer failed");
+        
+        // Refund excess payment
+        if (msg.value > totalPrice) {
+            uint256 refundAmount;
+            unchecked {
+                refundAmount = msg.value - totalPrice;
+            }
+            (bool refundSuccess, ) = payable(buyer).call{value: refundAmount}("");
+            require(refundSuccess, "Refund transfer failed");
+        }
+        
+        emit PurchaseCompleted(ticketsSold, totalPrice);
+        
+        // Update factory stats
+        emit FactoryUpdateAttempted(eventId, ticketsSold, totalPrice);
+        try IEventFactory(factory).updateEventStats(eventId, ticketsSold, totalPrice) {
+            emit FactoryUpdateResult(true);
+        } catch {
+            emit FactoryUpdateResult(false);
+        }
+        
+        emit CategoryTicketPurchased(buyer, categoryIds[0], quantities[0], totalPrice);
+    }
+    
+    // Helper function to convert address to string
+    function _address2str(address _addr) internal pure returns (string memory) {
+        bytes memory b = new bytes(42);
+        b[0] = "0";
+        b[1] = "x";
+        for (uint256 i = 0; i < 20; i++) {
+            bytes1 b1 = bytes1(uint8(uint(uint160(_addr)) / (2**(8*(19 - i)))));
+            bytes1 b2 = bytes1(uint8(uint(uint160(_addr)) / (2**(8*(19 - i) - 4))));
+            b[2+2*i] = _char(b1);
+            b[2+2*i+1] = _char(b2);
+        }
+        return string(b);
+    }
 
+    function _char(bytes1 b) internal pure returns (bytes1) {
+        if (uint8(b) < 10) return bytes1(uint8(b) + 0x30);
+        else return bytes1(uint8(b) + 0x57);
+    }
+
+    // Helper function to convert array to string
+    function _arrayToString(uint256[] memory arr) internal pure returns (string memory) {
+        if (arr.length == 0) return "[]";
+        string memory result = "[";
+        for (uint256 i = 0; i < arr.length; i++) {
+            if (i > 0) result = string(abi.encodePacked(result, ","));
+            result = string(abi.encodePacked(result, _uint2str(arr[i])));
+        }
+        return string(abi.encodePacked(result, "]"));
+    }
+    
+    // Helper function to convert uint to string
+    function _uint2str(uint256 _i) internal pure returns (string memory) {
+        if (_i == 0) {
+            return "0";
+        }
+        uint256 j = _i;
+        uint256 length;
+        while (j != 0) {
+            length++;
+            j /= 10;
+        }
+        bytes memory bstr = new bytes(length);
+        uint256 k = length;
+        j = _i;
+        while (j != 0) {
+            bstr[--k] = bytes1(uint8(48 + j % 10));
+            j /= 10;
+        }
+        return string(bstr);
+    }
+    
     function addTicketCategories(
         CategoryInput[] memory _categories
     ) external onlyOrganizer returns (uint256[] memory) {
@@ -333,6 +499,17 @@ contract EventContract is Ownable, ReentrancyGuard {
         if (!isActive) return false;
         if (block.timestamp < salesStartTime || block.timestamp > salesEndTime) return false;
         if (maxTickets > 0 && ticketsSold + quantity > maxTickets) return false;
+        return true;
+    }
+    
+    function isCategoryTicketAvailable(uint256 categoryId, uint256 quantity) external view returns (bool) {
+        if (!isActive) return false;
+        if (block.timestamp < salesStartTime || block.timestamp > salesEndTime) return false;
+        if (categoryId == 0 || categoryId > categoryCount) return false;
+        
+        TicketCategory storage category = ticketCategories[categoryId];
+        if (!category.isActive) return false;
+        if (category.maxSupply > 0 && category.sold + quantity > category.maxSupply) return false;
         return true;
     }
 }
