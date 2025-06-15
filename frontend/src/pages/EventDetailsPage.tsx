@@ -6,6 +6,7 @@ import type { EventData } from '../utils/models';
 import EventFactoryABI from '../contracts/EventFactory.sol/EventFactory.json';
 import EventContractABI from '../contracts/EventContract.sol/EventContract.json';
 import { fetchFirstImageFromIPFS } from '../utils/ipfs-helper.util';
+import { usePurchaseTickets } from '../utils/ticketPurchase.util';
 
 const FACTORY_ADDRESS =
   import.meta.env.FACTORY_ADDRESS ||
@@ -57,6 +58,7 @@ const EventDetailsPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { purchaseTickets } = usePurchaseTickets();
 
   const fetchEventStats = useCallback(
     async (eventContractAddress: string): Promise<EventStats> => {
@@ -196,10 +198,34 @@ const EventDetailsPage = () => {
     }
   }, [eventId, fetchEventDetails]);
 
-  const handlePurchase = async (quantity: number, categoryId?: number) => {
+  const handlePurchase = async (
+    quantities: number[],
+    categoryIds: number[],
+    tokenURIs: string[],
+    totalPrice: string,
+  ) => {
+    if (!event?.nftContract) {
+      throw new Error('No event selected or NFT contract not found');
+    }
+
     try {
-      console.log('Purchasing tickets:', { quantity, categoryId, eventId });
-      // TODO: Implement actual purchase logic
+      console.log('Purchasing tickets for event:', {
+        quantities,
+        categoryIds,
+        tokenURIs,
+        totalPrice,
+      });
+
+      const hash = await purchaseTickets({
+        nftContractAddress: event.nftContract,
+        quantities,
+        categoryIds,
+        tokenURIs,
+        totalPrice,
+      });
+
+      console.log('Purchase transaction hash:', hash);
+      return hash;
     } catch (error) {
       console.error('Purchase failed:', error);
       throw error;

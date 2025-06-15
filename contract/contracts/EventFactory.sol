@@ -57,7 +57,6 @@ contract EventFactory is IEventFactory {
         string memory _nftSymbol
     ) external override returns (uint256 eventId, address eventContract, address nftContract) {
         require(bytes(_title).length > 0, "Empty title");
-        require(_ticketPrice > 0, "Invalid price");
         require(_eventStartTime > block.timestamp, "Past event start");
         require(_eventEndTime > _eventStartTime, "Invalid times");
         
@@ -66,7 +65,8 @@ contract EventFactory is IEventFactory {
         // Use library to deploy contracts
         (eventContract, nftContract) = EventFactoryLib.deployEventContracts(
             _title, _description, msg.sender, _ticketPrice, _maxTickets,
-            _eventURI, _eventStartTime, _eventEndTime, _venue, _nftName, _nftSymbol
+            _eventURI, _eventStartTime, _eventEndTime, _venue, _nftName, _nftSymbol,
+            eventId, address(this)
         );
         
         // Store event info

@@ -9,6 +9,17 @@ interface TicketMetadataInput {
   admits: number;
 }
 
+export interface TicketPurchaseInput {
+  description: string;
+  external_url: string;
+  image: string;
+  name: string;
+  attributes: {
+    trait_type: string;
+    value: string;
+  }[];
+}
+
 interface EventMetadataInput {
   name: string;
   description: string;
@@ -91,7 +102,7 @@ export const createEventURIHelper = async (
 };
 
 export const createTicketURIHelperUtil = async (
-  ticketMetadata: TicketMetadataInput,
+  ticketMetadata: TicketMetadataInput | TicketPurchaseInput,
 ) => {
   try {
     const client = await create();
@@ -113,7 +124,7 @@ export const createTicketURIHelperUtil = async (
 
 const makeJsonFile = (
   filename: string,
-  data: TicketMetadataInput | EventMetadataInput,
+  data: TicketMetadataInput | EventMetadataInput | TicketPurchaseInput,
 ): File => {
   const blob = new Blob([JSON.stringify(data, null, 2)], {
     type: 'application/json',

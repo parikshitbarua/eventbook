@@ -6,6 +6,7 @@ import type { EventFactoryContract } from '../types/contracts';
 import TicketPurchaseModal from '../components/TicketPurchaseModal';
 import EventFactoryABI from '../contracts/EventFactory.sol/EventFactory.json';
 import { fetchFirstImageFromIPFS } from '../utils/ipfs-helper.util';
+// const { purchaseTickets } = usePurchaseTickets();
 
 const FACTORY_ADDRESS =
   import.meta.env.FACTORY_ADDRESS ||
@@ -98,25 +99,6 @@ const HomePage = () => {
 
     fetchData();
   }, []);
-
-  const handlePurchase = async (quantity: number, categoryId?: number) => {
-    if (!selectedEvent) return;
-
-    try {
-      console.log('Purchasing tickets for event:', {
-        quantity,
-        categoryId,
-        eventId: selectedEvent.eventId,
-      });
-      // const provider = new JsonRpcProvider('http://127.0.0.1:8545');
-      //
-      // TODO: Implement the actual purchase logic here
-      // console.log(`Purchasing ${quantity} tickets for event ${selectedEvent.eventId} ${categoryId ? `category ${categoryId}` : ''}`);
-    } catch (error) {
-      console.error('Purchase failed:', error);
-      throw error;
-    }
-  };
 
   // Loading Spinner Component
   // const LoadingSpinner = () => (
@@ -264,7 +246,6 @@ const HomePage = () => {
             setSelectedEvent(null);
           }}
           event={selectedEvent}
-          onPurchase={handlePurchase}
         />
       )}
     </div>

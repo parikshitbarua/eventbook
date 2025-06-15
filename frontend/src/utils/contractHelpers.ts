@@ -140,6 +140,7 @@ export interface ValidationResult {
  */
 export function validateEventForm(
   formData: CreateEventParams,
+  hasSingleCategory: boolean = false,
 ): ValidationResult {
   const {
     title,
@@ -167,8 +168,6 @@ export function validateEventForm(
   if (!nftName.trim()) return { isValid: false, error: 'NFT name is required' };
   if (!nftSymbol.trim())
     return { isValid: false, error: 'NFT symbol is required' };
-  // if (!eventImages || eventImages.length === 0)
-  //   return { isValid: false, error: 'At least one event image is required' };
 
   // NFT symbol validation (should be uppercase, 3-5 characters)
   if (!/^[A-Z]{2,10}$/.test(nftSymbol.trim())) {
@@ -181,34 +180,34 @@ export function validateEventForm(
   // Date validation
   const startDate = new Date(eventStartTime);
   const endDate = new Date(eventEndTime);
-  const now = new Date();
 
   if (isNaN(startDate.getTime()))
     return { isValid: false, error: 'Invalid start date' };
   if (isNaN(endDate.getTime()))
     return { isValid: false, error: 'Invalid end date' };
 
-  if (startDate <= now) {
-    return { isValid: false, error: 'Event start time must be in the future' };
-  }
-
   if (endDate <= startDate) {
     return { isValid: false, error: 'Event end time must be after start time' };
   }
 
-  // Numeric validation
-  const priceNum = parseFloat(ticketPrice);
-  const maxTicketsNum = parseInt(maxTickets);
+  // Numeric validation for single category events
+  if (hasSingleCategory) {
+    const priceNum = parseFloat(ticketPrice);
+    const maxTicketsNum = parseInt(maxTickets);
 
-  if (isNaN(priceNum) || priceNum < 0) {
-    return {
-      isValid: false,
-      error: 'Ticket price must be a valid positive number',
-    };
-  }
+    if (isNaN(priceNum) || priceNum < 0) {
+      return {
+        isValid: false,
+        error: 'Ticket price must be a valid positive number',
+      };
+    }
 
-  if (isNaN(maxTicketsNum) || maxTicketsNum <= 0) {
-    return { isValid: false, error: 'Max tickets must be a positive integer' };
+    if (isNaN(maxTicketsNum) || maxTicketsNum <= 0) {
+      return {
+        isValid: false,
+        error: 'Max tickets must be a positive integer',
+      };
+    }
   }
 
   return { isValid: true };
