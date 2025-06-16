@@ -4,6 +4,7 @@ import NewEventPage from './pages/NewEventPage.tsx';
 import HomePage from './pages/HomePage.tsx';
 import AddTicketsPage from './pages/AddTicketsPage.tsx';
 import EventDetailsPage from './pages/EventDetailsPage.tsx';
+import MyEvents from './pages/MyEvents.tsx';
 
 const router = createBrowserRouter([
   {
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
       {
         path: '/event/:eventId',
         element: <EventDetailsPage />,
+      },
+      {
+        path: '/profile/my-events',
+        element: <MyEvents />,
       },
     ],
   },
