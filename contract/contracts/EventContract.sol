@@ -3,13 +3,14 @@ pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "./Interfaces.sol";
 
 /**
  * @title EventContract
  * @dev Manages event details, ticket sales, and business logic
  */
-contract EventContract is Ownable, ReentrancyGuard {
+contract EventContract is Ownable, ReentrancyGuard, Initializable {
     // Event details
     string public eventTitle;
     string public eventDescription;
@@ -91,7 +92,12 @@ contract EventContract is Ownable, ReentrancyGuard {
         _;
     }
     
-    constructor(
+    constructor() Ownable(msg.sender) {
+        // Constructor is disabled for clones
+        _disableInitializers();
+    }
+    
+    function initialize(
         string memory _eventTitle,
         string memory _eventDescription,
         address _organizer,
@@ -103,12 +109,14 @@ contract EventContract is Ownable, ReentrancyGuard {
         string memory _venue,
         uint256 _eventId,
         address _factory
-    ) Ownable(_organizer) {
+    ) external initializer {
         require(bytes(_eventTitle).length > 0, "Empty title");
         require(_organizer != address(0), "Invalid organizer");
         require(_eventStartTime > block.timestamp, "Past event");
         require(_eventEndTime > _eventStartTime, "Invalid times");
         require(_factory != address(0), "Invalid factory");
+        
+        _transferOwnership(_organizer);
         
         eventTitle = _eventTitle;
         eventDescription = _eventDescription;

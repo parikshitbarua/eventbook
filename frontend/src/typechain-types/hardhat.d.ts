@@ -38,6 +38,14 @@ declare module 'hardhat/types/runtime' {
       signerOrOptions?: ethers.Signer | FactoryOptions,
     ): Promise<Contracts.IERC4906__factory>;
     getContractFactory(
+      name: 'Clones',
+      signerOrOptions?: ethers.Signer | FactoryOptions,
+    ): Promise<Contracts.Clones__factory>;
+    getContractFactory(
+      name: 'Initializable',
+      signerOrOptions?: ethers.Signer | FactoryOptions,
+    ): Promise<Contracts.Initializable__factory>;
+    getContractFactory(
       name: 'ERC721',
       signerOrOptions?: ethers.Signer | FactoryOptions,
     ): Promise<Contracts.ERC721__factory>;
@@ -66,6 +74,14 @@ declare module 'hardhat/types/runtime' {
       signerOrOptions?: ethers.Signer | FactoryOptions,
     ): Promise<Contracts.IERC721Receiver__factory>;
     getContractFactory(
+      name: 'Create2',
+      signerOrOptions?: ethers.Signer | FactoryOptions,
+    ): Promise<Contracts.Create2__factory>;
+    getContractFactory(
+      name: 'Errors',
+      signerOrOptions?: ethers.Signer | FactoryOptions,
+    ): Promise<Contracts.Errors__factory>;
+    getContractFactory(
       name: 'ERC165',
       signerOrOptions?: ethers.Signer | FactoryOptions,
     ): Promise<Contracts.ERC165__factory>;
@@ -85,6 +101,10 @@ declare module 'hardhat/types/runtime' {
       name: 'Strings',
       signerOrOptions?: ethers.Signer | FactoryOptions,
     ): Promise<Contracts.Strings__factory>;
+    getContractFactory(
+      name: 'DeploymentExample',
+      signerOrOptions?: ethers.Signer | FactoryOptions,
+    ): Promise<Contracts.DeploymentExample__factory>;
     getContractFactory(
       name: 'EventContract',
       signerOrOptions?: ethers.Signer | FactoryOptions,
@@ -145,6 +165,16 @@ declare module 'hardhat/types/runtime' {
       signer?: ethers.Signer,
     ): Promise<Contracts.IERC4906>;
     getContractAt(
+      name: 'Clones',
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer,
+    ): Promise<Contracts.Clones>;
+    getContractAt(
+      name: 'Initializable',
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer,
+    ): Promise<Contracts.Initializable>;
+    getContractAt(
       name: 'ERC721',
       address: string | ethers.Addressable,
       signer?: ethers.Signer,
@@ -180,6 +210,16 @@ declare module 'hardhat/types/runtime' {
       signer?: ethers.Signer,
     ): Promise<Contracts.IERC721Receiver>;
     getContractAt(
+      name: 'Create2',
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer,
+    ): Promise<Contracts.Create2>;
+    getContractAt(
+      name: 'Errors',
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer,
+    ): Promise<Contracts.Errors>;
+    getContractAt(
       name: 'ERC165',
       address: string | ethers.Addressable,
       signer?: ethers.Signer,
@@ -204,6 +244,11 @@ declare module 'hardhat/types/runtime' {
       address: string | ethers.Addressable,
       signer?: ethers.Signer,
     ): Promise<Contracts.Strings>;
+    getContractAt(
+      name: 'DeploymentExample',
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer,
+    ): Promise<Contracts.DeploymentExample>;
     getContractAt(
       name: 'EventContract',
       address: string | ethers.Addressable,
@@ -265,6 +310,14 @@ declare module 'hardhat/types/runtime' {
       signerOrOptions?: ethers.Signer | DeployContractOptions,
     ): Promise<Contracts.IERC4906>;
     deployContract(
+      name: 'Clones',
+      signerOrOptions?: ethers.Signer | DeployContractOptions,
+    ): Promise<Contracts.Clones>;
+    deployContract(
+      name: 'Initializable',
+      signerOrOptions?: ethers.Signer | DeployContractOptions,
+    ): Promise<Contracts.Initializable>;
+    deployContract(
       name: 'ERC721',
       signerOrOptions?: ethers.Signer | DeployContractOptions,
     ): Promise<Contracts.ERC721>;
@@ -293,6 +346,14 @@ declare module 'hardhat/types/runtime' {
       signerOrOptions?: ethers.Signer | DeployContractOptions,
     ): Promise<Contracts.IERC721Receiver>;
     deployContract(
+      name: 'Create2',
+      signerOrOptions?: ethers.Signer | DeployContractOptions,
+    ): Promise<Contracts.Create2>;
+    deployContract(
+      name: 'Errors',
+      signerOrOptions?: ethers.Signer | DeployContractOptions,
+    ): Promise<Contracts.Errors>;
+    deployContract(
       name: 'ERC165',
       signerOrOptions?: ethers.Signer | DeployContractOptions,
     ): Promise<Contracts.ERC165>;
@@ -312,6 +373,10 @@ declare module 'hardhat/types/runtime' {
       name: 'Strings',
       signerOrOptions?: ethers.Signer | DeployContractOptions,
     ): Promise<Contracts.Strings>;
+    deployContract(
+      name: 'DeploymentExample',
+      signerOrOptions?: ethers.Signer | DeployContractOptions,
+    ): Promise<Contracts.DeploymentExample>;
     deployContract(
       name: 'EventContract',
       signerOrOptions?: ethers.Signer | DeployContractOptions,
@@ -372,6 +437,16 @@ declare module 'hardhat/types/runtime' {
       signerOrOptions?: ethers.Signer | DeployContractOptions,
     ): Promise<Contracts.IERC4906>;
     deployContract(
+      name: 'Clones',
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions,
+    ): Promise<Contracts.Clones>;
+    deployContract(
+      name: 'Initializable',
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions,
+    ): Promise<Contracts.Initializable>;
+    deployContract(
       name: 'ERC721',
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions,
@@ -407,6 +482,16 @@ declare module 'hardhat/types/runtime' {
       signerOrOptions?: ethers.Signer | DeployContractOptions,
     ): Promise<Contracts.IERC721Receiver>;
     deployContract(
+      name: 'Create2',
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions,
+    ): Promise<Contracts.Create2>;
+    deployContract(
+      name: 'Errors',
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions,
+    ): Promise<Contracts.Errors>;
+    deployContract(
       name: 'ERC165',
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions,
@@ -431,6 +516,11 @@ declare module 'hardhat/types/runtime' {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions,
     ): Promise<Contracts.Strings>;
+    deployContract(
+      name: 'DeploymentExample',
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions,
+    ): Promise<Contracts.DeploymentExample>;
     deployContract(
       name: 'EventContract',
       args: any[],

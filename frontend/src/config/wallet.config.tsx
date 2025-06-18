@@ -2,6 +2,7 @@ import { createAppKit } from '@reown/appkit/react';
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
 import type { AppKitNetwork } from '@reown/appkit/networks';
 import { defineChain } from '@reown/appkit/networks';
+import { baseSepolia, base } from '@reown/appkit/networks';
 
 // Get projectId from https://cloud.reown.com
 export const projectId = import.meta.env.VITE_PROJECT_ID;
@@ -29,7 +30,7 @@ export const hardhatNetwork = defineChain({
   },
   rpcUrls: {
     default: {
-      http: ['http://127.0.0.1:8545'],
+      http: ['https://sepolia.base.org', 'http://127.0.0.1:8545'],
       webSocket: ['ws://127.0.0.1:8545'],
     },
   },
@@ -41,7 +42,20 @@ export const hardhatNetwork = defineChain({
   },
 });
 
-export const networks = [hardhatNetwork] as [AppKitNetwork, ...AppKitNetwork[]];
+// Configure networks based on environment
+const getNetworks = (): [AppKitNetwork, ...AppKitNetwork[]] => {
+  const networkUrl = import.meta.env.VITE_NETWORK_URL;
+
+  // If using Base networks, prioritize them
+  if (networkUrl?.includes('base.org')) {
+    return [baseSepolia, base, hardhatNetwork];
+  }
+
+  // Default to hardhat for local development
+  return [hardhatNetwork, baseSepolia, base];
+};
+
+export const networks = getNetworks();
 
 //Set up the Wagmi Adapter (Config)
 export const wagmiAdapter = new WagmiAdapter({

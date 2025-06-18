@@ -9,9 +9,11 @@ import { fetchFirstImageFromIPFS } from '../utils/ipfs-helper.util';
 // const { purchaseTickets } = usePurchaseTickets();
 
 const FACTORY_ADDRESS =
-  import.meta.env.FACTORY_ADDRESS ||
-  '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512';
-const NETWORK_URL = import.meta.env.NETWORK_URL || 'http://127.0.0.1:8545';
+  import.meta.env.VITE_FACTORY_ADDRESS ||
+  '0x5FbDB2315678afecb367f032d93F642f64180aa3';
+const NETWORK_URL = import.meta.env.VITE_NETWORK_URL || 'http://127.0.0.1:8545';
+console.log('FACTORY_ADDRESS', FACTORY_ADDRESS);
+console.log('NETWORK_URL', NETWORK_URL);
 
 const HomePage = () => {
   const [allEvents, setAllEvents] = useState<EventData[]>([]);

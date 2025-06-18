@@ -51,7 +51,9 @@ const TicketPurchaseModal = ({
   const fetchCategories = useCallback(async () => {
     try {
       setLoadingCategories(true);
-      const provider = new JsonRpcProvider('http://127.0.0.1:8545');
+      const NETWORK_URL =
+        import.meta.env.VITE_NETWORK_URL || 'http://127.0.0.1:8545';
+      const provider = new JsonRpcProvider(NETWORK_URL);
       const contract = new Contract(
         event.eventContract,
         EventContractABI.abi,

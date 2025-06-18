@@ -3,9 +3,15 @@ import type { EventFactoryContract } from '../types/contracts';
 import EventFactoryABI from '../contracts/EventFactory.sol/EventFactory.json';
 
 const FACTORY_ADDRESS =
-  import.meta.env.FACTORY_ADDRESS ||
-  '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512';
-const RPC_URL = 'http://127.0.0.1:8545';
+  import.meta.env.VITE_FACTORY_ADDRESS ||
+  '0x5FbDB2315678afecb367f032d93F642f64180aa3';
+const RPC_URL = import.meta.env.VITE_NETWORK_URL || 'http://127.0.0.1:8545';
+
+console.log('🔍 Environment Debug:');
+console.log('VITE_FACTORY_ADDRESS:', import.meta.env.VITE_FACTORY_ADDRESS);
+console.log('VITE_NETWORK_URL:', import.meta.env.VITE_NETWORK_URL);
+console.log('Final FACTORY_ADDRESS:', FACTORY_ADDRESS);
+console.log('Final RPC_URL:', RPC_URL);
 
 /**
  * Get an instance of the EventFactory contract with full TypeScript support

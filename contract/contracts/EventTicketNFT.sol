@@ -7,16 +7,21 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/interfaces/IERC2981.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "./Interfaces.sol";
 
 /**
  * @title EventTicketNFT
  * @dev NFT contract for minting and managing tickets
  */
-contract EventTicketNFT is ERC721, ERC721URIStorage, ERC721Enumerable, IERC2981, Ownable, ReentrancyGuard {
+contract EventTicketNFT is ERC721, ERC721URIStorage, ERC721Enumerable, IERC2981, Ownable, ReentrancyGuard, Initializable {
     address public eventContract;
     uint256 public constant ROYALTY_FEE = 500; // 5%
     uint256 private _tokenIdCounter;
+    
+    // Storage for dynamic name and symbol
+    string private _tokenName;
+    string private _tokenSymbol;
     
     struct Ticket {
         uint256 tokenId;
@@ -37,13 +42,29 @@ contract EventTicketNFT is ERC721, ERC721URIStorage, ERC721Enumerable, IERC2981,
         _;
     }
     
-    constructor(
+    constructor() ERC721("", "") Ownable(msg.sender) {
+        // Constructor is disabled for clones
+        _disableInitializers();
+    }
+    
+    function initialize(
         string memory _name,
         string memory _symbol,
         address _eventContract,
         address _owner
-    ) ERC721(_name, _symbol) Ownable(_owner) {
+    ) external initializer {
+        _transferOwnership(_owner);
         eventContract = _eventContract;
+        _tokenName = _name;
+        _tokenSymbol = _symbol;
+    }
+    
+    function name() public view virtual override returns (string memory) {
+        return _tokenName;
+    }
+    
+    function symbol() public view virtual override returns (string memory) {
+        return _tokenSymbol;
     }
     
     function mintTicket(

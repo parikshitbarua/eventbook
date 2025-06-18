@@ -63,12 +63,14 @@ export interface EventFactoryInterface extends Interface {
       | 'deactivateEvent'
       | 'emergencyWithdraw'
       | 'eventCounter'
+      | 'eventImplementation'
       | 'events'
       | 'getActiveEvents'
       | 'getAllEventIds'
       | 'getEventDetails'
       | 'getOrganizerEventCount'
       | 'getOrganizerEvents'
+      | 'nftImplementation'
       | 'organizerEventCount'
       | 'organizerEvents'
       | 'organizerEventsList'
@@ -117,6 +119,10 @@ export interface EventFactoryInterface extends Interface {
     values?: undefined,
   ): string;
   encodeFunctionData(
+    functionFragment: 'eventImplementation',
+    values?: undefined,
+  ): string;
+  encodeFunctionData(
     functionFragment: 'events',
     values: [BigNumberish],
   ): string;
@@ -139,6 +145,10 @@ export interface EventFactoryInterface extends Interface {
   encodeFunctionData(
     functionFragment: 'getOrganizerEvents',
     values: [AddressLike],
+  ): string;
+  encodeFunctionData(
+    functionFragment: 'nftImplementation',
+    values?: undefined,
   ): string;
   encodeFunctionData(
     functionFragment: 'organizerEventCount',
@@ -194,6 +204,10 @@ export interface EventFactoryInterface extends Interface {
     functionFragment: 'eventCounter',
     data: BytesLike,
   ): Result;
+  decodeFunctionResult(
+    functionFragment: 'eventImplementation',
+    data: BytesLike,
+  ): Result;
   decodeFunctionResult(functionFragment: 'events', data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: 'getActiveEvents',
@@ -213,6 +227,10 @@ export interface EventFactoryInterface extends Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: 'getOrganizerEvents',
+    data: BytesLike,
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: 'nftImplementation',
     data: BytesLike,
   ): Result;
   decodeFunctionResult(
@@ -394,6 +412,8 @@ export interface EventFactory extends BaseContract {
 
   eventCounter: TypedContractMethod<[], [bigint], 'view'>;
 
+  eventImplementation: TypedContractMethod<[], [string], 'view'>;
+
   events: TypedContractMethod<
     [arg0: BigNumberish],
     [
@@ -452,6 +472,8 @@ export interface EventFactory extends BaseContract {
     [bigint[]],
     'view'
   >;
+
+  nftImplementation: TypedContractMethod<[], [string], 'view'>;
 
   organizerEventCount: TypedContractMethod<
     [arg0: AddressLike],
@@ -532,6 +554,9 @@ export interface EventFactory extends BaseContract {
   getFunction(
     nameOrSignature: 'eventCounter',
   ): TypedContractMethod<[], [bigint], 'view'>;
+  getFunction(
+    nameOrSignature: 'eventImplementation',
+  ): TypedContractMethod<[], [string], 'view'>;
   getFunction(nameOrSignature: 'events'): TypedContractMethod<
     [arg0: BigNumberish],
     [
@@ -585,6 +610,9 @@ export interface EventFactory extends BaseContract {
   getFunction(
     nameOrSignature: 'getOrganizerEvents',
   ): TypedContractMethod<[organizer: AddressLike], [bigint[]], 'view'>;
+  getFunction(
+    nameOrSignature: 'nftImplementation',
+  ): TypedContractMethod<[], [string], 'view'>;
   getFunction(
     nameOrSignature: 'organizerEventCount',
   ): TypedContractMethod<[arg0: AddressLike], [bigint], 'view'>;
