@@ -1,7 +1,7 @@
 import { Fragment, useState, useEffect, useCallback } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Contract, JsonRpcProvider, formatEther } from 'ethers';
-import type { EventData } from '../utils/models';
+import type { EventData } from '../types/event.types.ts';
 import EventContractABI from '../contracts/EventContract.sol/EventContract.json';
 import {
   createTicketURIHelperUtil,
@@ -12,16 +12,8 @@ import {
   purchaseSingleTicket,
   purchaseCategoryTickets,
 } from '../utils/contractInteractions';
-
-interface TicketCategory {
-  name: string;
-  price: bigint;
-  maxSupply: bigint;
-  sold: bigint;
-  isActive: boolean;
-  categoryURI: string;
-  image?: string;
-}
+import { TicketCategory } from '../types/ticket.types.ts';
+import { APP_DOMAIN } from '../config/app.config.ts';
 
 interface CategorySelection {
   categoryIndex: number;
@@ -120,18 +112,10 @@ const TicketPurchaseModal = ({
 
   // Fetch categories when modal opens
   useEffect(() => {
-    console.log('event data', event);
     if (isOpen && event.eventContract) {
       fetchCategories();
     }
   }, [isOpen, event.eventContract, fetchCategories]);
-
-  useEffect(() => {
-    if (event) {
-      setCategories(event.categories || []);
-      setHasCategories(event.categories && event.categories.length > 0);
-    }
-  }, [event]);
 
   const updateCategoryQuantity = (
     categoryIndex: number,
@@ -148,7 +132,7 @@ const TicketPurchaseModal = ({
 
   const getTotalPrice = () => {
     if (!hasCategories) {
-      return (Number(event.ticketPrice) / 1e18) * quantity;
+      return (Number(event.ticketPrice) * quantity) / 1e18;
     }
 
     return categorySelections.reduce((total, selection) => {
@@ -179,12 +163,16 @@ const TicketPurchaseModal = ({
         const eventPrimaryImage = await fetchFirstImageFromIPFS(
           event.eventImages,
         );
+        console.log('eventPrimaryImage', eventPrimaryImage);
+
+        const defaultImage =
+          'https://static.vecteezy.com/system/resources/previews/002/779/812/non_2x/cartoon-illustration-of-ticket-free-vector.jpg';
+        const finalImage = eventPrimaryImage || defaultImage;
+
         const ticketMetadata: TicketPurchaseInput = {
           description: event.title || 'eventbook',
-          external_url: `https://localhost:5173/event/${event.eventId}`,
-          image:
-            eventPrimaryImage ||
-            'https://static.vecteezy.com/system/resources/previews/002/779/812/non_2x/cartoon-illustration-of-ticket-free-vector.jpg',
+          external_url: `${APP_DOMAIN}/event/${event.eventId}`,
+          image: finalImage,
           name: event.title || 'eventbook',
           attributes: [
             {
@@ -197,6 +185,7 @@ const TicketPurchaseModal = ({
             },
           ],
         };
+        console.log('Ticket metadata being uploaded:', ticketMetadata);
         const ticketURI = await createTicketURIHelperUtil(ticketMetadata);
         if (!ticketURI) {
           throw new Error('Failed to create ticket URI');
@@ -250,12 +239,20 @@ const TicketPurchaseModal = ({
           console.log('Category details:', category);
 
           const eventPrimaryImage = category.image;
+          const defaultImage =
+            'https://static.vecteezy.com/system/resources/previews/002/779/812/non_2x/cartoon-illustration-of-ticket-free-vector.jpg';
+          const finalImage = eventPrimaryImage || defaultImage;
+          console.log(
+            'Category image:',
+            eventPrimaryImage,
+            'Final image:',
+            finalImage,
+          );
+
           const ticketMetadata: TicketPurchaseInput = {
             description: `${event.title} - ${category.name}`,
-            external_url: `https://localhost:5173/event/${event.eventId}`,
-            image:
-              eventPrimaryImage ||
-              'https://static.vecteezy.com/system/resources/previews/002/779/812/non_2x/cartoon-illustration-of-ticket-free-vector.jpg',
+            external_url: `${APP_DOMAIN}/event/${event.eventId}`,
+            image: finalImage,
             name: `${event.title} - ${category.name}`,
             attributes: [
               {
@@ -327,7 +324,7 @@ const TicketPurchaseModal = ({
   const renderSingleTicketMode = () => (
     <>
       <div className="mt-2">
-        <p className="text-sm text-gray-500 mb-6">{event.description}</p>
+        {renderDescriptionSection()}
 
         <div className="mb-6">
           <label
@@ -353,7 +350,7 @@ const TicketPurchaseModal = ({
             Total Price:
           </span>
           <span className="text-xl font-bold text-red-600">
-            {getTotalPrice().toFixed(4)} ETH
+            {getTotalPrice().toFixed(6)} ETH
           </span>
         </div>
       </div>
@@ -363,7 +360,7 @@ const TicketPurchaseModal = ({
   const renderCategoriesMode = () => (
     <>
       <div className="mt-2">
-        <p className="text-sm text-gray-500 mb-6">{event.description}</p>
+        {renderDescriptionSection()}
 
         <div className="space-y-4 mb-6 max-h-96 overflow-y-auto">
           {categories.map((category, index) => {
@@ -443,7 +440,7 @@ const TicketPurchaseModal = ({
               Total Price:
             </span>
             <span className="text-xl font-bold text-red-600">
-              {getTotalPrice().toFixed(4)} ETH
+              {getTotalPrice().toFixed(6)} ETH
             </span>
           </div>
         </div>
@@ -485,6 +482,30 @@ const TicketPurchaseModal = ({
     return getTotalTickets() > 0;
   };
 
+  const truncateDescription = (text: string, maxLength: number = 150) => {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength).trim() + '...';
+  };
+
+  const renderDescriptionSection = () => {
+    const description = event.description || '';
+    return (
+      <div className="mb-6">
+        <p className="text-sm text-gray-500 mb-2">
+          {truncateDescription(description)}
+        </p>
+        {description.length > 150 && (
+          <button
+            onClick={() => (window.location.href = `/event/${event.eventId}`)}
+            className="text-red-600 hover:text-red-700 text-sm font-medium underline transition-colors"
+          >
+            View More Details
+          </button>
+        )}
+      </div>
+    );
+  };
+
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={onClose}>
@@ -511,36 +532,45 @@ const TicketPurchaseModal = ({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                <Dialog.Title
-                  as="h3"
-                  className="text-2xl font-bold leading-6 text-gray-900 mb-4"
-                >
-                  {event.title}
-                </Dialog.Title>
-
-                {loadingCategories
-                  ? renderLoadingState()
-                  : hasCategories
-                    ? renderCategoriesMode()
-                    : renderSingleTicketMode()}
-
-                <div className="mt-4 flex justify-end space-x-3">
-                  <button
-                    type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-gray-100 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2"
-                    onClick={onClose}
+              <Dialog.Panel className="w-full max-w-2xl max-h-[90vh] transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all flex flex-col">
+                {/* Fixed Header */}
+                <div className="px-6 py-4 border-b border-gray-200 flex-shrink-0">
+                  <Dialog.Title
+                    as="h3"
+                    className="text-2xl font-bold leading-6 text-gray-900"
                   >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                    onClick={handlePurchase}
-                    disabled={!canPurchase()}
-                  >
-                    {isLoading ? 'Processing...' : 'Buy Now'}
-                  </button>
+                    {event.title}
+                  </Dialog.Title>
+                </div>
+
+                {/* Scrollable Content */}
+                <div className="flex-1 overflow-y-auto px-6 py-4">
+                  {loadingCategories
+                    ? renderLoadingState()
+                    : hasCategories
+                      ? renderCategoriesMode()
+                      : renderSingleTicketMode()}
+                </div>
+
+                {/* Fixed Footer */}
+                <div className="px-6 py-4 border-t border-gray-200 flex-shrink-0">
+                  <div className="flex justify-end space-x-3">
+                    <button
+                      type="button"
+                      className="inline-flex justify-center rounded-md border border-transparent bg-gray-100 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2"
+                      onClick={onClose}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      className="inline-flex justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={handlePurchase}
+                      disabled={!canPurchase()}
+                    >
+                      {isLoading ? 'Processing...' : 'Buy Now'}
+                    </button>
+                  </div>
                 </div>
               </Dialog.Panel>
             </Transition.Child>

@@ -1,19 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { JsonRpcProvider, Contract } from 'ethers';
-import type { EventData } from '../utils/models';
-import type { EventFactoryContract } from '../types/contracts';
+import type { EventData } from '../types/event.types.ts';
+import type { EventFactoryContract } from '../types/contracts.types.ts';
 import TicketPurchaseModal from '../components/TicketPurchaseModal';
 import EventFactoryABI from '../contracts/EventFactory.sol/EventFactory.json';
 import { fetchFirstImageFromIPFS } from '../utils/ipfs-helper.util';
+import EventContractABI from '../contracts/EventContract.sol/EventContract.json';
+import { TicketCategory } from '../types/ticket.types.ts';
 // const { purchaseTickets } = usePurchaseTickets();
 
 const FACTORY_ADDRESS =
   import.meta.env.VITE_FACTORY_ADDRESS ||
   '0x5FbDB2315678afecb367f032d93F642f64180aa3';
 const NETWORK_URL = import.meta.env.VITE_NETWORK_URL || 'http://127.0.0.1:8545';
-console.log('FACTORY_ADDRESS', FACTORY_ADDRESS);
-console.log('NETWORK_URL', NETWORK_URL);
 
 const HomePage = () => {
   const [allEvents, setAllEvents] = useState<EventData[]>([]);
@@ -59,12 +59,52 @@ const HomePage = () => {
                 }
               }
 
+              let finalTicketPrice = eventDetails.ticketPrice;
+
+              if (eventDetails.ticketPrice === 0n) {
+                try {
+                  const provider = new JsonRpcProvider(NETWORK_URL);
+                  const contract = new Contract(
+                    eventDetails.eventInfo.eventContract,
+                    EventContractABI.abi,
+                    provider,
+                  );
+
+                  const categoriesData = await contract.getAllCategories();
+                  if (categoriesData && categoriesData.length > 0) {
+                    const categoriesArray = Array.from(
+                      categoriesData,
+                    ) as TicketCategory[];
+                    let lowestPrice = BigInt(categoriesArray[0].price);
+                    for (let i = 1; i < categoriesArray.length; i++) {
+                      const currentPrice = BigInt(categoriesArray[i].price);
+                      if (currentPrice < lowestPrice) {
+                        lowestPrice = currentPrice;
+                      }
+                    }
+
+                    finalTicketPrice = lowestPrice;
+                  } else {
+                    console.warn(
+                      `No valid categories found for event ${eventId}, keeping original ticket price`,
+                    );
+                    // Keep the original ticketPrice as 0n or set a default
+                  }
+                } catch (categoryError) {
+                  console.error(
+                    `Failed to fetch categories for event ${eventId}:`,
+                    categoryError,
+                  );
+                  // Keep the original ticketPrice as 0n in case of error
+                }
+              }
+
               eventData.push({
                 eventId: Number(eventId),
                 title: eventDetails.eventInfo.title,
                 description: eventDetails.description,
                 organizer: eventDetails.eventInfo.organizer as `0x${string}`,
-                ticketPrice: eventDetails.ticketPrice,
+                ticketPrice: finalTicketPrice,
                 maxTickets: eventDetails.maxTickets,
                 ticketsSold: eventDetails.eventInfo.ticketsSold,
                 ticketsLeft: BigInt(

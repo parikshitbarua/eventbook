@@ -2,11 +2,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { JsonRpcProvider, Contract } from 'ethers';
 import TicketPurchaseModal from '../components/TicketPurchaseModal';
-import type { EventData } from '../utils/models';
+import type { EventData } from '../types/event.types.ts';
 import EventFactoryABI from '../contracts/EventFactory.sol/EventFactory.json';
 import EventContractABI from '../contracts/EventContract.sol/EventContract.json';
 import { fetchFirstImageFromIPFS } from '../utils/ipfs-helper.util';
 import { usePurchaseTickets } from '../utils/ticketPurchase.util';
+import { EventDetailsResponseData } from '../types/event.types.ts';
 
 const FACTORY_ADDRESS =
   import.meta.env.VITE_FACTORY_ADDRESS ||
@@ -45,6 +46,7 @@ interface EventStats {
   totalSold: number;
   availableTickets: number;
   hasCategories: boolean;
+  minTicketPrice?: bigint;
 }
 
 const EventDetailsPage = () => {
@@ -61,7 +63,10 @@ const EventDetailsPage = () => {
   const { purchaseTickets } = usePurchaseTickets();
 
   const fetchEventStats = useCallback(
-    async (eventContractAddress: string): Promise<EventStats> => {
+    async (
+      eventContractAddress: string,
+      eventDetails: EventDetailsResponseData,
+    ): Promise<EventStats> => {
       try {
         const provider = new JsonRpcProvider(NETWORK_URL);
         const eventContract = new Contract(
@@ -75,16 +80,6 @@ const EventDetailsPage = () => {
           await eventContract.getAllCategories();
 
         if (categories.length === 0) {
-          // No categories, use the original event data
-          const factoryContract = new Contract(
-            FACTORY_ADDRESS,
-            EventFactoryABI.abi,
-            provider,
-          );
-          const eventDetails = await factoryContract.getEventDetails(
-            BigInt(eventId!),
-          );
-
           return {
             totalCapacity: Number(eventDetails.maxTickets),
             totalSold: Number(eventDetails.eventInfo.ticketsSold),
@@ -97,8 +92,12 @@ const EventDetailsPage = () => {
           // Calculate totals from categories
           let totalCapacity = 0;
           let totalSold = 0;
+          let minTicketPrice = categories[0].price;
 
           categories.forEach((category) => {
+            if (category.price < minTicketPrice) {
+              minTicketPrice = category.price;
+            }
             totalCapacity += Number(category.maxSupply);
             totalSold += Number(category.sold);
           });
@@ -108,6 +107,7 @@ const EventDetailsPage = () => {
             totalSold,
             availableTickets: totalCapacity - totalSold,
             hasCategories: true,
+            minTicketPrice,
           };
         }
       } catch (error) {
@@ -134,9 +134,8 @@ const EventDetailsPage = () => {
         provider,
       );
 
-      const eventDetails = await factoryContract.getEventDetails(
-        BigInt(eventId!),
-      );
+      const eventDetails: EventDetailsResponseData =
+        await factoryContract.getEventDetails(BigInt(eventId!));
 
       // Fetch first image from IPFS
       let firstImageUrl: string | null = null;
@@ -158,14 +157,20 @@ const EventDetailsPage = () => {
       }
 
       // Fetch ticket categories to calculate proper stats
-      const stats = await fetchEventStats(eventDetails.eventInfo.eventContract);
+      const stats = await fetchEventStats(
+        eventDetails.eventInfo.eventContract,
+        eventDetails,
+      );
 
       const eventData: EventData = {
         eventId: Number(eventId),
         title: eventDetails.eventInfo.title,
         description: eventDetails.description,
         organizer: eventDetails.eventInfo.organizer as `0x${string}`,
-        ticketPrice: eventDetails.ticketPrice,
+        ticketPrice:
+          stats.minTicketPrice > 0
+            ? stats.minTicketPrice
+            : eventDetails.ticketPrice,
         maxTickets: BigInt(stats.totalCapacity), // Use calculated capacity
         ticketsSold: BigInt(stats.totalSold), // Use calculated sold count
         ticketsLeft: BigInt(stats.availableTickets), // Use calculated available

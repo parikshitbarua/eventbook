@@ -486,7 +486,7 @@ const NewEventPage = () => {
                           name="ticketPrice"
                           value={formData.ticketPrice}
                           onChange={handleChange}
-                          step="0.001"
+                          step="0.000001"
                           min="0"
                           className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
                           placeholder="0.1"

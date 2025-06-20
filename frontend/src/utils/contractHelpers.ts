@@ -1,5 +1,5 @@
 import { JsonRpcProvider, Contract, Signer } from 'ethers';
-import type { EventFactoryContract } from '../types/contracts';
+import type { EventFactoryContract } from '../types/contracts.types.ts';
 import EventFactoryABI from '../contracts/EventFactory.sol/EventFactory.json';
 
 const FACTORY_ADDRESS =

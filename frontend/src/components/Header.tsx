@@ -33,7 +33,7 @@ const Header = () => {
             transition-all duration-300 group-hover:from-red-600 group-hover:to-red-700
             transform group-hover:scale-105 inline-block"
             >
-              eventbook
+              eventChain
             </p>
           </Link>
           <div
@@ -72,7 +72,7 @@ const Header = () => {
                     My Events
                   </Link>
                   <Link
-                    to="/my-tickets"
+                    to="profile/my-tickets"
                     className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
                     onClick={() => setIsDropdownOpen(false)}
                   >

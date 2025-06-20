@@ -4,12 +4,8 @@ import { useAccount } from 'wagmi';
 import { JsonRpcProvider, Contract } from 'ethers';
 import EventFactoryABI from '../contracts/EventFactory.sol/EventFactory.json';
 import { fetchFirstImageFromIPFS } from '../utils/ipfs-helper.util';
-import type { EventData } from '../utils/models';
-
-const FACTORY_ADDRESS =
-  import.meta.env.VITE_FACTORY_ADDRESS ||
-  '0x5FbDB2315678afecb367f032d93F642f64180aa3';
-const NETWORK_URL = import.meta.env.VITE_NETWORK_URL || 'http://127.0.0.1:8545';
+import type { EventData } from '../types/event.types.ts';
+import { NETWORK_URL, FACTORY_ADDRESS } from '../config/app.config';
 
 const MyEvents: React.FC = () => {
   const navigate = useNavigate();

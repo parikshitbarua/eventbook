@@ -30,7 +30,7 @@ export const hardhatNetwork = defineChain({
   },
   rpcUrls: {
     default: {
-      http: ['https://sepolia.base.org', 'http://127.0.0.1:8545'],
+      http: ['http://127.0.0.1:8545'],
       webSocket: ['ws://127.0.0.1:8545'],
     },
   },
