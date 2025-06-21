@@ -83,6 +83,7 @@ export interface EventContractInterface extends Interface {
       | 'getCategoryURI'
       | 'getEventDetails'
       | 'getTicketCategory'
+      | 'initialize'
       | 'isActive'
       | 'isCategoryTicketAvailable'
       | 'isTicketAvailable'
@@ -120,6 +121,8 @@ export interface EventContractInterface extends Interface {
       | 'EventUpdated'
       | 'FactoryUpdateAttempted'
       | 'FactoryUpdateResult'
+      | 'Initialized'
+      | 'MaxTicketsSet'
       | 'OwnershipTransferred'
       | 'PurchaseCompleted'
       | 'PurchaseStarted'
@@ -178,6 +181,22 @@ export interface EventContractInterface extends Interface {
   encodeFunctionData(
     functionFragment: 'getTicketCategory',
     values: [BigNumberish],
+  ): string;
+  encodeFunctionData(
+    functionFragment: 'initialize',
+    values: [
+      string,
+      string,
+      AddressLike,
+      BigNumberish,
+      BigNumberish,
+      string,
+      BigNumberish,
+      BigNumberish,
+      string,
+      BigNumberish,
+      AddressLike,
+    ],
   ): string;
   encodeFunctionData(functionFragment: 'isActive', values?: undefined): string;
   encodeFunctionData(
@@ -317,6 +336,7 @@ export interface EventContractInterface extends Interface {
     functionFragment: 'getTicketCategory',
     data: BytesLike,
   ): Result;
+  decodeFunctionResult(functionFragment: 'initialize', data: BytesLike): Result;
   decodeFunctionResult(functionFragment: 'isActive', data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: 'isCategoryTicketAvailable',
@@ -546,6 +566,31 @@ export namespace FactoryUpdateResultEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
+export namespace InitializedEvent {
+  export type InputTuple = [version: BigNumberish];
+  export type OutputTuple = [version: bigint];
+  export interface OutputObject {
+    version: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace MaxTicketsSetEvent {
+  export type InputTuple = [maxTickets: BigNumberish, rawInput: BigNumberish];
+  export type OutputTuple = [maxTickets: bigint, rawInput: bigint];
+  export interface OutputObject {
+    maxTickets: bigint;
+    rawInput: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
 export namespace OwnershipTransferredEvent {
   export type InputTuple = [previousOwner: AddressLike, newOwner: AddressLike];
   export type OutputTuple = [previousOwner: string, newOwner: string];
@@ -762,6 +807,24 @@ export interface EventContract extends BaseContract {
     [_categoryId: BigNumberish],
     [EventContract.TicketCategoryStructOutput],
     'view'
+  >;
+
+  initialize: TypedContractMethod<
+    [
+      _eventTitle: string,
+      _eventDescription: string,
+      _organizer: AddressLike,
+      _ticketPrice: BigNumberish,
+      _maxTickets: BigNumberish,
+      _eventURI: string,
+      _eventStartTime: BigNumberish,
+      _eventEndTime: BigNumberish,
+      _venue: string,
+      _eventId: BigNumberish,
+      _factory: AddressLike,
+    ],
+    [void],
+    'nonpayable'
   >;
 
   isActive: TypedContractMethod<[], [boolean], 'view'>;
@@ -981,6 +1044,25 @@ export interface EventContract extends BaseContract {
     'view'
   >;
   getFunction(
+    nameOrSignature: 'initialize',
+  ): TypedContractMethod<
+    [
+      _eventTitle: string,
+      _eventDescription: string,
+      _organizer: AddressLike,
+      _ticketPrice: BigNumberish,
+      _maxTickets: BigNumberish,
+      _eventURI: string,
+      _eventStartTime: BigNumberish,
+      _eventEndTime: BigNumberish,
+      _venue: string,
+      _eventId: BigNumberish,
+      _factory: AddressLike,
+    ],
+    [void],
+    'nonpayable'
+  >;
+  getFunction(
     nameOrSignature: 'isActive',
   ): TypedContractMethod<[], [boolean], 'view'>;
   getFunction(
@@ -1158,6 +1240,20 @@ export interface EventContract extends BaseContract {
     FactoryUpdateResultEvent.OutputObject
   >;
   getEvent(
+    key: 'Initialized',
+  ): TypedContractEvent<
+    InitializedEvent.InputTuple,
+    InitializedEvent.OutputTuple,
+    InitializedEvent.OutputObject
+  >;
+  getEvent(
+    key: 'MaxTicketsSet',
+  ): TypedContractEvent<
+    MaxTicketsSetEvent.InputTuple,
+    MaxTicketsSetEvent.OutputTuple,
+    MaxTicketsSetEvent.OutputObject
+  >;
+  getEvent(
     key: 'OwnershipTransferred',
   ): TypedContractEvent<
     OwnershipTransferredEvent.InputTuple,
@@ -1280,6 +1376,28 @@ export interface EventContract extends BaseContract {
       FactoryUpdateResultEvent.InputTuple,
       FactoryUpdateResultEvent.OutputTuple,
       FactoryUpdateResultEvent.OutputObject
+    >;
+
+    'Initialized(uint64)': TypedContractEvent<
+      InitializedEvent.InputTuple,
+      InitializedEvent.OutputTuple,
+      InitializedEvent.OutputObject
+    >;
+    Initialized: TypedContractEvent<
+      InitializedEvent.InputTuple,
+      InitializedEvent.OutputTuple,
+      InitializedEvent.OutputObject
+    >;
+
+    'MaxTicketsSet(uint256,uint256)': TypedContractEvent<
+      MaxTicketsSetEvent.InputTuple,
+      MaxTicketsSetEvent.OutputTuple,
+      MaxTicketsSetEvent.OutputObject
+    >;
+    MaxTicketsSet: TypedContractEvent<
+      MaxTicketsSetEvent.InputTuple,
+      MaxTicketsSetEvent.OutputTuple,
+      MaxTicketsSetEvent.OutputObject
     >;
 
     'OwnershipTransferred(address,address)': TypedContractEvent<

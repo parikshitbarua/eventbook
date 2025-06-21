@@ -58,6 +58,7 @@ export interface EventTicketNFTInterface extends Interface {
       | 'getApproved'
       | 'getTicket'
       | 'getTicketsOfOwner'
+      | 'initialize'
       | 'isApprovedForAll'
       | 'isTicketUsed'
       | 'mintTicket'
@@ -89,6 +90,7 @@ export interface EventTicketNFTInterface extends Interface {
       | 'Approval'
       | 'ApprovalForAll'
       | 'BatchMetadataUpdate'
+      | 'Initialized'
       | 'MetadataUpdate'
       | 'OwnershipTransferred'
       | 'TicketMinted'
@@ -127,6 +129,10 @@ export interface EventTicketNFTInterface extends Interface {
   encodeFunctionData(
     functionFragment: 'getTicketsOfOwner',
     values: [AddressLike],
+  ): string;
+  encodeFunctionData(
+    functionFragment: 'initialize',
+    values: [string, string, AddressLike, AddressLike],
   ): string;
   encodeFunctionData(
     functionFragment: 'isApprovedForAll',
@@ -239,6 +245,7 @@ export interface EventTicketNFTInterface extends Interface {
     functionFragment: 'getTicketsOfOwner',
     data: BytesLike,
   ): Result;
+  decodeFunctionResult(functionFragment: 'initialize', data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: 'isApprovedForAll',
     data: BytesLike,
@@ -362,6 +369,18 @@ export namespace BatchMetadataUpdateEvent {
   export interface OutputObject {
     _fromTokenId: bigint;
     _toTokenId: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace InitializedEvent {
+  export type InputTuple = [version: BigNumberish];
+  export type OutputTuple = [version: bigint];
+  export interface OutputObject {
+    version: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -526,6 +545,17 @@ export interface EventTicketNFT extends BaseContract {
     'view'
   >;
 
+  initialize: TypedContractMethod<
+    [
+      _name: string,
+      _symbol: string,
+      _eventContract: AddressLike,
+      _owner: AddressLike,
+    ],
+    [void],
+    'nonpayable'
+  >;
+
   isApprovedForAll: TypedContractMethod<
     [owner: AddressLike, operator: AddressLike],
     [boolean],
@@ -685,6 +715,18 @@ export interface EventTicketNFT extends BaseContract {
     nameOrSignature: 'getTicketsOfOwner',
   ): TypedContractMethod<[owner: AddressLike], [bigint[]], 'view'>;
   getFunction(
+    nameOrSignature: 'initialize',
+  ): TypedContractMethod<
+    [
+      _name: string,
+      _symbol: string,
+      _eventContract: AddressLike,
+      _owner: AddressLike,
+    ],
+    [void],
+    'nonpayable'
+  >;
+  getFunction(
     nameOrSignature: 'isApprovedForAll',
   ): TypedContractMethod<
     [owner: AddressLike, operator: AddressLike],
@@ -834,6 +876,13 @@ export interface EventTicketNFT extends BaseContract {
     BatchMetadataUpdateEvent.OutputObject
   >;
   getEvent(
+    key: 'Initialized',
+  ): TypedContractEvent<
+    InitializedEvent.InputTuple,
+    InitializedEvent.OutputTuple,
+    InitializedEvent.OutputObject
+  >;
+  getEvent(
     key: 'MetadataUpdate',
   ): TypedContractEvent<
     MetadataUpdateEvent.InputTuple,
@@ -901,6 +950,17 @@ export interface EventTicketNFT extends BaseContract {
       BatchMetadataUpdateEvent.InputTuple,
       BatchMetadataUpdateEvent.OutputTuple,
       BatchMetadataUpdateEvent.OutputObject
+    >;
+
+    'Initialized(uint64)': TypedContractEvent<
+      InitializedEvent.InputTuple,
+      InitializedEvent.OutputTuple,
+      InitializedEvent.OutputObject
+    >;
+    Initialized: TypedContractEvent<
+      InitializedEvent.InputTuple,
+      InitializedEvent.OutputTuple,
+      InitializedEvent.OutputObject
     >;
 
     'MetadataUpdate(uint256)': TypedContractEvent<

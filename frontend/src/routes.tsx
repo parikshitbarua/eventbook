@@ -5,14 +5,20 @@ import HomePage from './pages/HomePage.tsx';
 import AddTicketsPage from './pages/AddTicketsPage.tsx';
 import EventDetailsPage from './pages/EventDetailsPage.tsx';
 import MyEvents from './pages/MyEvents.tsx';
+import MyTickets from './pages/MyTickets.tsx';
+import LandingPage from './pages/LandingPage.tsx';
 
 const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <LandingPage />,
+  },
   {
     path: '/',
     element: <Layout />,
     children: [
       {
-        path: '/',
+        path: '/home',
         element: <HomePage />,
       },
       {
@@ -30,6 +36,10 @@ const router = createBrowserRouter([
       {
         path: '/profile/my-events',
         element: <MyEvents />,
+      },
+      {
+        path: '/profile/my-tickets',
+        element: <MyTickets />,
       },
     ],
   },

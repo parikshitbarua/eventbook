@@ -1,17 +1,19 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { JsonRpcProvider, Contract } from 'ethers';
+import Confetti from 'react-confetti';
 import TicketPurchaseModal from '../components/TicketPurchaseModal';
-import type { EventData } from '../utils/models';
+import type { EventData } from '../types/event.types.ts';
 import EventFactoryABI from '../contracts/EventFactory.sol/EventFactory.json';
 import EventContractABI from '../contracts/EventContract.sol/EventContract.json';
 import { fetchFirstImageFromIPFS } from '../utils/ipfs-helper.util';
-import { usePurchaseTickets } from '../utils/ticketPurchase.util';
+import { EventDetailsResponseData } from '../types/event.types.ts';
+import { useTheme } from '../hooks/theme.hook.ts';
 
 const FACTORY_ADDRESS =
-  import.meta.env.FACTORY_ADDRESS ||
-  '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512';
-const NETWORK_URL = import.meta.env.NETWORK_URL || 'http://127.0.0.1:8545';
+  import.meta.env.VITE_FACTORY_ADDRESS ||
+  '0x5FbDB2315678afecb367f032d93F642f64180aa3';
+const NETWORK_URL = import.meta.env.VITE_NETWORK_URL || 'http://127.0.0.1:8545';
 
 interface EventMetadata {
   name?: string;
@@ -45,6 +47,7 @@ interface EventStats {
   totalSold: number;
   availableTickets: number;
   hasCategories: boolean;
+  minTicketPrice?: bigint;
 }
 
 const EventDetailsPage = () => {
@@ -58,10 +61,18 @@ const EventDetailsPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { purchaseTickets } = usePurchaseTickets();
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [windowDimensions, setWindowDimensions] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+  const { isDark } = useTheme();
 
   const fetchEventStats = useCallback(
-    async (eventContractAddress: string): Promise<EventStats> => {
+    async (
+      eventContractAddress: string,
+      eventDetails: EventDetailsResponseData,
+    ): Promise<EventStats> => {
       try {
         const provider = new JsonRpcProvider(NETWORK_URL);
         const eventContract = new Contract(
@@ -75,16 +86,6 @@ const EventDetailsPage = () => {
           await eventContract.getAllCategories();
 
         if (categories.length === 0) {
-          // No categories, use the original event data
-          const factoryContract = new Contract(
-            FACTORY_ADDRESS,
-            EventFactoryABI.abi,
-            provider,
-          );
-          const eventDetails = await factoryContract.getEventDetails(
-            BigInt(eventId!),
-          );
-
           return {
             totalCapacity: Number(eventDetails.maxTickets),
             totalSold: Number(eventDetails.eventInfo.ticketsSold),
@@ -97,8 +98,12 @@ const EventDetailsPage = () => {
           // Calculate totals from categories
           let totalCapacity = 0;
           let totalSold = 0;
+          let minTicketPrice = categories[0].price;
 
           categories.forEach((category) => {
+            if (category.price < minTicketPrice) {
+              minTicketPrice = category.price;
+            }
             totalCapacity += Number(category.maxSupply);
             totalSold += Number(category.sold);
           });
@@ -108,6 +113,7 @@ const EventDetailsPage = () => {
             totalSold,
             availableTickets: totalCapacity - totalSold,
             hasCategories: true,
+            minTicketPrice,
           };
         }
       } catch (error) {
@@ -134,9 +140,8 @@ const EventDetailsPage = () => {
         provider,
       );
 
-      const eventDetails = await factoryContract.getEventDetails(
-        BigInt(eventId!),
-      );
+      const eventDetails: EventDetailsResponseData =
+        await factoryContract.getEventDetails(BigInt(eventId!));
 
       // Fetch first image from IPFS
       let firstImageUrl: string | null = null;
@@ -158,14 +163,20 @@ const EventDetailsPage = () => {
       }
 
       // Fetch ticket categories to calculate proper stats
-      const stats = await fetchEventStats(eventDetails.eventInfo.eventContract);
+      const stats = await fetchEventStats(
+        eventDetails.eventInfo.eventContract,
+        eventDetails,
+      );
 
       const eventData: EventData = {
         eventId: Number(eventId),
         title: eventDetails.eventInfo.title,
         description: eventDetails.description,
         organizer: eventDetails.eventInfo.organizer as `0x${string}`,
-        ticketPrice: eventDetails.ticketPrice,
+        ticketPrice:
+          stats.minTicketPrice && stats.minTicketPrice > 0
+            ? stats.minTicketPrice
+            : eventDetails.ticketPrice,
         maxTickets: BigInt(stats.totalCapacity), // Use calculated capacity
         ticketsSold: BigInt(stats.totalSold), // Use calculated sold count
         ticketsLeft: BigInt(stats.availableTickets), // Use calculated available
@@ -198,38 +209,26 @@ const EventDetailsPage = () => {
     }
   }, [eventId, fetchEventDetails]);
 
-  const handlePurchase = async (
-    quantities: number[],
-    categoryIds: number[],
-    tokenURIs: string[],
-    totalPrice: string,
-  ) => {
-    if (!event?.nftContract) {
-      throw new Error('No event selected or NFT contract not found');
-    }
-
-    try {
-      console.log('Purchasing tickets for event:', {
-        quantities,
-        categoryIds,
-        tokenURIs,
-        totalPrice,
+  // Handle window resize for confetti
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight,
       });
+    };
 
-      const hash = await purchaseTickets({
-        nftContractAddress: event.nftContract,
-        quantities,
-        categoryIds,
-        tokenURIs,
-        totalPrice,
-      });
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
-      console.log('Purchase transaction hash:', hash);
-      return hash;
-    } catch (error) {
-      console.error('Purchase failed:', error);
-      throw error;
-    }
+  // Handle success state
+  const handlePurchaseSuccess = () => {
+    setShowSuccess(true);
+    // Auto-hide success message after 5 seconds
+    setTimeout(() => {
+      setShowSuccess(false);
+    }, 5000);
   };
 
   const formatDate = (timestamp: bigint) => {
@@ -263,7 +262,11 @@ const EventDetailsPage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div
+        className={`min-h-screen flex items-center justify-center transition-colors ${
+          isDark ? 'bg-gray-900' : 'bg-gray-50'
+        }`}
+      >
         <div className="text-center">
           <svg
             className="animate-spin h-12 w-12 text-red-600 mx-auto mb-4"
@@ -285,7 +288,13 @@ const EventDetailsPage = () => {
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
             ></path>
           </svg>
-          <p className="text-gray-600">Loading event details...</p>
+          <p
+            className={`transition-colors ${
+              isDark ? 'text-gray-300' : 'text-gray-600'
+            }`}
+          >
+            Loading event details...
+          </p>
         </div>
       </div>
     );
@@ -293,7 +302,11 @@ const EventDetailsPage = () => {
 
   if (error || !event || !eventStats) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div
+        className={`min-h-screen flex items-center justify-center transition-colors ${
+          isDark ? 'bg-gray-900' : 'bg-gray-50'
+        }`}
+      >
         <div className="text-center">
           <div className="text-red-500 mb-4">
             <svg
@@ -308,10 +321,18 @@ const EventDetailsPage = () => {
               />
             </svg>
           </div>
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">
+          <h3
+            className={`text-xl font-semibold mb-2 transition-colors ${
+              isDark ? 'text-gray-200' : 'text-gray-700'
+            }`}
+          >
             Event Not Found
           </h3>
-          <p className="text-gray-500 mb-4">
+          <p
+            className={`mb-4 transition-colors ${
+              isDark ? 'text-gray-400' : 'text-gray-500'
+            }`}
+          >
             {error || 'The requested event could not be found.'}
           </p>
           <button
@@ -326,7 +347,77 @@ const EventDetailsPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div
+      className={`min-h-screen transition-colors ${
+        isDark ? 'bg-gray-900' : 'bg-gray-50'
+      }`}
+    >
+      {/* Confetti Animation */}
+      {showSuccess && (
+        <Confetti
+          width={windowDimensions.width}
+          height={windowDimensions.height}
+          recycle={false}
+          numberOfPieces={200}
+          gravity={0.3}
+        />
+      )}
+
+      {/* Success Message */}
+      {showSuccess && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+          <div
+            className={`max-w-md mx-4 p-6 rounded-2xl shadow-2xl transform transition-all duration-500 ${
+              isDark
+                ? 'bg-gray-800 border border-gray-700'
+                : 'bg-white border border-gray-200'
+            }`}
+          >
+            <div className="text-center">
+              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+                <svg
+                  className="h-8 w-8 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+              <h3
+                className={`text-lg font-semibold mb-2 transition-colors ${
+                  isDark ? 'text-gray-100' : 'text-gray-900'
+                }`}
+              >
+                🎉 Purchase Successful!
+              </h3>
+              <p
+                className={`text-sm transition-colors ${
+                  isDark ? 'text-gray-300' : 'text-gray-600'
+                }`}
+              >
+                Your tickets have been successfully purchased! Check your wallet
+                for the NFT tickets.
+              </p>
+              <button
+                onClick={() => setShowSuccess(false)}
+                className={`mt-4 px-4 py-2 rounded-lg text-sm font-medium transition-colors pointer-events-auto ${
+                  isDark
+                    ? 'bg-gray-700 text-gray-200 hover:bg-gray-600'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Hero Section */}
       <div className="relative h-96 md:h-[500px] overflow-hidden">
         <img
@@ -394,11 +485,23 @@ const EventDetailsPage = () => {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Event Description */}
-            <div className="bg-white rounded-2xl p-8 shadow-sm">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <div
+              className={`rounded-2xl p-8 shadow-sm transition-colors ${
+                isDark ? 'bg-gray-800' : 'bg-white'
+              }`}
+            >
+              <h2
+                className={`text-2xl font-bold mb-4 transition-colors ${
+                  isDark ? 'text-gray-100' : 'text-gray-900'
+                }`}
+              >
                 About This Event
               </h2>
-              <p className="text-gray-700 leading-relaxed mb-6">
+              <p
+                className={`leading-relaxed mb-6 transition-colors ${
+                  isDark ? 'text-gray-300' : 'text-gray-700'
+                }`}
+              >
                 {event.description}
               </p>
 
@@ -417,8 +520,16 @@ const EventDetailsPage = () => {
             </div>
 
             {/* Event Statistics */}
-            <div className="bg-white rounded-2xl p-8 shadow-sm">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            <div
+              className={`rounded-2xl p-8 shadow-sm transition-colors ${
+                isDark ? 'bg-gray-800' : 'bg-white'
+              }`}
+            >
+              <h2
+                className={`text-2xl font-bold mb-6 transition-colors ${
+                  isDark ? 'text-gray-100' : 'text-gray-900'
+                }`}
+              >
                 Event Statistics
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -426,9 +537,19 @@ const EventDetailsPage = () => {
                   <div className="text-3xl font-bold text-red-600 mb-2">
                     {eventStats.totalCapacity.toLocaleString()}
                   </div>
-                  <p className="text-gray-600">Total Capacity</p>
+                  <p
+                    className={`transition-colors ${
+                      isDark ? 'text-gray-300' : 'text-gray-600'
+                    }`}
+                  >
+                    Total Capacity
+                  </p>
                   {eventStats.hasCategories && (
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p
+                      className={`text-xs mt-1 transition-colors ${
+                        isDark ? 'text-gray-400' : 'text-gray-500'
+                      }`}
+                    >
                       Across all categories
                     </p>
                   )}
@@ -437,13 +558,25 @@ const EventDetailsPage = () => {
                   <div className="text-3xl font-bold text-blue-600 mb-2">
                     {eventStats.totalSold.toLocaleString()}
                   </div>
-                  <p className="text-gray-600">Tickets Sold</p>
+                  <p
+                    className={`transition-colors ${
+                      isDark ? 'text-gray-300' : 'text-gray-600'
+                    }`}
+                  >
+                    Tickets Sold
+                  </p>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-green-600 mb-2">
                     {eventStats.availableTickets.toLocaleString()}
                   </div>
-                  <p className="text-gray-600">Available</p>
+                  <p
+                    className={`transition-colors ${
+                      isDark ? 'text-gray-300' : 'text-gray-600'
+                    }`}
+                  >
+                    Available
+                  </p>
                 </div>
               </div>
             </div>
@@ -452,14 +585,26 @@ const EventDetailsPage = () => {
             {(eventMetadata?.ageRestriction ||
               eventMetadata?.dresscode ||
               eventMetadata?.amenities) && (
-              <div className="bg-white rounded-2xl p-8 shadow-sm">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              <div
+                className={`rounded-2xl p-8 shadow-sm transition-colors ${
+                  isDark ? 'bg-gray-800' : 'bg-white'
+                }`}
+              >
+                <h2
+                  className={`text-2xl font-bold mb-6 transition-colors ${
+                    isDark ? 'text-gray-100' : 'text-gray-900'
+                  }`}
+                >
                   Event Information
                 </h2>
                 <div className="space-y-4">
                   {eventMetadata?.ageRestriction && (
                     <div className="flex items-start">
-                      <div className="flex-shrink-0 w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                      <div
+                        className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center mr-3 mt-0.5 transition-colors ${
+                          isDark ? 'bg-red-900/50' : 'bg-red-100'
+                        }`}
+                      >
                         <svg
                           className="w-3 h-3 text-red-600"
                           fill="currentColor"
@@ -473,10 +618,18 @@ const EventDetailsPage = () => {
                         </svg>
                       </div>
                       <div>
-                        <h4 className="font-semibold text-gray-900">
+                        <h4
+                          className={`font-semibold transition-colors ${
+                            isDark ? 'text-gray-100' : 'text-gray-900'
+                          }`}
+                        >
                           Age Restriction
                         </h4>
-                        <p className="text-gray-600">
+                        <p
+                          className={`transition-colors ${
+                            isDark ? 'text-gray-300' : 'text-gray-600'
+                          }`}
+                        >
                           {eventMetadata.ageRestriction}
                         </p>
                       </div>
@@ -485,7 +638,11 @@ const EventDetailsPage = () => {
 
                   {eventMetadata?.dresscode && (
                     <div className="flex items-start">
-                      <div className="flex-shrink-0 w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                      <div
+                        className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center mr-3 mt-0.5 transition-colors ${
+                          isDark ? 'bg-red-900/50' : 'bg-red-100'
+                        }`}
+                      >
                         <svg
                           className="w-3 h-3 text-red-600"
                           fill="currentColor"
@@ -499,10 +656,18 @@ const EventDetailsPage = () => {
                         </svg>
                       </div>
                       <div>
-                        <h4 className="font-semibold text-gray-900">
+                        <h4
+                          className={`font-semibold transition-colors ${
+                            isDark ? 'text-gray-100' : 'text-gray-900'
+                          }`}
+                        >
                           Dress Code
                         </h4>
-                        <p className="text-gray-600">
+                        <p
+                          className={`transition-colors ${
+                            isDark ? 'text-gray-300' : 'text-gray-600'
+                          }`}
+                        >
                           {eventMetadata.dresscode}
                         </p>
                       </div>
@@ -511,7 +676,11 @@ const EventDetailsPage = () => {
 
                   {eventMetadata?.amenities && (
                     <div className="flex items-start">
-                      <div className="flex-shrink-0 w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                      <div
+                        className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center mr-3 mt-0.5 transition-colors ${
+                          isDark ? 'bg-red-900/50' : 'bg-red-100'
+                        }`}
+                      >
                         <svg
                           className="w-3 h-3 text-red-600"
                           fill="currentColor"
@@ -525,14 +694,22 @@ const EventDetailsPage = () => {
                         </svg>
                       </div>
                       <div>
-                        <h4 className="font-semibold text-gray-900">
+                        <h4
+                          className={`font-semibold transition-colors ${
+                            isDark ? 'text-gray-100' : 'text-gray-900'
+                          }`}
+                        >
                           Amenities
                         </h4>
                         <div className="flex flex-wrap gap-2 mt-1">
                           {eventMetadata.amenities.map((amenity, index) => (
                             <span
                               key={index}
-                              className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm"
+                              className={`px-2 py-1 rounded text-sm transition-colors ${
+                                isDark
+                                  ? 'bg-gray-700 text-gray-300'
+                                  : 'bg-gray-100 text-gray-700'
+                              }`}
                             >
                               {amenity}
                             </span>
@@ -549,12 +726,22 @@ const EventDetailsPage = () => {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Ticket Purchase Card */}
-            <div className="bg-white rounded-2xl p-8 shadow-sm sticky top-6">
+            <div
+              className={`rounded-2xl p-8 shadow-sm sticky top-6 transition-colors ${
+                isDark ? 'bg-gray-800' : 'bg-white'
+              }`}
+            >
               <div className="text-center mb-6">
                 <div className="text-3xl font-bold text-red-600 mb-2">
                   {event.ticketPrice ? Number(event.ticketPrice) / 1e18 : 0} ETH
                 </div>
-                <p className="text-gray-600">Starting from</p>
+                <p
+                  className={`transition-colors ${
+                    isDark ? 'text-gray-300' : 'text-gray-600'
+                  }`}
+                >
+                  Starting from
+                </p>
               </div>
 
               <button
@@ -562,14 +749,20 @@ const EventDetailsPage = () => {
                 disabled={eventStats.availableTickets === 0}
                 className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-colors ${
                   eventStats.availableTickets === 0
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    ? isDark
+                      ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-red-600 text-white hover:bg-red-700'
                 }`}
               >
                 {eventStats.availableTickets === 0 ? 'Sold Out' : 'Buy Tickets'}
               </button>
 
-              <div className="mt-4 text-center text-sm text-gray-500">
+              <div
+                className={`mt-4 text-center text-sm transition-colors ${
+                  isDark ? 'text-gray-400' : 'text-gray-500'
+                }`}
+              >
                 {eventStats.availableTickets > 0 && (
                   <p>
                     {eventStats.availableTickets.toLocaleString()} tickets
@@ -580,8 +773,16 @@ const EventDetailsPage = () => {
             </div>
 
             {/* Event Details Card */}
-            <div className="bg-white rounded-2xl p-8 shadow-sm">
-              <h3 className="text-xl font-bold text-gray-900 mb-6">
+            <div
+              className={`rounded-2xl p-8 shadow-sm transition-colors ${
+                isDark ? 'bg-gray-800' : 'bg-white'
+              }`}
+            >
+              <h3
+                className={`text-xl font-bold mb-6 transition-colors ${
+                  isDark ? 'text-gray-100' : 'text-gray-900'
+                }`}
+              >
                 Event Details
               </h3>
               <div className="space-y-4">
@@ -598,8 +799,18 @@ const EventDetailsPage = () => {
                     />
                   </svg>
                   <div>
-                    <h4 className="font-semibold text-gray-900">Date & Time</h4>
-                    <p className="text-gray-600">
+                    <h4
+                      className={`font-semibold transition-colors ${
+                        isDark ? 'text-gray-100' : 'text-gray-900'
+                      }`}
+                    >
+                      Date & Time
+                    </h4>
+                    <p
+                      className={`transition-colors ${
+                        isDark ? 'text-gray-300' : 'text-gray-600'
+                      }`}
+                    >
                       {formatDateTime(event.eventStartTime)} -{' '}
                       {formatTime(event.eventEndTime)}
                     </p>
@@ -619,10 +830,26 @@ const EventDetailsPage = () => {
                     />
                   </svg>
                   <div>
-                    <h4 className="font-semibold text-gray-900">Venue</h4>
-                    <p className="text-gray-600">{event.venue}</p>
+                    <h4
+                      className={`font-semibold transition-colors ${
+                        isDark ? 'text-gray-100' : 'text-gray-900'
+                      }`}
+                    >
+                      Venue
+                    </h4>
+                    <p
+                      className={`transition-colors ${
+                        isDark ? 'text-gray-300' : 'text-gray-600'
+                      }`}
+                    >
+                      {event.venue}
+                    </p>
                     {eventMetadata?.location && (
-                      <p className="text-gray-500 text-sm">
+                      <p
+                        className={`text-sm transition-colors ${
+                          isDark ? 'text-gray-400' : 'text-gray-500'
+                        }`}
+                      >
                         {eventMetadata.location}
                       </p>
                     )}
@@ -642,8 +869,18 @@ const EventDetailsPage = () => {
                     />
                   </svg>
                   <div>
-                    <h4 className="font-semibold text-gray-900">Organizer</h4>
-                    <p className="text-gray-600 font-mono text-sm">
+                    <h4
+                      className={`font-semibold transition-colors ${
+                        isDark ? 'text-gray-100' : 'text-gray-900'
+                      }`}
+                    >
+                      Organizer
+                    </h4>
+                    <p
+                      className={`font-mono text-sm transition-colors ${
+                        isDark ? 'text-gray-300' : 'text-gray-600'
+                      }`}
+                    >
                       {event.organizer
                         ? `${event.organizer.slice(0, 6)}...${event.organizer.slice(-4)}`
                         : 'Unknown'}
@@ -660,14 +897,26 @@ const EventDetailsPage = () => {
                     <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <div>
-                    <h4 className="font-semibold text-gray-900">
+                    <h4
+                      className={`font-semibold transition-colors ${
+                        isDark ? 'text-gray-100' : 'text-gray-900'
+                      }`}
+                    >
                       Total Capacity
                     </h4>
-                    <p className="text-gray-600">
+                    <p
+                      className={`transition-colors ${
+                        isDark ? 'text-gray-300' : 'text-gray-600'
+                      }`}
+                    >
                       {eventStats.totalCapacity.toLocaleString()} attendees
                     </p>
                     {eventStats.hasCategories && (
-                      <p className="text-gray-500 text-sm">
+                      <p
+                        className={`text-sm transition-colors ${
+                          isDark ? 'text-gray-400' : 'text-gray-500'
+                        }`}
+                      >
                         Multiple ticket categories available
                       </p>
                     )}
@@ -678,8 +927,16 @@ const EventDetailsPage = () => {
 
             {/* Social Links */}
             {eventMetadata?.socialMedia && (
-              <div className="bg-white rounded-2xl p-8 shadow-sm">
-                <h3 className="text-xl font-bold text-gray-900 mb-6">
+              <div
+                className={`rounded-2xl p-8 shadow-sm transition-colors ${
+                  isDark ? 'bg-gray-800' : 'bg-white'
+                }`}
+              >
+                <h3
+                  className={`text-xl font-bold mb-6 transition-colors ${
+                    isDark ? 'text-gray-100' : 'text-gray-900'
+                  }`}
+                >
                   Follow Event
                 </h3>
                 <div className="space-y-3">
@@ -688,7 +945,11 @@ const EventDetailsPage = () => {
                       href={eventMetadata.socialMedia.website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center text-gray-600 hover:text-red-600 transition-colors"
+                      className={`flex items-center transition-colors ${
+                        isDark
+                          ? 'text-gray-300 hover:text-red-400'
+                          : 'text-gray-600 hover:text-red-600'
+                      }`}
                     >
                       <svg
                         className="w-5 h-5 mr-3"
@@ -709,7 +970,11 @@ const EventDetailsPage = () => {
                       href={eventMetadata.socialMedia.twitter}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center text-gray-600 hover:text-red-600 transition-colors"
+                      className={`flex items-center transition-colors ${
+                        isDark
+                          ? 'text-gray-300 hover:text-red-400'
+                          : 'text-gray-600 hover:text-red-600'
+                      }`}
                     >
                       <svg
                         className="w-5 h-5 mr-3"
@@ -726,7 +991,11 @@ const EventDetailsPage = () => {
                       href={eventMetadata.socialMedia.instagram}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center text-gray-600 hover:text-red-600 transition-colors"
+                      className={`flex items-center transition-colors ${
+                        isDark
+                          ? 'text-gray-300 hover:text-red-400'
+                          : 'text-gray-600 hover:text-red-600'
+                      }`}
                     >
                       <svg
                         className="w-5 h-5 mr-3"
@@ -753,10 +1022,16 @@ const EventDetailsPage = () => {
       <div className="fixed bottom-6 left-6">
         <button
           onClick={() => navigate('/')}
-          className="bg-white shadow-lg rounded-full p-3 hover:shadow-xl transition-shadow"
+          className={`shadow-lg rounded-full p-3 hover:shadow-xl transition-all ${
+            isDark
+              ? 'bg-gray-800 hover:bg-gray-700'
+              : 'bg-white hover:bg-gray-50'
+          }`}
         >
           <svg
-            className="w-6 h-6 text-gray-600"
+            className={`w-6 h-6 transition-colors ${
+              isDark ? 'text-gray-300' : 'text-gray-600'
+            }`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -777,7 +1052,7 @@ const EventDetailsPage = () => {
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           event={event}
-          onPurchase={handlePurchase}
+          onSuccess={handlePurchaseSuccess}
         />
       )}
     </div>

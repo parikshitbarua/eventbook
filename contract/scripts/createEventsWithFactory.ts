@@ -9,17 +9,10 @@ async function main() {
   console.log("💰 Balance:", ethers.formatEther(await ethers.provider.getBalance(deployer.address)));
 
   // Replace with your deployed EventFactory address
-  const FACTORY_ADDRESS = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
+  const FACTORY_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
   
-  // Library address from deployment
-  const LIB_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
-  
-  // Get the factory contract with library linking
-  const EventFactory = await ethers.getContractFactory("EventFactory", {
-    libraries: {
-      EventFactoryLib: LIB_ADDRESS,
-    },
-  });
+  // Get the factory contract (no library linking needed with Clones pattern)
+  const EventFactory = await ethers.getContractFactory("EventFactory");
   const factory = EventFactory.attach(FACTORY_ADDRESS) as any;
 
   // Sample event data

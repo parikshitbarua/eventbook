@@ -1,7 +1,7 @@
 import { Fragment, useState, useEffect, useCallback } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Contract, JsonRpcProvider, formatEther } from 'ethers';
-import type { EventData } from '../utils/models';
+import type { EventData } from '../types/event.types.ts';
 import EventContractABI from '../contracts/EventContract.sol/EventContract.json';
 import {
   createTicketURIHelperUtil,
@@ -12,16 +12,9 @@ import {
   purchaseSingleTicket,
   purchaseCategoryTickets,
 } from '../utils/contractInteractions';
-
-interface TicketCategory {
-  name: string;
-  price: bigint;
-  maxSupply: bigint;
-  sold: bigint;
-  isActive: boolean;
-  categoryURI: string;
-  image?: string;
-}
+import { TicketCategory } from '../types/ticket.types.ts';
+import { APP_DOMAIN } from '../config/app.config.ts';
+import { useTheme } from '../hooks/theme.hook.ts';
 
 interface CategorySelection {
   categoryIndex: number;
@@ -32,13 +25,17 @@ interface TicketPurchaseModalProps {
   isOpen: boolean;
   onClose: () => void;
   event: EventData;
+  onSuccess?: () => void;
 }
 
 const TicketPurchaseModal = ({
   isOpen,
   onClose,
   event,
+  onSuccess,
 }: TicketPurchaseModalProps) => {
+  console.log('event', event);
+  const { isDark } = useTheme();
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingCategories, setLoadingCategories] = useState(true);
@@ -51,7 +48,9 @@ const TicketPurchaseModal = ({
   const fetchCategories = useCallback(async () => {
     try {
       setLoadingCategories(true);
-      const provider = new JsonRpcProvider('http://127.0.0.1:8545');
+      const NETWORK_URL =
+        import.meta.env.VITE_NETWORK_URL || 'http://127.0.0.1:8545';
+      const provider = new JsonRpcProvider(NETWORK_URL);
       const contract = new Contract(
         event.eventContract,
         EventContractABI.abi,
@@ -118,18 +117,10 @@ const TicketPurchaseModal = ({
 
   // Fetch categories when modal opens
   useEffect(() => {
-    console.log('event data', event);
     if (isOpen && event.eventContract) {
       fetchCategories();
     }
   }, [isOpen, event.eventContract, fetchCategories]);
-
-  useEffect(() => {
-    if (event) {
-      setCategories(event.categories || []);
-      setHasCategories(event.categories && event.categories.length > 0);
-    }
-  }, [event]);
 
   const updateCategoryQuantity = (
     categoryIndex: number,
@@ -146,7 +137,7 @@ const TicketPurchaseModal = ({
 
   const getTotalPrice = () => {
     if (!hasCategories) {
-      return (Number(event.ticketPrice) / 1e18) * quantity;
+      return (Number(event.ticketPrice) * quantity) / 1e18;
     }
 
     return categorySelections.reduce((total, selection) => {
@@ -177,12 +168,16 @@ const TicketPurchaseModal = ({
         const eventPrimaryImage = await fetchFirstImageFromIPFS(
           event.eventImages,
         );
+        console.log('eventPrimaryImage', eventPrimaryImage);
+
+        const defaultImage =
+          'https://static.vecteezy.com/system/resources/previews/002/779/812/non_2x/cartoon-illustration-of-ticket-free-vector.jpg';
+        const finalImage = eventPrimaryImage || defaultImage;
+
         const ticketMetadata: TicketPurchaseInput = {
           description: event.title || 'eventbook',
-          external_url: `https://localhost:5173/event/${event.eventId}`,
-          image:
-            eventPrimaryImage ||
-            'https://static.vecteezy.com/system/resources/previews/002/779/812/non_2x/cartoon-illustration-of-ticket-free-vector.jpg',
+          external_url: `${APP_DOMAIN}/event/${event.eventId}`,
+          image: finalImage,
           name: event.title || 'eventbook',
           attributes: [
             {
@@ -195,6 +190,7 @@ const TicketPurchaseModal = ({
             },
           ],
         };
+        console.log('Ticket metadata being uploaded:', ticketMetadata);
         const ticketURI = await createTicketURIHelperUtil(ticketMetadata);
         if (!ticketURI) {
           throw new Error('Failed to create ticket URI');
@@ -248,12 +244,20 @@ const TicketPurchaseModal = ({
           console.log('Category details:', category);
 
           const eventPrimaryImage = category.image;
+          const defaultImage =
+            'https://static.vecteezy.com/system/resources/previews/002/779/812/non_2x/cartoon-illustration-of-ticket-free-vector.jpg';
+          const finalImage = eventPrimaryImage || defaultImage;
+          console.log(
+            'Category image:',
+            eventPrimaryImage,
+            'Final image:',
+            finalImage,
+          );
+
           const ticketMetadata: TicketPurchaseInput = {
             description: `${event.title} - ${category.name}`,
-            external_url: `https://localhost:5173/event/${event.eventId}`,
-            image:
-              eventPrimaryImage ||
-              'https://static.vecteezy.com/system/resources/previews/002/779/812/non_2x/cartoon-illustration-of-ticket-free-vector.jpg',
+            external_url: `${APP_DOMAIN}/event/${event.eventId}`,
+            image: finalImage,
             name: `${event.title} - ${category.name}`,
             attributes: [
               {
@@ -314,6 +318,12 @@ const TicketPurchaseModal = ({
       }
 
       onClose();
+      // Call success callback after closing modal
+      if (onSuccess) {
+        setTimeout(() => {
+          onSuccess();
+        }, 100); // Small delay to ensure modal is closed first
+      }
     } catch (error) {
       console.error('Purchase failed:', error);
       throw error;
@@ -325,12 +335,14 @@ const TicketPurchaseModal = ({
   const renderSingleTicketMode = () => (
     <>
       <div className="mt-2">
-        <p className="text-sm text-gray-500 mb-6">{event.description}</p>
+        {renderDescriptionSection()}
 
         <div className="mb-6">
           <label
             htmlFor="quantity"
-            className="block text-sm font-medium text-gray-700 mb-2"
+            className={`block text-sm font-medium mb-2 transition-colors ${
+              isDark ? 'text-gray-300' : 'text-gray-700'
+            }`}
           >
             Number of Tickets
           </label>
@@ -342,16 +354,24 @@ const TicketPurchaseModal = ({
             onChange={(e) =>
               setQuantity(Math.max(1, parseInt(e.target.value) || 1))
             }
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500"
+            className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 transition-colors ${
+              isDark
+                ? 'bg-gray-800 border-gray-600 text-gray-100 placeholder-gray-400'
+                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+            }`}
           />
         </div>
 
         <div className="flex justify-between items-center mb-6">
-          <span className="text-lg font-semibold text-gray-900">
+          <span
+            className={`text-lg font-semibold transition-colors ${
+              isDark ? 'text-gray-100' : 'text-gray-900'
+            }`}
+          >
             Total Price:
           </span>
           <span className="text-xl font-bold text-red-600">
-            {getTotalPrice().toFixed(4)} ETH
+            {getTotalPrice().toFixed(6)} ETH
           </span>
         </div>
       </div>
@@ -361,7 +381,7 @@ const TicketPurchaseModal = ({
   const renderCategoriesMode = () => (
     <>
       <div className="mt-2">
-        <p className="text-sm text-gray-500 mb-6">{event.description}</p>
+        {renderDescriptionSection()}
 
         <div className="space-y-4 mb-6 max-h-96 overflow-y-auto">
           {categories.map((category, index) => {
@@ -371,7 +391,11 @@ const TicketPurchaseModal = ({
             return (
               <div
                 key={index}
-                className="border border-gray-200 rounded-lg p-4"
+                className={`border rounded-lg p-4 transition-colors ${
+                  isDark
+                    ? 'border-gray-600 bg-gray-800'
+                    : 'border-gray-200 bg-white'
+                }`}
               >
                 <div className="flex items-start space-x-4">
                   {/* Category Image */}
@@ -387,13 +411,25 @@ const TicketPurchaseModal = ({
 
                   {/* Category Details */}
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-lg font-semibold text-gray-900 truncate">
+                    <h4
+                      className={`text-lg font-semibold truncate transition-colors ${
+                        isDark ? 'text-gray-100' : 'text-gray-900'
+                      }`}
+                    >
                       {category.name}
                     </h4>
-                    <p className="text-sm text-gray-600 mb-2">
+                    <p
+                      className={`text-sm mb-2 transition-colors ${
+                        isDark ? 'text-gray-300' : 'text-gray-600'
+                      }`}
+                    >
                       {formatEther(category.price)} ETH per ticket
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p
+                      className={`text-sm transition-colors ${
+                        isDark ? 'text-gray-400' : 'text-gray-500'
+                      }`}
+                    >
                       {available > 0
                         ? `${available} tickets available`
                         : 'Sold out'}
@@ -402,7 +438,11 @@ const TicketPurchaseModal = ({
 
                   {/* Quantity Input */}
                   <div className="flex-shrink-0 w-24">
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                    <label
+                      className={`block text-xs font-medium mb-1 transition-colors ${
+                        isDark ? 'text-gray-300' : 'text-gray-700'
+                      }`}
+                    >
                       Quantity
                     </label>
                     <input
@@ -417,7 +457,11 @@ const TicketPurchaseModal = ({
                         )
                       }
                       disabled={available === 0}
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 disabled:bg-gray-100"
+                      className={`w-full px-2 py-1 text-sm border rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 transition-colors ${
+                        isDark
+                          ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400 disabled:bg-gray-800 disabled:text-gray-500'
+                          : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 disabled:bg-gray-100 disabled:text-gray-500'
+                      }`}
                     />
                   </div>
                 </div>
@@ -427,21 +471,37 @@ const TicketPurchaseModal = ({
         </div>
 
         {/* Total Summary */}
-        <div className="bg-gray-50 rounded-lg p-4 mb-6">
+        <div
+          className={`rounded-lg p-4 mb-6 transition-colors ${
+            isDark ? 'bg-gray-800' : 'bg-gray-50'
+          }`}
+        >
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-gray-700">
+            <span
+              className={`text-sm font-medium transition-colors ${
+                isDark ? 'text-gray-300' : 'text-gray-700'
+              }`}
+            >
               Total Tickets:
             </span>
-            <span className="text-sm font-semibold text-gray-900">
+            <span
+              className={`text-sm font-semibold transition-colors ${
+                isDark ? 'text-gray-100' : 'text-gray-900'
+              }`}
+            >
               {getTotalTickets()}
             </span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-lg font-semibold text-gray-900">
+            <span
+              className={`text-lg font-semibold transition-colors ${
+                isDark ? 'text-gray-100' : 'text-gray-900'
+              }`}
+            >
               Total Price:
             </span>
             <span className="text-xl font-bold text-red-600">
-              {getTotalPrice().toFixed(4)} ETH
+              {getTotalPrice().toFixed(6)} ETH
             </span>
           </div>
         </div>
@@ -472,7 +532,13 @@ const TicketPurchaseModal = ({
             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
           ></path>
         </svg>
-        <span className="ml-3 text-gray-600">Loading ticket categories...</span>
+        <span
+          className={`ml-3 transition-colors ${
+            isDark ? 'text-gray-300' : 'text-gray-600'
+          }`}
+        >
+          Loading ticket categories...
+        </span>
       </div>
     </div>
   );
@@ -481,6 +547,34 @@ const TicketPurchaseModal = ({
     if (isLoading) return false;
     if (!hasCategories) return quantity > 0;
     return getTotalTickets() > 0;
+  };
+
+  const truncateDescription = (text: string, maxLength: number = 150) => {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength).trim() + '...';
+  };
+
+  const renderDescriptionSection = () => {
+    const description = event.description || '';
+    return (
+      <div className="mb-6">
+        <p
+          className={`text-sm mb-2 transition-colors ${
+            isDark ? 'text-gray-400' : 'text-gray-500'
+          }`}
+        >
+          {truncateDescription(description)}
+        </p>
+        {description.length > 150 && (
+          <button
+            onClick={() => (window.location.href = `/event/${event.eventId}`)}
+            className="text-red-600 hover:text-red-700 text-sm font-medium underline transition-colors"
+          >
+            View More Details
+          </button>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -509,36 +603,63 @@ const TicketPurchaseModal = ({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                <Dialog.Title
-                  as="h3"
-                  className="text-2xl font-bold leading-6 text-gray-900 mb-4"
+              <Dialog.Panel
+                className={`w-full max-w-2xl max-h-[90vh] transform overflow-hidden rounded-2xl ${
+                  isDark ? 'bg-gray-900' : 'bg-white'
+                } text-left align-middle shadow-xl transition-all flex flex-col`}
+              >
+                {/* Fixed Header */}
+                <div
+                  className={`px-6 py-4 border-b ${
+                    isDark ? 'border-gray-700' : 'border-gray-200'
+                  } flex-shrink-0`}
                 >
-                  {event.title}
-                </Dialog.Title>
-
-                {loadingCategories
-                  ? renderLoadingState()
-                  : hasCategories
-                    ? renderCategoriesMode()
-                    : renderSingleTicketMode()}
-
-                <div className="mt-4 flex justify-end space-x-3">
-                  <button
-                    type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-gray-100 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2"
-                    onClick={onClose}
+                  <Dialog.Title
+                    as="h3"
+                    className={`text-2xl font-bold leading-6 ${
+                      isDark ? 'text-white' : 'text-gray-900'
+                    } transition-colors duration-300`}
                   >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                    onClick={handlePurchase}
-                    disabled={!canPurchase()}
-                  >
-                    {isLoading ? 'Processing...' : 'Buy Now'}
-                  </button>
+                    {event.title}
+                  </Dialog.Title>
+                </div>
+
+                {/* Scrollable Content */}
+                <div className="flex-1 overflow-y-auto px-6 py-4">
+                  {loadingCategories
+                    ? renderLoadingState()
+                    : hasCategories
+                      ? renderCategoriesMode()
+                      : renderSingleTicketMode()}
+                </div>
+
+                {/* Fixed Footer */}
+                <div
+                  className={`px-6 py-4 border-t ${
+                    isDark ? 'border-gray-700' : 'border-gray-200'
+                  } flex-shrink-0`}
+                >
+                  <div className="flex justify-end space-x-3">
+                    <button
+                      type="button"
+                      className={`inline-flex justify-center rounded-md border border-transparent ${
+                        isDark
+                          ? 'bg-gray-700 text-gray-200 hover:bg-gray-600'
+                          : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                      } px-4 py-2 text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2 transition-colors duration-200`}
+                      onClick={onClose}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      className="inline-flex justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                      onClick={handlePurchase}
+                      disabled={!canPurchase()}
+                    >
+                      {isLoading ? 'Processing...' : 'Buy Now'}
+                    </button>
+                  </div>
                 </div>
               </Dialog.Panel>
             </Transition.Child>
