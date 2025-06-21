@@ -25,8 +25,10 @@ import {
   createEventURIHelper,
 } from '../utils/ipfs-helper.util.ts';
 import Confetti from 'react-confetti';
+import { useTheme } from '../hooks/theme.hook.ts';
 
 const NewEventPage = () => {
+  const { isDark } = useTheme();
   const {
     writeContractAsync,
     isPending,
@@ -326,7 +328,11 @@ const NewEventPage = () => {
   // Success Dialog Component
   const SuccessDialog = () => (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
-      <div className="bg-white rounded-2xl max-w-md w-full p-8 text-center">
+      <div
+        className={`${
+          isDark ? 'bg-gray-900' : 'bg-white'
+        } rounded-2xl max-w-md w-full p-8 text-center transition-colors duration-300`}
+      >
         {/* Success Icon */}
         <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6">
           <svg
@@ -345,10 +351,18 @@ const NewEventPage = () => {
         </div>
 
         {/* Success Message */}
-        <h3 className="text-2xl font-bold text-gray-900 mb-2">
+        <h3
+          className={`text-2xl font-bold ${
+            isDark ? 'text-white' : 'text-gray-900'
+          } mb-2 transition-colors duration-300`}
+        >
           Event Has Been Successfully Created! 🎉
         </h3>
-        <p className="text-gray-600 mb-8">
+        <p
+          className={`${
+            isDark ? 'text-gray-400' : 'text-gray-600'
+          } mb-8 transition-colors duration-300`}
+        >
           Your event has been created on the blockchain and is ready to go.
         </p>
 
@@ -367,7 +381,13 @@ const NewEventPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div
+      className={`min-h-screen ${
+        isDark
+          ? 'bg-gradient-to-br from-gray-900 to-black'
+          : 'bg-gradient-to-br from-gray-50 to-gray-100'
+      } py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300`}
+    >
       {/* Confetti */}
       {showSuccessDialog && (
         <Confetti
@@ -383,10 +403,18 @@ const NewEventPage = () => {
 
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl">
+          <h1
+            className={`text-4xl font-extrabold ${
+              isDark ? 'text-white' : 'text-gray-900'
+            } sm:text-5xl transition-colors duration-300`}
+          >
             Create New Event
           </h1>
-          <p className="mt-4 text-xl text-gray-600">
+          <p
+            className={`mt-4 text-xl ${
+              isDark ? 'text-gray-300' : 'text-gray-600'
+            } transition-colors duration-300`}
+          >
             Fill in the details to create your blockchain-powered event
           </p>
 
@@ -415,20 +443,36 @@ const NewEventPage = () => {
 
         <form
           onSubmit={handleSubmit}
-          className="bg-white shadow-2xl rounded-3xl overflow-hidden"
+          className={`${
+            isDark
+              ? 'bg-gray-900 shadow-2xl shadow-black/20'
+              : 'bg-white shadow-2xl'
+          } rounded-3xl overflow-hidden transition-colors duration-300`}
         >
           <div className="px-8 py-10 sm:px-12 sm:py-12">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Left Column */}
               <div className="space-y-8">
-                <div className="bg-gray-50 p-6 rounded-2xl">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-6">
+                <div
+                  className={`${
+                    isDark ? 'bg-gray-800' : 'bg-gray-50'
+                  } p-6 rounded-2xl transition-colors duration-300`}
+                >
+                  <h3
+                    className={`text-lg font-semibold ${
+                      isDark ? 'text-white' : 'text-gray-900'
+                    } mb-6 transition-colors duration-300`}
+                  >
                     Event Information
                   </h3>
 
                   {/* Title */}
                   <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      className={`block text-sm font-medium ${
+                        isDark ? 'text-gray-300' : 'text-gray-700'
+                      } mb-2 transition-colors duration-300`}
+                    >
                       Event Title *
                     </label>
                     <input
@@ -436,7 +480,11 @@ const NewEventPage = () => {
                       name="title"
                       value={formData.title}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
+                      className={`w-full px-4 py-3 border ${
+                        isDark
+                          ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                          : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                      } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
                       placeholder="Summer Music Festival 2024"
                       required
                     />
@@ -444,7 +492,11 @@ const NewEventPage = () => {
 
                   {/* Description */}
                   <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      className={`block text-sm font-medium ${
+                        isDark ? 'text-gray-300' : 'text-gray-700'
+                      } mb-2 transition-colors duration-300`}
+                    >
                       Description *
                     </label>
                     <textarea
@@ -452,7 +504,11 @@ const NewEventPage = () => {
                       value={formData.description}
                       onChange={handleChange}
                       rows={4}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
+                      className={`w-full px-4 py-3 border ${
+                        isDark
+                          ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                          : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                      } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
                       placeholder="Describe your event in detail..."
                       required
                     />
@@ -469,7 +525,9 @@ const NewEventPage = () => {
                     />
                     <label
                       htmlFor="singleCategory"
-                      className="ml-2 block text-sm font-medium text-gray-700"
+                      className={`ml-2 block text-sm font-medium ${
+                        isDark ? 'text-gray-300' : 'text-gray-700'
+                      } transition-colors duration-300`}
                     >
                       This event has only one ticket category
                     </label>
@@ -478,7 +536,11 @@ const NewEventPage = () => {
                   {hasSingleCategory && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label
+                          className={`block text-sm font-medium ${
+                            isDark ? 'text-gray-300' : 'text-gray-700'
+                          } mb-2 transition-colors duration-300`}
+                        >
                           Ticket Price (ETH) *
                         </label>
                         <input
@@ -488,13 +550,21 @@ const NewEventPage = () => {
                           onChange={handleChange}
                           step="0.000001"
                           min="0"
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
+                          className={`w-full px-4 py-3 border ${
+                            isDark
+                              ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                              : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                          } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
                           placeholder="0.1"
                           required={hasSingleCategory}
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label
+                          className={`block text-sm font-medium ${
+                            isDark ? 'text-gray-300' : 'text-gray-700'
+                          } mb-2 transition-colors duration-300`}
+                        >
                           Max Tickets *
                         </label>
                         <input
@@ -503,7 +573,11 @@ const NewEventPage = () => {
                           value={formData.maxTickets}
                           onChange={handleChange}
                           min="1"
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
+                          className={`w-full px-4 py-3 border ${
+                            isDark
+                              ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                              : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                          } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
                           placeholder="1000"
                           required={hasSingleCategory}
                         />
@@ -513,14 +587,26 @@ const NewEventPage = () => {
                 </div>
 
                 {/* Date & Time */}
-                <div className="bg-gray-50 p-6 rounded-2xl">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-6">
+                <div
+                  className={`${
+                    isDark ? 'bg-gray-800' : 'bg-gray-50'
+                  } p-6 rounded-2xl transition-colors duration-300`}
+                >
+                  <h3
+                    className={`text-lg font-semibold ${
+                      isDark ? 'text-white' : 'text-gray-900'
+                    } mb-6 transition-colors duration-300`}
+                  >
                     Schedule
                   </h3>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label
+                        className={`block text-sm font-medium ${
+                          isDark ? 'text-gray-300' : 'text-gray-700'
+                        } mb-2 transition-colors duration-300`}
+                      >
                         Start Date & Time *
                       </label>
                       <input
@@ -528,12 +614,20 @@ const NewEventPage = () => {
                         name="eventStartTime"
                         value={formData.eventStartTime}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
+                        className={`w-full px-4 py-3 border ${
+                          isDark
+                            ? 'border-gray-600 bg-gray-700 text-white'
+                            : 'border-gray-300 bg-white text-gray-900'
+                        } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
                         required
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label
+                        className={`block text-sm font-medium ${
+                          isDark ? 'text-gray-300' : 'text-gray-700'
+                        } mb-2 transition-colors duration-300`}
+                      >
                         End Date & Time *
                       </label>
                       <input
@@ -541,7 +635,11 @@ const NewEventPage = () => {
                         name="eventEndTime"
                         value={formData.eventEndTime}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
+                        className={`w-full px-4 py-3 border ${
+                          isDark
+                            ? 'border-gray-600 bg-gray-700 text-white'
+                            : 'border-gray-300 bg-white text-gray-900'
+                        } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
                         required
                       />
                     </div>
@@ -549,14 +647,26 @@ const NewEventPage = () => {
                 </div>
 
                 {/* Location */}
-                <div className="bg-gray-50 p-6 rounded-2xl">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-6">
+                <div
+                  className={`${
+                    isDark ? 'bg-gray-800' : 'bg-gray-50'
+                  } p-6 rounded-2xl transition-colors duration-300`}
+                >
+                  <h3
+                    className={`text-lg font-semibold ${
+                      isDark ? 'text-white' : 'text-gray-900'
+                    } mb-6 transition-colors duration-300`}
+                  >
                     Location
                   </h3>
 
                   {/* Venue */}
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      className={`block text-sm font-medium ${
+                        isDark ? 'text-gray-300' : 'text-gray-700'
+                      } mb-2 transition-colors duration-300`}
+                    >
                       Venue Name *
                     </label>
                     <input
@@ -564,7 +674,11 @@ const NewEventPage = () => {
                       name="venue"
                       value={formData.venue}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
+                      className={`w-full px-4 py-3 border ${
+                        isDark
+                          ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                          : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                      } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
                       placeholder="Madison Square Garden"
                       required
                     />
@@ -573,14 +687,22 @@ const NewEventPage = () => {
                   {/* Country, State, City */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label
+                        className={`block text-sm font-medium ${
+                          isDark ? 'text-gray-300' : 'text-gray-700'
+                        } mb-2 transition-colors duration-300`}
+                      >
                         Country *
                       </label>
                       <select
                         name="country"
                         value={formData.country}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
+                        className={`w-full px-4 py-3 border ${
+                          isDark
+                            ? 'border-gray-600 bg-gray-700 text-white'
+                            : 'border-gray-300 bg-white text-gray-900'
+                        } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
                         required
                       >
                         <option value="">Select Country</option>
@@ -592,14 +714,22 @@ const NewEventPage = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label
+                        className={`block text-sm font-medium ${
+                          isDark ? 'text-gray-300' : 'text-gray-700'
+                        } mb-2 transition-colors duration-300`}
+                      >
                         State/Province *
                       </label>
                       <select
                         name="state"
                         value={formData.state}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
+                        className={`w-full px-4 py-3 border ${
+                          isDark
+                            ? 'border-gray-600 bg-gray-700 text-white'
+                            : 'border-gray-300 bg-white text-gray-900'
+                        } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
                         required
                         disabled={!formData.country}
                       >
@@ -612,14 +742,22 @@ const NewEventPage = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label
+                        className={`block text-sm font-medium ${
+                          isDark ? 'text-gray-300' : 'text-gray-700'
+                        } mb-2 transition-colors duration-300`}
+                      >
                         City *
                       </label>
                       <select
                         name="city"
                         value={formData.city}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
+                        className={`w-full px-4 py-3 border ${
+                          isDark
+                            ? 'border-gray-600 bg-gray-700 text-white'
+                            : 'border-gray-300 bg-white text-gray-900'
+                        } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
                         required
                         disabled={!formData.state}
                       >
@@ -638,8 +776,16 @@ const NewEventPage = () => {
               {/* Right Column */}
               <div className="space-y-8">
                 {/* Event Images */}
-                <div className="bg-gray-50 p-6 rounded-2xl">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-6">
+                <div
+                  className={`${
+                    isDark ? 'bg-gray-800' : 'bg-gray-50'
+                  } p-6 rounded-2xl transition-colors duration-300`}
+                >
+                  <h3
+                    className={`text-lg font-semibold ${
+                      isDark ? 'text-white' : 'text-gray-900'
+                    } mb-6 transition-colors duration-300`}
+                  >
                     Event Images *
                   </h3>
 
@@ -648,14 +794,22 @@ const NewEventPage = () => {
                     className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-200 ${
                       isDragActive
                         ? 'border-red-500 bg-red-50'
-                        : 'border-gray-300 hover:border-red-400 hover:bg-gray-50'
+                        : isDark
+                          ? 'border-gray-600 hover:border-red-400 hover:bg-gray-700'
+                          : 'border-gray-300 hover:border-red-400 hover:bg-gray-50'
                     }`}
                   >
                     <input {...getInputProps()} />
                     <div className="space-y-4">
-                      <div className="mx-auto w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
+                      <div
+                        className={`mx-auto w-16 h-16 ${
+                          isDark ? 'bg-gray-700' : 'bg-gray-200'
+                        } rounded-full flex items-center justify-center transition-colors duration-300`}
+                      >
                         <svg
-                          className="w-8 h-8 text-gray-400"
+                          className={`w-8 h-8 ${
+                            isDark ? 'text-gray-400' : 'text-gray-400'
+                          }`}
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -669,12 +823,20 @@ const NewEventPage = () => {
                         </svg>
                       </div>
                       <div>
-                        <p className="text-lg font-medium text-gray-700">
+                        <p
+                          className={`text-lg font-medium ${
+                            isDark ? 'text-gray-300' : 'text-gray-700'
+                          } transition-colors duration-300`}
+                        >
                           {isDragActive
                             ? 'Drop images here'
                             : 'Drag & drop images here'}
                         </p>
-                        <p className="text-sm text-gray-500">
+                        <p
+                          className={`text-sm ${
+                            isDark ? 'text-gray-400' : 'text-gray-500'
+                          } transition-colors duration-300`}
+                        >
                           or click to browse (Max 5MB per image)
                         </p>
                       </div>
@@ -684,7 +846,11 @@ const NewEventPage = () => {
                   {/* Image Preview */}
                   {formData.eventImages.length > 0 && (
                     <div className="mt-6">
-                      <h4 className="text-sm font-medium text-gray-700 mb-3">
+                      <h4
+                        className={`text-sm font-medium ${
+                          isDark ? 'text-gray-300' : 'text-gray-700'
+                        } mb-3 transition-colors duration-300`}
+                      >
                         Uploaded Images
                       </h4>
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -702,7 +868,11 @@ const NewEventPage = () => {
                             >
                               ×
                             </button>
-                            <p className="text-xs text-gray-500 mt-1 truncate">
+                            <p
+                              className={`text-xs ${
+                                isDark ? 'text-gray-400' : 'text-gray-500'
+                              } mt-1 truncate transition-colors duration-300`}
+                            >
                               {file.name}
                             </p>
                           </div>
@@ -713,14 +883,26 @@ const NewEventPage = () => {
                 </div>
 
                 {/* NFT Configuration */}
-                <div className="bg-gray-50 p-6 rounded-2xl">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-6">
+                <div
+                  className={`${
+                    isDark ? 'bg-gray-800' : 'bg-gray-50'
+                  } p-6 rounded-2xl transition-colors duration-300`}
+                >
+                  <h3
+                    className={`text-lg font-semibold ${
+                      isDark ? 'text-white' : 'text-gray-900'
+                    } mb-6 transition-colors duration-300`}
+                  >
                     NFT Configuration
                   </h3>
 
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label
+                        className={`block text-sm font-medium ${
+                          isDark ? 'text-gray-300' : 'text-gray-700'
+                        } mb-2 transition-colors duration-300`}
+                      >
                         NFT Collection Name *
                       </label>
                       <input
@@ -728,13 +910,21 @@ const NewEventPage = () => {
                         name="nftName"
                         value={formData.nftName}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
+                        className={`w-full px-4 py-3 border ${
+                          isDark
+                            ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                            : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                        } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
                         placeholder="Summer Music Festival 2024 Tickets"
                         required
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label
+                        className={`block text-sm font-medium ${
+                          isDark ? 'text-gray-300' : 'text-gray-700'
+                        } mb-2 transition-colors duration-300`}
+                      >
                         NFT Symbol *
                       </label>
                       <input
@@ -743,11 +933,19 @@ const NewEventPage = () => {
                         value={formData.nftSymbol}
                         onChange={handleChange}
                         maxLength={10}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 uppercase"
+                        className={`w-full px-4 py-3 border ${
+                          isDark
+                            ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                            : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                        } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 uppercase`}
                         placeholder="MUSIC"
                         required
                       />
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p
+                        className={`text-xs ${
+                          isDark ? 'text-gray-400' : 'text-gray-500'
+                        } mt-1 transition-colors duration-300`}
+                      >
                         2-10 uppercase letters (automatically converted)
                       </p>
                     </div>
@@ -757,7 +955,11 @@ const NewEventPage = () => {
             </div>
 
             {/* Submit Button */}
-            <div className="mt-12 pt-8 border-t border-gray-200 flex justify-end">
+            <div
+              className={`mt-12 pt-8 border-t ${
+                isDark ? 'border-gray-700' : 'border-gray-200'
+              } flex justify-end transition-colors duration-300`}
+            >
               <button
                 type="submit"
                 disabled={isPending || isUploading}

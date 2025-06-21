@@ -6,8 +6,10 @@ import EventFactoryABI from '../contracts/EventFactory.sol/EventFactory.json';
 import { fetchFirstImageFromIPFS } from '../utils/ipfs-helper.util';
 import type { EventData } from '../types/event.types.ts';
 import { NETWORK_URL, FACTORY_ADDRESS } from '../config/app.config';
+import { useTheme } from '../hooks/theme.hook.ts';
 
 const MyEvents: React.FC = () => {
+  const { isDark } = useTheme();
   const navigate = useNavigate();
   const { address, isConnected } = useAccount();
   const [events, setEvents] = useState<EventData[]>([]);
@@ -122,7 +124,11 @@ const MyEvents: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div
+        className={`min-h-screen ${
+          isDark ? 'bg-black' : 'bg-gray-50'
+        } flex items-center justify-center transition-colors duration-300`}
+      >
         <div className="text-center">
           <svg
             className="animate-spin h-12 w-12 text-red-600 mx-auto mb-4"
@@ -144,7 +150,13 @@ const MyEvents: React.FC = () => {
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
             ></path>
           </svg>
-          <p className="text-gray-600">Loading your events...</p>
+          <p
+            className={`${
+              isDark ? 'text-gray-400' : 'text-gray-600'
+            } transition-colors duration-300`}
+          >
+            Loading your events...
+          </p>
         </div>
       </div>
     );
@@ -152,7 +164,11 @@ const MyEvents: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div
+        className={`min-h-screen ${
+          isDark ? 'bg-black' : 'bg-gray-50'
+        } flex items-center justify-center transition-colors duration-300`}
+      >
         <div className="text-center">
           <div className="text-red-500 mb-4">
             <svg
@@ -167,7 +183,13 @@ const MyEvents: React.FC = () => {
               />
             </svg>
           </div>
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">{error}</h3>
+          <h3
+            className={`text-xl font-semibold ${
+              isDark ? 'text-gray-300' : 'text-gray-700'
+            } mb-2 transition-colors duration-300`}
+          >
+            {error}
+          </h3>
           {!isConnected && (
             <div className="flex justify-center">
               <appkit-button />
@@ -180,11 +202,27 @@ const MyEvents: React.FC = () => {
 
   if (events.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div
+        className={`min-h-screen ${
+          isDark ? 'bg-black' : 'bg-gray-50'
+        } py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300`}
+      >
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">My Events</h1>
-            <div className="bg-white rounded-lg shadow-sm p-8">
+            <h1
+              className={`text-3xl font-bold ${
+                isDark ? 'text-white' : 'text-gray-900'
+              } mb-4 transition-colors duration-300`}
+            >
+              My Events
+            </h1>
+            <div
+              className={`${
+                isDark
+                  ? 'bg-gray-900 shadow-lg shadow-black/20'
+                  : 'bg-white shadow-sm'
+              } rounded-lg p-8 transition-colors duration-300`}
+            >
               <svg
                 className="w-16 h-16 text-gray-400 mx-auto mb-4"
                 fill="none"
@@ -198,10 +236,18 @@ const MyEvents: React.FC = () => {
                   d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                 />
               </svg>
-              <h2 className="text-xl font-semibold text-gray-700 mb-2">
+              <h2
+                className={`text-xl font-semibold ${
+                  isDark ? 'text-gray-300' : 'text-gray-700'
+                } mb-2 transition-colors duration-300`}
+              >
                 No Events Found
               </h2>
-              <p className="text-gray-500 mb-6">
+              <p
+                className={`${
+                  isDark ? 'text-gray-400' : 'text-gray-500'
+                } mb-6 transition-colors duration-300`}
+              >
                 You haven't created any events yet.
               </p>
               <button
@@ -218,17 +264,31 @@ const MyEvents: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div
+      className={`min-h-screen ${
+        isDark ? 'bg-black' : 'bg-gray-50'
+      } py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300`}
+    >
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">My Events</h1>
+          <h1
+            className={`text-3xl font-bold ${
+              isDark ? 'text-white' : 'text-gray-900'
+            } transition-colors duration-300`}
+          >
+            My Events
+          </h1>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {events.map((event) => (
             <div
               key={event.eventId}
-              className="bg-white shadow-lg rounded-2xl overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300"
+              className={`${
+                isDark
+                  ? 'bg-gray-900 border-gray-700 shadow-lg shadow-black/20 hover:shadow-black/40'
+                  : 'bg-white border-gray-200 shadow-lg hover:shadow-xl'
+              } rounded-2xl overflow-hidden border transition-all duration-300`}
             >
               <div className="relative">
                 <img
@@ -253,15 +313,27 @@ const MyEvents: React.FC = () => {
               </div>
 
               <div className="p-6">
-                <h2 className="text-xl font-semibold text-gray-800 mb-2">
+                <h2
+                  className={`text-xl font-semibold ${
+                    isDark ? 'text-white' : 'text-gray-800'
+                  } mb-2 transition-colors duration-300`}
+                >
                   {event.title}
                 </h2>
-                <p className="text-sm text-gray-600 line-clamp-2 mb-4">
+                <p
+                  className={`text-sm ${
+                    isDark ? 'text-gray-400' : 'text-gray-600'
+                  } line-clamp-2 mb-4 transition-colors duration-300`}
+                >
                   {event.description}
                 </p>
 
                 <div className="space-y-3 mb-4">
-                  <div className="flex items-center text-sm text-gray-600">
+                  <div
+                    className={`flex items-center text-sm ${
+                      isDark ? 'text-gray-400' : 'text-gray-600'
+                    } transition-colors duration-300`}
+                  >
                     <svg
                       className="w-4 h-4 mr-2 text-red-600"
                       fill="currentColor"
@@ -275,7 +347,11 @@ const MyEvents: React.FC = () => {
                     </svg>
                     {formatDate(event.eventStartTime)}
                   </div>
-                  <div className="flex items-center text-sm text-gray-600">
+                  <div
+                    className={`flex items-center text-sm ${
+                      isDark ? 'text-gray-400' : 'text-gray-600'
+                    } transition-colors duration-300`}
+                  >
                     <svg
                       className="w-4 h-4 mr-2 text-red-600"
                       fill="currentColor"
@@ -291,8 +367,16 @@ const MyEvents: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pt-4 border-t border-gray-100 gap-3 sm:gap-0">
-                  <div className="text-sm text-gray-600">
+                <div
+                  className={`flex flex-col sm:flex-row justify-between items-start sm:items-center pt-4 border-t ${
+                    isDark ? 'border-gray-700' : 'border-gray-100'
+                  } gap-3 sm:gap-0 transition-colors duration-300`}
+                >
+                  <div
+                    className={`text-sm ${
+                      isDark ? 'text-gray-400' : 'text-gray-600'
+                    } transition-colors duration-300`}
+                  >
                     <span className="font-semibold text-red-600">
                       {Number(event.ticketsSold)}/{Number(event.maxTickets)}
                     </span>{' '}
@@ -301,7 +385,11 @@ const MyEvents: React.FC = () => {
                   <div className="flex flex-row sm:flex-row gap-2 w-full sm:w-auto">
                     <button
                       onClick={() => navigate(`/event/${event.eventId}`)}
-                      className="flex-1 sm:flex-none px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                      className={`flex-1 sm:flex-none px-4 py-2 text-sm ${
+                        isDark
+                          ? 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      } rounded-lg transition-colors`}
                     >
                       View
                     </button>

@@ -51,7 +51,7 @@ const LandingPage = () => {
       icon: <MessageCircle className="w-8 h-8" />,
       title: 'On-Chain Social',
       description:
-        'Share reviews, feedback, and memories directly on the blockchain',
+        'Share reviews, feedback, and memories directly on the blockchain (coming soon!)',
     },
     {
       icon: <Award className="w-8 h-8" />,
@@ -218,7 +218,9 @@ const LandingPage = () => {
             {/*<div className="w-8 h-8 bg-[#e43636] rounded-lg flex items-center justify-center border-2 border-white">*/}
             {/*    <Calendar className="w-5 h-5 text-white" />*/}
             {/*</div>*/}
-            <span className="text-3xl font-bold text-white">eventChain</span>
+            <span className="text-3xl font-bold text-[#e43636]">
+              eventChain
+            </span>
           </div>
           <button
             onClick={() => (window.location.href = '/home')}

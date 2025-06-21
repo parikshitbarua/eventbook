@@ -11,6 +11,7 @@ import {
   createTicketURIHelperUtil,
 } from '../utils/ipfs-helper.util.ts';
 import EventContractABI from '../contracts/EventContract.sol/EventContract.json';
+import { useTheme } from '../hooks/theme.hook.ts';
 
 interface TicketCategory {
   id: string;
@@ -22,6 +23,7 @@ interface TicketCategory {
 }
 
 const AddTicketsPage = () => {
+  const { isDark } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const { writeContractAsync } = useWriteContract();
@@ -242,21 +244,40 @@ const AddTicketsPage = () => {
     };
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden">
-          <form onSubmit={handleSubmit} className="flex flex-col h-full">
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
+        <div
+          className={`${
+            isDark ? 'bg-gray-900' : 'bg-white'
+          } rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col transition-colors duration-300`}
+        >
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col h-full min-h-0"
+          >
             {/* Fixed Header */}
-            <div className="px-6 py-4 border-b border-gray-200 flex-shrink-0">
-              <h3 className="text-xl font-semibold text-gray-900">
+            <div
+              className={`px-6 py-4 border-b ${
+                isDark ? 'border-gray-700' : 'border-gray-200'
+              } flex-shrink-0 transition-colors duration-300`}
+            >
+              <h3
+                className={`text-xl font-semibold ${
+                  isDark ? 'text-white' : 'text-gray-900'
+                } transition-colors duration-300`}
+              >
                 {category.id ? 'Edit' : 'Add'} Ticket Category
               </h3>
             </div>
 
             {/* Scrollable Form Content */}
-            <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
+            <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6 min-h-0">
               {/* Category Name */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                  className={`block text-sm font-medium ${
+                    isDark ? 'text-gray-300' : 'text-gray-700'
+                  } mb-2 transition-colors duration-300`}
+                >
                   Category Name *
                 </label>
                 <input
@@ -265,14 +286,22 @@ const AddTicketsPage = () => {
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, name: e.target.value }))
                   }
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  className={`w-full px-4 py-3 border ${
+                    isDark
+                      ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                      : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                  } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
                   placeholder="e.g., VIP, General Admission, Early Bird"
                   required
                 />
               </div>
-              Description
+              {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                  className={`block text-sm font-medium ${
+                    isDark ? 'text-gray-300' : 'text-gray-700'
+                  } mb-2 transition-colors duration-300`}
+                >
                   Description *
                 </label>
                 <textarea
@@ -284,7 +313,11 @@ const AddTicketsPage = () => {
                     }))
                   }
                   rows={3}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  className={`w-full px-4 py-3 border ${
+                    isDark
+                      ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                      : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                  } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
                   placeholder="Describe what this ticket category includes..."
                   required
                 />
@@ -292,7 +325,11 @@ const AddTicketsPage = () => {
               {/* Price and Supply */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    className={`block text-sm font-medium ${
+                      isDark ? 'text-gray-300' : 'text-gray-700'
+                    } mb-2 transition-colors duration-300`}
+                  >
                     Price (ETH) *
                   </label>
                   <input
@@ -306,13 +343,21 @@ const AddTicketsPage = () => {
                         price: e.target.value,
                       }))
                     }
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    className={`w-full px-4 py-3 border ${
+                      isDark
+                        ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                        : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                    } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
                     placeholder="0.1"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    className={`block text-sm font-medium ${
+                      isDark ? 'text-gray-300' : 'text-gray-700'
+                    } mb-2 transition-colors duration-300`}
+                  >
                     Max Supply *
                   </label>
                   <input
@@ -325,7 +370,11 @@ const AddTicketsPage = () => {
                         maxSupply: e.target.value,
                       }))
                     }
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    className={`w-full px-4 py-3 border ${
+                      isDark
+                        ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                        : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                    } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
                     placeholder="100"
                     required
                   />
@@ -346,7 +395,11 @@ const AddTicketsPage = () => {
               {/*</div>*/}
               {/* Image Upload */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                  className={`block text-sm font-medium ${
+                    isDark ? 'text-gray-300' : 'text-gray-700'
+                  } mb-2 transition-colors duration-300`}
+                >
                   Ticket Design Image
                 </label>
                 <div
@@ -354,7 +407,9 @@ const AddTicketsPage = () => {
                   className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
                     isDragActive
                       ? 'border-red-500 bg-red-50'
-                      : 'border-gray-300 hover:border-red-400 hover:bg-gray-50'
+                      : isDark
+                        ? 'border-gray-600 hover:border-red-400 hover:bg-gray-700'
+                        : 'border-gray-300 hover:border-red-400 hover:bg-gray-50'
                   }`}
                 >
                   <input {...getInputProps()} />
@@ -365,16 +420,28 @@ const AddTicketsPage = () => {
                         alt="Ticket design"
                         className="mx-auto h-24 w-24 object-cover rounded-lg"
                       />
-                      <p className="text-sm text-gray-600">
+                      <p
+                        className={`text-sm ${
+                          isDark ? 'text-gray-400' : 'text-gray-600'
+                        } transition-colors duration-300`}
+                      >
                         {formData.image.name}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p
+                        className={`text-xs ${
+                          isDark ? 'text-gray-500' : 'text-gray-500'
+                        } transition-colors duration-300`}
+                      >
                         Click or drag to replace
                       </p>
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <div className="mx-auto w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                      <div
+                        className={`mx-auto w-12 h-12 ${
+                          isDark ? 'bg-gray-700' : 'bg-gray-200'
+                        } rounded-full flex items-center justify-center transition-colors duration-300`}
+                      >
                         <svg
                           className="w-6 h-6 text-gray-400"
                           fill="none"
@@ -389,12 +456,20 @@ const AddTicketsPage = () => {
                           />
                         </svg>
                       </div>
-                      <p className="text-sm text-gray-600">
+                      <p
+                        className={`text-sm ${
+                          isDark ? 'text-gray-400' : 'text-gray-600'
+                        } transition-colors duration-300`}
+                      >
                         {isDragActive
                           ? 'Drop image here'
                           : 'Drag & drop or click to upload'}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p
+                        className={`text-xs ${
+                          isDark ? 'text-gray-500' : 'text-gray-500'
+                        } transition-colors duration-300`}
+                      >
                         PNG, JPG, GIF up to 5MB
                       </p>
                     </div>
@@ -404,12 +479,22 @@ const AddTicketsPage = () => {
             </div>
 
             {/* Fixed Footer */}
-            <div className="px-6 py-4 border-t border-gray-200 flex-shrink-0">
+            <div
+              className={`px-6 py-4 border-t ${
+                isDark
+                  ? 'border-gray-700 bg-gray-900'
+                  : 'border-gray-200 bg-white'
+              } flex-shrink-0 transition-colors duration-300 rounded-b-2xl`}
+            >
               <div className="flex justify-end space-x-3">
                 <button
                   type="button"
                   onClick={onCancel}
-                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                  className={`px-4 py-2 ${
+                    isDark
+                      ? 'text-gray-300 bg-gray-800 hover:bg-gray-700'
+                      : 'text-gray-700 bg-gray-100 hover:bg-gray-200'
+                  } rounded-lg transition-colors`}
                 >
                   Cancel
                 </button>
@@ -430,7 +515,11 @@ const AddTicketsPage = () => {
   // Success Dialog Component
   const SuccessDialog = () => (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
-      <div className="bg-white rounded-2xl max-w-md w-full p-8 text-center">
+      <div
+        className={`${
+          isDark ? 'bg-gray-900' : 'bg-white'
+        } rounded-2xl max-w-md w-full p-8 text-center transition-colors duration-300`}
+      >
         {/* Success Icon */}
         <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6">
           <svg
@@ -449,10 +538,18 @@ const AddTicketsPage = () => {
         </div>
 
         {/* Success Message */}
-        <h3 className="text-2xl font-bold text-gray-900 mb-2">
+        <h3
+          className={`text-2xl font-bold ${
+            isDark ? 'text-white' : 'text-gray-900'
+          } mb-2 transition-colors duration-300`}
+        >
           Event Has Been Successfully Created! 🎉
         </h3>
-        <p className="text-gray-600 mb-8">
+        <p
+          className={`${
+            isDark ? 'text-gray-400' : 'text-gray-600'
+          } mb-8 transition-colors duration-300`}
+        >
           Your event tickets have been added to the blockchain and are ready for
           sale.
         </p>
@@ -481,33 +578,71 @@ const AddTicketsPage = () => {
 
   if (!navigationState) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div
+        className={`min-h-screen ${
+          isDark ? 'bg-black' : 'bg-white'
+        } flex items-center justify-center transition-colors duration-300`}
+      >
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Loading...</h2>
-          <p className="text-gray-600">Redirecting to create event page...</p>
+          <h2
+            className={`text-2xl font-bold ${
+              isDark ? 'text-white' : 'text-gray-900'
+            } mb-4 transition-colors duration-300`}
+          >
+            Loading...
+          </h2>
+          <p
+            className={`${
+              isDark ? 'text-gray-400' : 'text-gray-600'
+            } transition-colors duration-300`}
+          >
+            Redirecting to create event page...
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div
+      className={`min-h-screen ${
+        isDark ? 'bg-black' : 'bg-gray-50'
+      } transition-colors duration-300`}
+    >
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1
+            className={`text-3xl font-bold ${
+              isDark ? 'text-white' : 'text-gray-900'
+            } mb-2 transition-colors duration-300`}
+          >
             Add Ticket Categories
           </h1>
-          <p className="text-gray-600">
+          <p
+            className={`${
+              isDark ? 'text-gray-400' : 'text-gray-600'
+            } transition-colors duration-300`}
+          >
             Configure ticket categories for your event:{' '}
             <span className="font-semibold">{navigationState?.eventTitle}</span>
           </p>
         </div>
 
         {/* Ticket Categories Configuration */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 mb-6">
+        <div
+          className={`${
+            isDark
+              ? 'bg-gray-900 border-gray-700 shadow-sm shadow-black/20'
+              : 'bg-white border-gray-200 shadow-sm'
+          } rounded-2xl border p-8 mb-6 transition-colors duration-300`}
+        >
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2
+              className={`text-xl font-semibold ${
+                isDark ? 'text-white' : 'text-gray-900'
+              } transition-colors duration-300`}
+            >
               Ticket Categories
             </h2>
             <button
@@ -524,8 +659,16 @@ const AddTicketsPage = () => {
           </div>
 
           {categories.length === 0 ? (
-            <div className="text-center py-12 bg-gray-50 rounded-xl">
-              <div className="w-16 h-16 mx-auto mb-4 bg-gray-200 rounded-full flex items-center justify-center">
+            <div
+              className={`text-center py-12 ${
+                isDark ? 'bg-gray-800' : 'bg-gray-50'
+              } rounded-xl transition-colors duration-300`}
+            >
+              <div
+                className={`w-16 h-16 mx-auto mb-4 ${
+                  isDark ? 'bg-gray-700' : 'bg-gray-200'
+                } rounded-full flex items-center justify-center transition-colors duration-300`}
+              >
                 <svg
                   className="w-8 h-8 text-gray-400"
                   fill="none"
@@ -540,10 +683,18 @@ const AddTicketsPage = () => {
                   />
                 </svg>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3
+                className={`text-lg font-medium ${
+                  isDark ? 'text-white' : 'text-gray-900'
+                } mb-2 transition-colors duration-300`}
+              >
                 No ticket categories yet
               </h3>
-              <p className="text-gray-500 mb-4">
+              <p
+                className={`${
+                  isDark ? 'text-gray-400' : 'text-gray-500'
+                } mb-4 transition-colors duration-300`}
+              >
                 Add your first ticket category to get started
               </p>
             </div>
@@ -552,14 +703,24 @@ const AddTicketsPage = () => {
               {categories.map((category) => (
                 <div
                   key={category.id}
-                  className="border border-gray-200 rounded-xl p-6"
+                  className={`border ${
+                    isDark ? 'border-gray-700' : 'border-gray-200'
+                  } rounded-xl p-6 transition-colors duration-300`}
                 >
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                      <h3
+                        className={`text-lg font-semibold ${
+                          isDark ? 'text-white' : 'text-gray-900'
+                        } mb-1 transition-colors duration-300`}
+                      >
                         {category.name}
                       </h3>
-                      <p className="text-gray-600 text-sm mb-2">
+                      <p
+                        className={`${
+                          isDark ? 'text-gray-400' : 'text-gray-600'
+                        } text-sm mb-2 transition-colors duration-300`}
+                      >
                         {category.description}
                       </p>
                       <div className="flex flex-wrap gap-4 text-sm">
@@ -581,7 +742,11 @@ const AddTicketsPage = () => {
                       )}
                       <button
                         onClick={() => editCategory(category)}
-                        className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                        className={`p-2 ${
+                          isDark
+                            ? 'text-gray-400 hover:text-gray-200'
+                            : 'text-gray-400 hover:text-gray-600'
+                        } transition-colors`}
                       >
                         <svg
                           className="w-5 h-5"
@@ -624,9 +789,25 @@ const AddTicketsPage = () => {
         </div>
 
         {/* Event Details Summary */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6">
-          <h3 className="font-medium text-blue-900 mb-3">Event Summary</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-blue-800">
+        <div
+          className={`${
+            isDark
+              ? 'bg-blue-900/20 border-blue-700/50'
+              : 'bg-blue-50 border-blue-200'
+          } border rounded-xl p-6 mb-6 transition-colors duration-300`}
+        >
+          <h3
+            className={`font-medium ${
+              isDark ? 'text-blue-300' : 'text-blue-900'
+            } mb-3 transition-colors duration-300`}
+          >
+            Event Summary
+          </h3>
+          <div
+            className={`grid grid-cols-1 md:grid-cols-2 gap-4 text-sm ${
+              isDark ? 'text-blue-300' : 'text-blue-800'
+            } transition-colors duration-300`}
+          >
             <div>
               <p>
                 <span className="font-medium">Event:</span>{' '}
@@ -670,7 +851,11 @@ const AddTicketsPage = () => {
         <div className="flex justify-between">
           <button
             onClick={() => navigate(-1)}
-            className="px-6 py-3 text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors font-medium"
+            className={`px-6 py-3 ${
+              isDark
+                ? 'text-gray-300 bg-gray-800 hover:bg-gray-700'
+                : 'text-gray-700 bg-gray-100 hover:bg-gray-200'
+            } rounded-xl transition-colors font-medium`}
           >
             Back
           </button>

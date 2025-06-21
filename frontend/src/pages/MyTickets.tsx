@@ -4,6 +4,7 @@ import { JsonRpcProvider, Contract } from 'ethers';
 import EventFactoryABI from '../contracts/EventFactory.sol/EventFactory.json';
 import EventTicketNFTABI from '../contracts/EventTicketNFT.sol/EventTicketNFT.json';
 import { NETWORK_URL, FACTORY_ADDRESS } from '../config/app.config';
+import { useTheme } from '../hooks/theme.hook.ts';
 
 interface TicketNFT {
   tokenId: number;
@@ -22,6 +23,7 @@ interface TicketNFT {
 }
 
 const MyTickets: React.FC = () => {
+  const { isDark } = useTheme();
   const { address, isConnected } = useAccount();
   const [tickets, setTickets] = useState<TicketNFT[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -157,7 +159,11 @@ const MyTickets: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div
+        className={`min-h-screen ${
+          isDark ? 'bg-black' : 'bg-gray-50'
+        } flex items-center justify-center transition-colors duration-300`}
+      >
         <div className="text-center">
           <svg
             className="animate-spin h-12 w-12 text-red-600 mx-auto mb-4"
@@ -179,7 +185,13 @@ const MyTickets: React.FC = () => {
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
             ></path>
           </svg>
-          <p className="text-gray-600">Loading your tickets...</p>
+          <p
+            className={`${
+              isDark ? 'text-gray-400' : 'text-gray-600'
+            } transition-colors duration-300`}
+          >
+            Loading your tickets...
+          </p>
         </div>
       </div>
     );
@@ -187,7 +199,11 @@ const MyTickets: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div
+        className={`min-h-screen ${
+          isDark ? 'bg-black' : 'bg-gray-50'
+        } flex items-center justify-center transition-colors duration-300`}
+      >
         <div className="text-center">
           <div className="text-red-500 mb-4">
             <svg
@@ -202,7 +218,13 @@ const MyTickets: React.FC = () => {
               />
             </svg>
           </div>
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">{error}</h3>
+          <h3
+            className={`text-xl font-semibold ${
+              isDark ? 'text-gray-300' : 'text-gray-700'
+            } mb-2 transition-colors duration-300`}
+          >
+            {error}
+          </h3>
           {!isConnected && (
             <div className="flex justify-center">
               <appkit-button />
@@ -215,13 +237,27 @@ const MyTickets: React.FC = () => {
 
   if (tickets.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div
+        className={`min-h-screen ${
+          isDark ? 'bg-black' : 'bg-gray-50'
+        } py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300`}
+      >
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
+            <h1
+              className={`text-3xl font-bold ${
+                isDark ? 'text-white' : 'text-gray-900'
+              } mb-4 transition-colors duration-300`}
+            >
               My Tickets
             </h1>
-            <div className="bg-white rounded-lg shadow-sm p-8">
+            <div
+              className={`${
+                isDark
+                  ? 'bg-gray-900 shadow-lg shadow-black/20'
+                  : 'bg-white shadow-sm'
+              } rounded-lg p-8 transition-colors duration-300`}
+            >
               <svg
                 className="w-16 h-16 text-gray-400 mx-auto mb-4"
                 fill="none"
@@ -235,10 +271,18 @@ const MyTickets: React.FC = () => {
                   d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a1 1 0 001 1h1a1 1 0 001-1V7a2 2 0 00-2-2H5zM5 21a2 2 0 002-2v-3a1 1 0 00-1-1H5a1 1 0 00-1 1v3a2 2 0 002 2h0z"
                 />
               </svg>
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">
+              <h3
+                className={`text-xl font-semibold ${
+                  isDark ? 'text-gray-300' : 'text-gray-700'
+                } mb-2 transition-colors duration-300`}
+              >
                 No tickets found
               </h3>
-              <p className="text-gray-500 mb-6">
+              <p
+                className={`${
+                  isDark ? 'text-gray-400' : 'text-gray-500'
+                } mb-6 transition-colors duration-300`}
+              >
                 You don't have any tickets yet. Purchase some tickets to see
                 them here!
               </p>
@@ -256,11 +300,25 @@ const MyTickets: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div
+      className={`min-h-screen ${
+        isDark ? 'bg-black' : 'bg-gray-50'
+      } py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300`}
+    >
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">My Tickets</h1>
-          <p className="text-gray-600">
+          <h1
+            className={`text-3xl font-bold ${
+              isDark ? 'text-white' : 'text-gray-900'
+            } mb-2 transition-colors duration-300`}
+          >
+            My Tickets
+          </h1>
+          <p
+            className={`${
+              isDark ? 'text-gray-400' : 'text-gray-600'
+            } transition-colors duration-300`}
+          >
             You have {tickets.length} ticket{tickets.length !== 1 ? 's' : ''}
           </p>
         </div>
@@ -269,7 +327,11 @@ const MyTickets: React.FC = () => {
           {tickets.map((ticket) => (
             <div
               key={`${ticket.nftContract}-${ticket.tokenId}`}
-              className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-2xl hover:border-red-200 hover:-translate-y-1 transition-all duration-300 group"
+              className={`${
+                isDark
+                  ? 'bg-gray-900 border-gray-700 shadow-lg shadow-black/20 hover:shadow-black/40 hover:border-red-600'
+                  : 'bg-white border-gray-100 shadow-lg hover:shadow-2xl hover:border-red-200'
+              } rounded-xl border overflow-hidden hover:-translate-y-1 transition-all duration-300 group`}
             >
               <div className="aspect-square relative overflow-hidden">
                 {ticket.image ? (
@@ -311,26 +373,64 @@ const MyTickets: React.FC = () => {
                 <div className="absolute top-0 left-0 w-12 h-12 bg-gradient-to-br from-red-500/20 to-transparent"></div>
               </div>
 
-              <div className="p-5 bg-gradient-to-b from-white to-gray-50/30">
-                <h3 className="font-bold text-gray-900 mb-2 truncate text-lg">
+              <div
+                className={`p-5 ${
+                  isDark
+                    ? 'bg-gradient-to-b from-gray-900 to-gray-800/30'
+                    : 'bg-gradient-to-b from-white to-gray-50/30'
+                } transition-colors duration-300`}
+              >
+                <h3
+                  className={`font-bold ${
+                    isDark ? 'text-white' : 'text-gray-900'
+                  } mb-2 truncate text-lg transition-colors duration-300`}
+                >
                   {ticket.name || ticket.eventTitle}
                 </h3>
                 {ticket.description && (
-                  <p className="text-sm text-gray-600 mb-3 line-clamp-2 leading-relaxed">
+                  <p
+                    className={`text-sm ${
+                      isDark ? 'text-gray-400' : 'text-gray-600'
+                    } mb-3 line-clamp-2 leading-relaxed transition-colors duration-300`}
+                  >
                     {ticket.description}
                   </p>
                 )}
 
-                <div className="space-y-2.5 text-sm text-gray-600">
-                  <div className="flex justify-between items-center py-1 px-2 bg-gray-50 rounded-lg">
+                <div
+                  className={`space-y-2.5 text-sm ${
+                    isDark ? 'text-gray-400' : 'text-gray-600'
+                  } transition-colors duration-300`}
+                >
+                  <div
+                    className={`flex justify-between items-center py-1 px-2 ${
+                      isDark ? 'bg-gray-800' : 'bg-gray-50'
+                    } rounded-lg transition-colors duration-300`}
+                  >
                     <span className="font-medium">Token ID:</span>
-                    <span className="font-mono bg-white px-2 py-0.5 rounded text-xs border">
+                    <span
+                      className={`font-mono ${
+                        isDark
+                          ? 'bg-gray-700 border-gray-600 text-gray-200'
+                          : 'bg-white border-gray-200 text-gray-900'
+                      } px-2 py-0.5 rounded text-xs border transition-colors duration-300`}
+                    >
                       #{ticket.tokenId}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center py-1 px-2 bg-gray-50 rounded-lg">
+                  <div
+                    className={`flex justify-between items-center py-1 px-2 ${
+                      isDark ? 'bg-gray-800' : 'bg-gray-50'
+                    } rounded-lg transition-colors duration-300`}
+                  >
                     <span className="font-medium">Event ID:</span>
-                    <span className="font-mono bg-white px-2 py-0.5 rounded text-xs border">
+                    <span
+                      className={`font-mono ${
+                        isDark
+                          ? 'bg-gray-700 border-gray-600 text-gray-200'
+                          : 'bg-white border-gray-200 text-gray-900'
+                      } px-2 py-0.5 rounded text-xs border transition-colors duration-300`}
+                    >
                       #{ticket.eventId}
                     </span>
                   </div>

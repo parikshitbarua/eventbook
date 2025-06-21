@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { JsonRpcProvider, Contract } from 'ethers';
+import Confetti from 'react-confetti';
 import type { EventData } from '../types/event.types.ts';
 import type { EventFactoryContract } from '../types/contracts.types.ts';
 import TicketPurchaseModal from '../components/TicketPurchaseModal';
@@ -8,6 +9,7 @@ import EventFactoryABI from '../contracts/EventFactory.sol/EventFactory.json';
 import { fetchFirstImageFromIPFS } from '../utils/ipfs-helper.util';
 import EventContractABI from '../contracts/EventContract.sol/EventContract.json';
 import { TicketCategory } from '../types/ticket.types.ts';
+import { useTheme } from '../hooks/theme.hook.ts';
 // const { purchaseTickets } = usePurchaseTickets();
 
 const FACTORY_ADDRESS =
@@ -16,10 +18,16 @@ const FACTORY_ADDRESS =
 const NETWORK_URL = import.meta.env.VITE_NETWORK_URL || 'http://127.0.0.1:8545';
 
 const HomePage = () => {
+  const { isDark } = useTheme();
   const [allEvents, setAllEvents] = useState<EventData[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<EventData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [windowDimensions, setWindowDimensions] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -142,6 +150,28 @@ const HomePage = () => {
     fetchData();
   }, []);
 
+  // Handle window resize for confetti
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Handle success state
+  const handlePurchaseSuccess = () => {
+    setShowSuccess(true);
+    // Auto-hide success message after 5 seconds
+    setTimeout(() => {
+      setShowSuccess(false);
+    }, 5000);
+  };
+
   // Loading Spinner Component
   // const LoadingSpinner = () => (
   //   <div className="flex items-center justify-center">
@@ -154,17 +184,59 @@ const HomePage = () => {
 
   // Skeleton Card Component
   const SkeletonCard = () => (
-    <div className="bg-white shadow-lg rounded-2xl overflow-hidden border border-gray-200 animate-pulse">
-      <div className="h-48 w-full bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-size-200 animate-gradient"></div>
+    <div
+      className={`${
+        isDark
+          ? 'bg-gray-900 border-gray-700 shadow-lg shadow-black/20'
+          : 'bg-white border-gray-200 shadow-lg'
+      } rounded-2xl overflow-hidden border animate-pulse transition-colors duration-300`}
+    >
+      <div
+        className={`h-48 w-full ${
+          isDark
+            ? 'bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700'
+            : 'bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200'
+        } bg-size-200 animate-gradient`}
+      ></div>
       <div className="p-4 flex flex-col justify-between h-48">
         <div>
-          <div className="h-6 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-size-200 animate-gradient rounded mb-2"></div>
-          <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-size-200 animate-gradient rounded mb-1"></div>
-          <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-size-200 animate-gradient rounded w-3/4"></div>
+          <div
+            className={`h-6 ${
+              isDark
+                ? 'bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700'
+                : 'bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200'
+            } bg-size-200 animate-gradient rounded mb-2`}
+          ></div>
+          <div
+            className={`h-4 ${
+              isDark
+                ? 'bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700'
+                : 'bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200'
+            } bg-size-200 animate-gradient rounded mb-1`}
+          ></div>
+          <div
+            className={`h-4 ${
+              isDark
+                ? 'bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700'
+                : 'bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200'
+            } bg-size-200 animate-gradient rounded w-3/4`}
+          ></div>
         </div>
         <div className="mt-4 flex justify-between items-center">
-          <div className="h-6 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-size-200 animate-gradient rounded w-20"></div>
-          <div className="h-10 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-size-200 animate-gradient rounded w-24"></div>
+          <div
+            className={`h-6 ${
+              isDark
+                ? 'bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700'
+                : 'bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200'
+            } bg-size-200 animate-gradient rounded w-20`}
+          ></div>
+          <div
+            className={`h-10 ${
+              isDark
+                ? 'bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700'
+                : 'bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200'
+            } bg-size-200 animate-gradient rounded w-24`}
+          ></div>
         </div>
       </div>
     </div>
@@ -172,7 +244,11 @@ const HomePage = () => {
 
   // Loading State Component
   const LoadingState = () => (
-    <div className="min-h-screen bg-white px-6 py-10">
+    <div
+      className={`min-h-screen ${
+        isDark ? 'bg-black' : 'bg-white'
+      } px-6 py-10 transition-colors duration-300`}
+    >
       <h1 className="text-4xl font-bold text-red-600 text-center mb-10">
         Upcoming Events
       </h1>
@@ -203,14 +279,88 @@ const HomePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white px-6 py-10">
+    <div
+      className={`min-h-screen ${
+        isDark ? 'bg-black' : 'bg-white'
+      } px-6 py-10 transition-colors duration-300`}
+    >
+      {/* Confetti Animation */}
+      {showSuccess && (
+        <Confetti
+          width={windowDimensions.width}
+          height={windowDimensions.height}
+          recycle={false}
+          numberOfPieces={200}
+          gravity={0.3}
+        />
+      )}
+
+      {/* Success Message */}
+      {showSuccess && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+          <div
+            className={`max-w-md mx-4 p-6 rounded-2xl shadow-2xl transform transition-all duration-500 ${
+              isDark
+                ? 'bg-gray-800 border border-gray-700'
+                : 'bg-white border border-gray-200'
+            }`}
+          >
+            <div className="text-center">
+              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+                <svg
+                  className="h-8 w-8 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+              <h3
+                className={`text-lg font-semibold mb-2 transition-colors ${
+                  isDark ? 'text-gray-100' : 'text-gray-900'
+                }`}
+              >
+                🎉 Purchase Successful!
+              </h3>
+              <p
+                className={`text-sm transition-colors ${
+                  isDark ? 'text-gray-300' : 'text-gray-600'
+                }`}
+              >
+                Your tickets have been successfully purchased! Check your wallet
+                for the NFT tickets.
+              </p>
+              <button
+                onClick={() => setShowSuccess(false)}
+                className={`mt-4 px-4 py-2 rounded-lg text-sm font-medium transition-colors pointer-events-auto ${
+                  isDark
+                    ? 'bg-gray-700 text-gray-200 hover:bg-gray-600'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <h1 className="text-4xl font-bold text-red-600 text-center mb-10">
         Upcoming Events
       </h1>
 
       {allEvents.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20">
-          <div className="text-gray-400 mb-4">
+          <div
+            className={`${
+              isDark ? 'text-gray-500' : 'text-gray-400'
+            } mb-4 transition-colors duration-300`}
+          >
             <svg className="w-20 h-20" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
@@ -219,10 +369,18 @@ const HomePage = () => {
               />
             </svg>
           </div>
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">
+          <h3
+            className={`text-xl font-semibold ${
+              isDark ? 'text-white' : 'text-gray-700'
+            } mb-2 transition-colors duration-300`}
+          >
             No Events Found
           </h3>
-          <p className="text-gray-500 text-center max-w-md">
+          <p
+            className={`${
+              isDark ? 'text-gray-400' : 'text-gray-500'
+            } text-center max-w-md transition-colors duration-300`}
+          >
             There are currently no active events available. Check back later or
             create your own event!
           </p>
@@ -232,7 +390,11 @@ const HomePage = () => {
           {allEvents.map((event) => (
             <div
               key={event.eventId}
-              className="bg-white shadow-lg rounded-2xl overflow-hidden border border-gray-200 hover:shadow-xl transition-transform duration-500 ease-in-out hover:scale-105 cursor-pointer"
+              className={`${
+                isDark
+                  ? 'bg-gray-900 border-gray-700 shadow-lg shadow-black/20 hover:shadow-black/40'
+                  : 'bg-white border-gray-200 shadow-lg hover:shadow-xl'
+              } rounded-2xl overflow-hidden border transition-all duration-500 ease-in-out hover:scale-105 cursor-pointer`}
               onClick={() => navigate(`/event/${event.eventId}`)}
             >
               <div className="relative">
@@ -251,10 +413,18 @@ const HomePage = () => {
               </div>
               <div className="p-4 flex flex-col justify-between h-48">
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-800 mb-2">
+                  <h2
+                    className={`text-xl font-semibold ${
+                      isDark ? 'text-white' : 'text-gray-800'
+                    } mb-2 transition-colors duration-300`}
+                  >
                     {event.title}
                   </h2>
-                  <p className="text-sm text-gray-600 line-clamp-3">
+                  <p
+                    className={`text-sm ${
+                      isDark ? 'text-gray-400' : 'text-gray-600'
+                    } line-clamp-3 transition-colors duration-300`}
+                  >
                     {event.description}
                   </p>
                 </div>
@@ -288,6 +458,7 @@ const HomePage = () => {
             setSelectedEvent(null);
           }}
           event={selectedEvent}
+          onSuccess={handlePurchaseSuccess}
         />
       )}
     </div>
