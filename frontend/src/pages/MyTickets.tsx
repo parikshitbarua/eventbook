@@ -5,6 +5,9 @@ import EventFactoryABI from '../contracts/EventFactory.sol/EventFactory.json';
 import EventTicketNFTABI from '../contracts/EventTicketNFT.sol/EventTicketNFT.json';
 import { NETWORK_URL, FACTORY_ADDRESS } from '../config/app.config';
 import { useTheme } from '../hooks/theme.hook.ts';
+import { useWalletClient } from 'wagmi';
+import QRModal from '../components/QRModal';
+import { API_ENDPOINTS } from '../config/api.config';
 
 interface TicketNFT {
   tokenId: number;
@@ -25,9 +28,32 @@ interface TicketNFT {
 const MyTickets: React.FC = () => {
   const { isDark } = useTheme();
   const { address, isConnected } = useAccount();
+  const { data: walletClient } = useWalletClient();
   const [tickets, setTickets] = useState<TicketNFT[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [generatingQR, setGeneratingQR] = useState<string | null>(null); // Track which ticket is generating QR
+  
+  // Modal state
+  const [modal, setModal] = useState<{
+    isOpen: boolean;
+    type: 'success' | 'error';
+    title: string;
+    message: string;
+    qrData?: {
+      tokenId: number;
+      eventId: number;
+      owner: string;
+      expiresAt: number;
+      serverSignature: string;
+    } | null;
+  }>({
+    isOpen: false,
+    type: 'success',
+    title: '',
+    message: '',
+    qrData: null,
+  });
 
   const fetchTicketMetadata = async (
     tokenURI: string,
@@ -156,6 +182,87 @@ const MyTickets: React.FC = () => {
   useEffect(() => {
     fetchUserTickets();
   }, [fetchUserTickets]);
+
+  const handleGenerateQR = async (ticket: TicketNFT) => {
+    if (!walletClient || !address) {
+      setModal({
+        isOpen: true,
+        type: 'error',
+        title: 'Wallet Not Connected',
+        message: 'Please connect your wallet first to generate QR codes.',
+        qrData: null,
+      });
+      return;
+    }
+
+    const ticketKey = `${ticket.nftContract}-${ticket.tokenId}`;
+    setGeneratingQR(ticketKey);
+
+    try {
+      // Create the message to sign
+      const message = `I am the owner of ticket ${ticket.tokenId} for event ${ticket.eventId}`;
+      
+      // Request signature from user
+      const signature = await walletClient.signMessage({
+        message,
+      });
+
+      // Call the backend API
+      const response = await fetch(API_ENDPOINTS.GENERATE_QR, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tokenId: ticket.tokenId.toString(),
+          eventId: ticket.eventId.toString(),
+          walletAddress: address,
+          userSignature: signature,
+          message: message, // Include the message that was signed
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to generate QR data');
+      }
+
+      // Show success modal with QR data
+      console.log('QR Data generated successfully:', data);
+      setModal({
+        isOpen: true,
+        type: 'success',
+        title: 'QR Code Generated!',
+        message: 'Your QR code has been successfully generated and is valid for 10 minutes.',
+        qrData: data.data,
+      });
+
+    } catch (error: unknown) {
+      console.error('Error generating QR:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to generate QR code';
+      
+      setModal({
+        isOpen: true,
+        type: 'error',
+        title: 'QR Generation Failed',
+        message: errorMessage,
+        qrData: null,
+      });
+    } finally {
+      setGeneratingQR(null);
+    }
+  };
+
+  const closeModal = () => {
+    setModal({
+      isOpen: false,
+      type: 'success',
+      title: '',
+      message: '',
+      qrData: null,
+    });
+  };
 
   if (isLoading) {
     return (
@@ -369,6 +476,13 @@ const MyTickets: React.FC = () => {
                   #{ticket.tokenId}
                 </div>
 
+                {/* Category Type Badge */}
+                {ticket.attributes && ticket.attributes.find(attr => attr.trait_type === 'Category') && (
+                  <div className="absolute top-3 left-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-3 py-1.5 rounded-full text-xs font-medium shadow-lg backdrop-blur-sm">
+                    {ticket.attributes.find(attr => attr.trait_type === 'Category')?.value}
+                  </div>
+                )}
+
                 {/* Decorative corner accent */}
                 <div className="absolute top-0 left-0 w-12 h-12 bg-gradient-to-br from-red-500/20 to-transparent"></div>
               </div>
@@ -402,62 +516,8 @@ const MyTickets: React.FC = () => {
                     isDark ? 'text-gray-400' : 'text-gray-600'
                   } transition-colors duration-300`}
                 >
-                  <div
-                    className={`flex justify-between items-center py-1 px-2 ${
-                      isDark ? 'bg-gray-800' : 'bg-gray-50'
-                    } rounded-lg transition-colors duration-300`}
-                  >
-                    <span className="font-medium">Token ID:</span>
-                    <span
-                      className={`font-mono ${
-                        isDark
-                          ? 'bg-gray-700 border-gray-600 text-gray-200'
-                          : 'bg-white border-gray-200 text-gray-900'
-                      } px-2 py-0.5 rounded text-xs border transition-colors duration-300`}
-                    >
-                      #{ticket.tokenId}
-                    </span>
-                  </div>
-                  <div
-                    className={`flex justify-between items-center py-1 px-2 ${
-                      isDark ? 'bg-gray-800' : 'bg-gray-50'
-                    } rounded-lg transition-colors duration-300`}
-                  >
-                    <span className="font-medium">Event ID:</span>
-                    <span
-                      className={`font-mono ${
-                        isDark
-                          ? 'bg-gray-700 border-gray-600 text-gray-200'
-                          : 'bg-white border-gray-200 text-gray-900'
-                      } px-2 py-0.5 rounded text-xs border transition-colors duration-300`}
-                    >
-                      #{ticket.eventId}
-                    </span>
-                  </div>
 
-                  {/* Display attributes */}
-                  {ticket.attributes && ticket.attributes.length > 0 && (
-                    <div className="mt-4 pt-3 border-t border-gray-200/70">
-                      <h4 className="text-xs font-bold text-gray-800 mb-3 uppercase tracking-wide">
-                        Attributes
-                      </h4>
-                      <div className="space-y-2">
-                        {ticket.attributes.map((attr, index) => (
-                          <div
-                            key={index}
-                            className="flex justify-between items-center py-1 px-2 bg-blue-50 rounded-md"
-                          >
-                            <span className="text-xs text-blue-700 font-medium">
-                              {attr.trait_type}:
-                            </span>
-                            <span className="text-xs font-semibold text-blue-900 bg-white px-2 py-0.5 rounded border border-blue-200">
-                              {attr.value}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+
 
                   <div className="pt-4 space-y-2">
                     {/* External URL link */}
@@ -472,29 +532,99 @@ const MyTickets: React.FC = () => {
                     {/*  </a>*/}
                     {/*)}*/}
 
-                    <button
-                      onClick={() =>
-                        (window.location.href = `/event/${ticket.eventId}`)
-                      }
-                      className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white py-3 px-4 rounded-lg font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 text-sm"
-                    >
-                      <span className="flex items-center justify-center gap-2">
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                          />
-                        </svg>
-                        View Event
-                      </span>
-                    </button>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => handleGenerateQR(ticket)}
+                        disabled={generatingQR === `${ticket.nftContract}-${ticket.tokenId}`}
+                        className={`flex-1 ${
+                          generatingQR === `${ticket.nftContract}-${ticket.tokenId}`
+                            ? 'bg-gray-400 cursor-not-allowed'
+                            : 'bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 active:scale-95'
+                        } text-white py-2 px-3 rounded-xl font-medium shadow-sm hover:shadow-md backdrop-blur-sm transition-all duration-150 text-xs border-0 focus:outline-none focus:ring-2 focus:ring-emerald-500/50`}
+                      >
+                        <span className="flex items-center justify-center gap-1.5">
+                          {generatingQR === `${ticket.nftContract}-${ticket.tokenId}` ? (
+                            <>
+                              <svg
+                                className="animate-spin h-3.5 w-3.5"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                              >
+                                <circle
+                                  className="opacity-25"
+                                  cx="12"
+                                  cy="12"
+                                  r="10"
+                                  stroke="currentColor"
+                                  strokeWidth="4"
+                                ></circle>
+                                <path
+                                  className="opacity-75"
+                                  fill="currentColor"
+                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                ></path>
+                              </svg>
+                              <span className="hidden sm:inline font-medium">Generating...</span>
+                              <span className="sm:hidden font-medium">Gen...</span>
+                            </>
+                          ) : (
+                            <>
+                              <svg
+                                className="w-3.5 h-3.5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                strokeWidth="2.5"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 013.75 9.375v-4.5zM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 01-1.125-1.125v-4.5zM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0113.5 9.375v-4.5z"
+                                />
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M6.75 6.75h.75v.75h-.75v-.75zM6.75 16.5h.75v.75h-.75v-.75zM16.5 6.75h.75v.75h-.75v-.75zM13.5 13.5h4.5v4.5h-4.5v-4.5z"
+                                />
+                              </svg>
+                              <span className="hidden sm:inline font-medium">Scan QR</span>
+                              <span className="sm:hidden font-medium">QR</span>
+                            </>
+                          )}
+                        </span>
+                      </button>
+
+                      <button
+                        onClick={() =>
+                          (window.location.href = `/event/${ticket.eventId}`)
+                        }
+                        className="flex-1 bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-800 hover:to-slate-900 active:scale-95 text-white py-2 px-3 rounded-xl font-medium shadow-sm hover:shadow-md backdrop-blur-sm transition-all duration-150 text-xs border-0 focus:outline-none focus:ring-2 focus:ring-slate-500/50"
+                      >
+                        <span className="flex items-center justify-center gap-1.5">
+                          <svg
+                            className="w-3.5 h-3.5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            strokeWidth="2.5"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
+                            />
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                            />
+                          </svg>
+                          <span className="hidden sm:inline font-medium">View Event</span>
+                          <span className="sm:hidden font-medium">View</span>
+                        </span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -502,6 +632,16 @@ const MyTickets: React.FC = () => {
           ))}
         </div>
       </div>
+
+      {/* QR Modal */}
+      <QRModal
+        isOpen={modal.isOpen}
+        onClose={closeModal}
+        type={modal.type}
+        title={modal.title}
+        message={modal.message}
+        qrData={modal.qrData}
+      />
     </div>
   );
 };
