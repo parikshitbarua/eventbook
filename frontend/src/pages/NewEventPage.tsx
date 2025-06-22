@@ -417,123 +417,302 @@ const NewEventPage = () => {
           >
             Fill in the details to create your blockchain-powered event
           </p>
-
-          {/* Wallet Connection Status (Debug) */}
-          {/*<div className="mt-4 p-4 bg-gray-100 rounded-lg text-sm text-left max-w-md mx-auto">*/}
-          {/*  <h3 className="font-medium mb-2">Wallet Status:</h3>*/}
-          {/*  <p>*/}
-          {/*    <strong>Connected:</strong> {isConnected ? '✅ Yes' : '❌ No'}*/}
-          {/*  </p>*/}
-          {/*  <p>*/}
-          {/*    <strong>Address:</strong> {address || 'Not connected'}*/}
-          {/*  </p>*/}
-          {/*  <p>*/}
-          {/*    <strong>Chain ID:</strong> {chainId}*/}
-          {/*  </p>*/}
-          {/*  <p>*/}
-          {/*    <strong>Contract Address:</strong> {CONTRACT_CONFIG.address}*/}
-          {/*  </p>*/}
-          {/*  {writeError && (*/}
-          {/*    <p className="text-red-600">*/}
-          {/*      <strong>Error:</strong> {writeError.message}*/}
-          {/*    </p>*/}
-          {/*  )}*/}
-          {/*</div>*/}
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className={`${
+        {/* Wallet Connection Required Screen */}
+        {!isConnected ? (
+          <div className={`${
             isDark
               ? 'bg-gray-900 shadow-2xl shadow-black/20'
               : 'bg-white shadow-2xl'
-          } rounded-3xl overflow-hidden transition-colors duration-300`}
-        >
-          <div className="px-8 py-10 sm:px-12 sm:py-12">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Left Column */}
-              <div className="space-y-8">
-                <div
-                  className={`${
-                    isDark ? 'bg-gray-800' : 'bg-gray-50'
-                  } p-6 rounded-2xl transition-colors duration-300`}
+          } rounded-3xl overflow-hidden transition-colors duration-300`}>
+            <div className="px-8 py-16 sm:px-12 sm:py-20 text-center">
+              {/* Wallet Icon */}
+              <div className={`mx-auto w-24 h-24 ${
+                isDark ? 'bg-gray-800' : 'bg-gray-100'
+              } rounded-full flex items-center justify-center mb-8 transition-colors duration-300`}>
+                <svg
+                  className={`w-12 h-12 ${
+                    isDark ? 'text-gray-400' : 'text-gray-500'
+                  }`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  <h3
-                    className={`text-lg font-semibold ${
-                      isDark ? 'text-white' : 'text-gray-900'
-                    } mb-6 transition-colors duration-300`}
-                  >
-                    Event Information
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                  />
+                </svg>
+              </div>
+
+              {/* Title */}
+              <h2
+                className={`text-3xl font-bold ${
+                  isDark ? 'text-white' : 'text-gray-900'
+                } mb-4 transition-colors duration-300`}
+              >
+                Wallet Connection Required
+              </h2>
+
+              {/* Description */}
+              <p
+                className={`text-lg ${
+                  isDark ? 'text-gray-300' : 'text-gray-600'
+                } mb-8 max-w-2xl mx-auto transition-colors duration-300`}
+              >
+                To create an event on the blockchain, you need to connect your wallet first. 
+                This allows you to sign transactions and deploy your event smart contracts.
+              </p>
+
+              {/* Features List */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto">
+                <div className={`p-6 ${
+                  isDark ? 'bg-gray-800' : 'bg-gray-50'
+                } rounded-xl transition-colors duration-300`}>
+                  <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </div>
+                  <h3 className={`font-semibold ${
+                    isDark ? 'text-white' : 'text-gray-900'
+                  } mb-2 transition-colors duration-300`}>
+                    Secure & Decentralized
                   </h3>
+                  <p className={`text-sm ${
+                    isDark ? 'text-gray-400' : 'text-gray-600'
+                  } transition-colors duration-300`}>
+                    Your event data is stored on the blockchain, ensuring transparency and immutability.
+                  </p>
+                </div>
 
-                  {/* Title */}
-                  <div className="mb-6">
-                    <label
-                      className={`block text-sm font-medium ${
-                        isDark ? 'text-gray-300' : 'text-gray-700'
-                      } mb-2 transition-colors duration-300`}
+                <div className={`p-6 ${
+                  isDark ? 'bg-gray-800' : 'bg-gray-50'
+                } rounded-xl transition-colors duration-300`}>
+                  <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a1 1 0 001 1h1a1 1 0 001-1V7a2 2 0 00-2-2H5zM5 21a2 2 0 002-2v-3a1 1 0 00-1-1H5a1 1 0 00-1 1v3a2 2 0 002 2h0z" />
+                    </svg>
+                  </div>
+                  <h3 className={`font-semibold ${
+                    isDark ? 'text-white' : 'text-gray-900'
+                  } mb-2 transition-colors duration-300`}>
+                    NFT Tickets
+                  </h3>
+                  <p className={`text-sm ${
+                    isDark ? 'text-gray-400' : 'text-gray-600'
+                  } transition-colors duration-300`}>
+                    Create unique NFT tickets that can be traded on secondary markets.
+                  </p>
+                </div>
+
+                <div className={`p-6 ${
+                  isDark ? 'bg-gray-800' : 'bg-gray-50'
+                } rounded-xl transition-colors duration-300`}>
+                  <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </div>
+                  <h3 className={`font-semibold ${
+                    isDark ? 'text-white' : 'text-gray-900'
+                  } mb-2 transition-colors duration-300`}>
+                    Instant Deployment
+                  </h3>
+                  <p className={`text-sm ${
+                    isDark ? 'text-gray-400' : 'text-gray-600'
+                  } transition-colors duration-300`}>
+                    Deploy your event smart contract in minutes, not days.
+                  </p>
+                </div>
+              </div>
+
+              {/* Connect Button */}
+              <div className="flex justify-center">
+                <appkit-button />
+              </div>
+
+              {/* Help Text */}
+              <p className={`text-sm ${
+                isDark ? 'text-gray-400' : 'text-gray-500'
+              } mt-6 transition-colors duration-300`}>
+                Don't have a wallet? We recommend{' '}
+                <a 
+                  href="https://metamask.io" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-red-600 hover:text-red-700 underline"
+                >
+                  MetaMask
+                </a>{' '}
+                for beginners.
+              </p>
+            </div>
+          </div>
+        ) : (
+          /* Event Creation Form */
+          <form
+            onSubmit={handleSubmit}
+            className={`${
+              isDark
+                ? 'bg-gray-900 shadow-2xl shadow-black/20'
+                : 'bg-white shadow-2xl'
+            } rounded-3xl overflow-hidden transition-colors duration-300`}
+          >
+            <div className="px-8 py-10 sm:px-12 sm:py-12">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Left Column */}
+                <div className="space-y-8">
+                  <div
+                    className={`${
+                      isDark ? 'bg-gray-800' : 'bg-gray-50'
+                    } p-6 rounded-2xl transition-colors duration-300`}
+                  >
+                    <h3
+                      className={`text-lg font-semibold ${
+                        isDark ? 'text-white' : 'text-gray-900'
+                      } mb-6 transition-colors duration-300`}
                     >
-                      Event Title *
-                    </label>
-                    <input
-                      type="text"
-                      name="title"
-                      value={formData.title}
-                      onChange={handleChange}
-                      className={`w-full px-4 py-3 border ${
-                        isDark
-                          ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
-                          : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-                      } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
-                      placeholder="Summer Music Festival 2024"
-                      required
-                    />
+                      Event Information
+                    </h3>
+
+                    {/* Title */}
+                    <div className="mb-6">
+                      <label
+                        className={`block text-sm font-medium ${
+                          isDark ? 'text-gray-300' : 'text-gray-700'
+                        } mb-2 transition-colors duration-300`}
+                      >
+                        Event Title *
+                      </label>
+                      <input
+                        type="text"
+                        name="title"
+                        value={formData.title}
+                        onChange={handleChange}
+                        className={`w-full px-4 py-3 border ${
+                          isDark
+                            ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                            : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                        } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
+                        placeholder="Summer Music Festival 2024"
+                        required
+                      />
+                    </div>
+
+                    {/* Description */}
+                    <div className="mb-6">
+                      <label
+                        className={`block text-sm font-medium ${
+                          isDark ? 'text-gray-300' : 'text-gray-700'
+                        } mb-2 transition-colors duration-300`}
+                      >
+                        Description *
+                      </label>
+                      <textarea
+                        name="description"
+                        value={formData.description}
+                        onChange={handleChange}
+                        rows={4}
+                        className={`w-full px-4 py-3 border ${
+                          isDark
+                            ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                            : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                        } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
+                        placeholder="Describe your event in detail..."
+                        required
+                      />
+                    </div>
+
+                    {/* Pricing */}
+                    <div className="flex items-center mb-4">
+                      <input
+                        type="checkbox"
+                        id="singleCategory"
+                        checked={hasSingleCategory}
+                        onChange={(e) => setHasSingleCategory(e.target.checked)}
+                        className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                      />
+                      <label
+                        htmlFor="singleCategory"
+                        className={`ml-2 block text-sm font-medium ${
+                          isDark ? 'text-gray-300' : 'text-gray-700'
+                        } transition-colors duration-300`}
+                      >
+                        This event has only one ticket category
+                      </label>
+                    </div>
+
+                    {hasSingleCategory && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label
+                            className={`block text-sm font-medium ${
+                              isDark ? 'text-gray-300' : 'text-gray-700'
+                            } mb-2 transition-colors duration-300`}
+                          >
+                            Ticket Price (ETH) *
+                          </label>
+                          <input
+                            type="number"
+                            name="ticketPrice"
+                            value={formData.ticketPrice}
+                            onChange={handleChange}
+                            step="0.000001"
+                            min="0"
+                            className={`w-full px-4 py-3 border ${
+                              isDark
+                                ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                                : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                            } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
+                            placeholder="0.1"
+                            required={hasSingleCategory}
+                          />
+                        </div>
+                        <div>
+                          <label
+                            className={`block text-sm font-medium ${
+                              isDark ? 'text-gray-300' : 'text-gray-700'
+                            } mb-2 transition-colors duration-300`}
+                          >
+                            Max Tickets *
+                          </label>
+                          <input
+                            type="number"
+                            name="maxTickets"
+                            value={formData.maxTickets}
+                            onChange={handleChange}
+                            min="1"
+                            className={`w-full px-4 py-3 border ${
+                              isDark
+                                ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                                : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                            } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
+                            placeholder="1000"
+                            required={hasSingleCategory}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Description */}
-                  <div className="mb-6">
-                    <label
-                      className={`block text-sm font-medium ${
-                        isDark ? 'text-gray-300' : 'text-gray-700'
-                      } mb-2 transition-colors duration-300`}
+                  {/* Date & Time */}
+                  <div
+                    className={`${
+                      isDark ? 'bg-gray-800' : 'bg-gray-50'
+                    } p-6 rounded-2xl transition-colors duration-300`}
+                  >
+                    <h3
+                      className={`text-lg font-semibold ${
+                        isDark ? 'text-white' : 'text-gray-900'
+                      } mb-6 transition-colors duration-300`}
                     >
-                      Description *
-                    </label>
-                    <textarea
-                      name="description"
-                      value={formData.description}
-                      onChange={handleChange}
-                      rows={4}
-                      className={`w-full px-4 py-3 border ${
-                        isDark
-                          ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
-                          : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-                      } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
-                      placeholder="Describe your event in detail..."
-                      required
-                    />
-                  </div>
+                      Schedule
+                    </h3>
 
-                  {/* Pricing */}
-                  <div className="flex items-center mb-4">
-                    <input
-                      type="checkbox"
-                      id="singleCategory"
-                      checked={hasSingleCategory}
-                      onChange={(e) => setHasSingleCategory(e.target.checked)}
-                      className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
-                    />
-                    <label
-                      htmlFor="singleCategory"
-                      className={`ml-2 block text-sm font-medium ${
-                        isDark ? 'text-gray-300' : 'text-gray-700'
-                      } transition-colors duration-300`}
-                    >
-                      This event has only one ticket category
-                    </label>
-                  </div>
-
-                  {hasSingleCategory && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label
@@ -541,22 +720,19 @@ const NewEventPage = () => {
                             isDark ? 'text-gray-300' : 'text-gray-700'
                           } mb-2 transition-colors duration-300`}
                         >
-                          Ticket Price (ETH) *
+                          Start Date & Time *
                         </label>
                         <input
-                          type="number"
-                          name="ticketPrice"
-                          value={formData.ticketPrice}
+                          type="datetime-local"
+                          name="eventStartTime"
+                          value={formData.eventStartTime}
                           onChange={handleChange}
-                          step="0.000001"
-                          min="0"
                           className={`w-full px-4 py-3 border ${
                             isDark
-                              ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
-                              : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                              ? 'border-gray-600 bg-gray-700 text-white'
+                              : 'border-gray-300 bg-white text-gray-900'
                           } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
-                          placeholder="0.1"
-                          required={hasSingleCategory}
+                          required
                         />
                       </div>
                       <div>
@@ -565,437 +741,375 @@ const NewEventPage = () => {
                             isDark ? 'text-gray-300' : 'text-gray-700'
                           } mb-2 transition-colors duration-300`}
                         >
-                          Max Tickets *
+                          End Date & Time *
                         </label>
                         <input
-                          type="number"
-                          name="maxTickets"
-                          value={formData.maxTickets}
+                          type="datetime-local"
+                          name="eventEndTime"
+                          value={formData.eventEndTime}
                           onChange={handleChange}
-                          min="1"
+                          className={`w-full px-4 py-3 border ${
+                            isDark
+                              ? 'border-gray-600 bg-gray-700 text-white'
+                              : 'border-gray-300 bg-white text-gray-900'
+                          } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Location */}
+                  <div
+                    className={`${
+                      isDark ? 'bg-gray-800' : 'bg-gray-50'
+                    } p-6 rounded-2xl transition-colors duration-300`}
+                  >
+                    <h3
+                      className={`text-lg font-semibold ${
+                        isDark ? 'text-white' : 'text-gray-900'
+                      } mb-6 transition-colors duration-300`}
+                    >
+                      Location
+                    </h3>
+
+                    {/* Venue */}
+                    <div className="mb-4">
+                      <label
+                        className={`block text-sm font-medium ${
+                          isDark ? 'text-gray-300' : 'text-gray-700'
+                        } mb-2 transition-colors duration-300`}
+                      >
+                        Venue Name *
+                      </label>
+                      <input
+                        type="text"
+                        name="venue"
+                        value={formData.venue}
+                        onChange={handleChange}
+                        className={`w-full px-4 py-3 border ${
+                          isDark
+                            ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                            : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                        } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
+                        placeholder="Madison Square Garden"
+                        required
+                      />
+                    </div>
+
+                    {/* Country, State, City */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label
+                          className={`block text-sm font-medium ${
+                            isDark ? 'text-gray-300' : 'text-gray-700'
+                          } mb-2 transition-colors duration-300`}
+                        >
+                          Country *
+                        </label>
+                        <select
+                          name="country"
+                          value={formData.country}
+                          onChange={handleChange}
+                          className={`w-full px-4 py-3 border ${
+                            isDark
+                              ? 'border-gray-600 bg-gray-700 text-white'
+                              : 'border-gray-300 bg-white text-gray-900'
+                          } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
+                          required
+                        >
+                          <option value="">Select Country</option>
+                          {locationData.map((country) => (
+                            <option key={country.id} value={country.id}>
+                              {country.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label
+                          className={`block text-sm font-medium ${
+                            isDark ? 'text-gray-300' : 'text-gray-700'
+                          } mb-2 transition-colors duration-300`}
+                        >
+                          State/Province *
+                        </label>
+                        <select
+                          name="state"
+                          value={formData.state}
+                          onChange={handleChange}
+                          className={`w-full px-4 py-3 border ${
+                            isDark
+                              ? 'border-gray-600 bg-gray-700 text-white'
+                              : 'border-gray-300 bg-white text-gray-900'
+                          } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
+                          required
+                          disabled={!formData.country}
+                        >
+                          <option value="">Select State</option>
+                          {availableStates.map((state) => (
+                            <option key={state.id} value={state.id}>
+                              {state.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label
+                          className={`block text-sm font-medium ${
+                            isDark ? 'text-gray-300' : 'text-gray-700'
+                          } mb-2 transition-colors duration-300`}
+                        >
+                          City *
+                        </label>
+                        <select
+                          name="city"
+                          value={formData.city}
+                          onChange={handleChange}
+                          className={`w-full px-4 py-3 border ${
+                            isDark
+                              ? 'border-gray-600 bg-gray-700 text-white'
+                              : 'border-gray-300 bg-white text-gray-900'
+                          } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
+                          required
+                          disabled={!formData.state}
+                        >
+                          <option value="">Select City</option>
+                          {availableCities.map((city) => (
+                            <option key={city.id} value={city.id}>
+                              {city.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Column */}
+                <div className="space-y-8">
+                  {/* Event Images */}
+                  <div
+                    className={`${
+                      isDark ? 'bg-gray-800' : 'bg-gray-50'
+                    } p-6 rounded-2xl transition-colors duration-300`}
+                  >
+                    <h3
+                      className={`text-lg font-semibold ${
+                        isDark ? 'text-white' : 'text-gray-900'
+                      } mb-6 transition-colors duration-300`}
+                    >
+                      Event Images *
+                    </h3>
+
+                    <div
+                      {...getRootProps()}
+                      className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-200 ${
+                        isDragActive
+                          ? 'border-red-500 bg-red-50'
+                          : isDark
+                            ? 'border-gray-600 hover:border-red-400 hover:bg-gray-700'
+                            : 'border-gray-300 hover:border-red-400 hover:bg-gray-50'
+                      }`}
+                    >
+                      <input {...getInputProps()} />
+                      <div className="space-y-4">
+                        <div
+                          className={`mx-auto w-16 h-16 ${
+                            isDark ? 'bg-gray-700' : 'bg-gray-200'
+                          } rounded-full flex items-center justify-center transition-colors duration-300`}
+                        >
+                          <svg
+                            className={`w-8 h-8 ${
+                              isDark ? 'text-gray-400' : 'text-gray-400'
+                            }`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                            />
+                          </svg>
+                        </div>
+                        <div>
+                          <p
+                            className={`text-lg font-medium ${
+                              isDark ? 'text-gray-300' : 'text-gray-700'
+                            } transition-colors duration-300`}
+                          >
+                            {isDragActive
+                              ? 'Drop images here'
+                              : 'Drag & drop images here'}
+                          </p>
+                          <p
+                            className={`text-sm ${
+                              isDark ? 'text-gray-400' : 'text-gray-500'
+                            } transition-colors duration-300`}
+                          >
+                            or click to browse (Max 5MB per image)
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Image Preview */}
+                    {formData.eventImages.length > 0 && (
+                      <div className="mt-6">
+                        <h4
+                          className={`text-sm font-medium ${
+                            isDark ? 'text-gray-300' : 'text-gray-700'
+                          } mb-3 transition-colors duration-300`}
+                        >
+                          Uploaded Images
+                        </h4>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                          {formData.eventImages.map((file, index) => (
+                            <div key={index} className="relative group">
+                              <img
+                                src={URL.createObjectURL(file)}
+                                alt={`Event ${index + 1}`}
+                                className="w-full h-24 object-cover rounded-lg"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => removeImage(index)}
+                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                ×
+                              </button>
+                              <p
+                                className={`text-xs ${
+                                  isDark ? 'text-gray-400' : 'text-gray-500'
+                                } mt-1 truncate transition-colors duration-300`}
+                              >
+                                {file.name}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* NFT Configuration */}
+                  <div
+                    className={`${
+                      isDark ? 'bg-gray-800' : 'bg-gray-50'
+                    } p-6 rounded-2xl transition-colors duration-300`}
+                  >
+                    <h3
+                      className={`text-lg font-semibold ${
+                        isDark ? 'text-white' : 'text-gray-900'
+                      } mb-6 transition-colors duration-300`}
+                    >
+                      NFT Configuration
+                    </h3>
+
+                    <div className="space-y-4">
+                      <div>
+                        <label
+                          className={`block text-sm font-medium ${
+                            isDark ? 'text-gray-300' : 'text-gray-700'
+                          } mb-2 transition-colors duration-300`}
+                        >
+                          NFT Collection Name *
+                        </label>
+                        <input
+                          type="text"
+                          name="nftName"
+                          value={formData.nftName}
+                          onChange={handleChange}
                           className={`w-full px-4 py-3 border ${
                             isDark
                               ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
                               : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
                           } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
-                          placeholder="1000"
-                          required={hasSingleCategory}
+                          placeholder="Summer Music Festival 2024 Tickets"
+                          required
                         />
                       </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Date & Time */}
-                <div
-                  className={`${
-                    isDark ? 'bg-gray-800' : 'bg-gray-50'
-                  } p-6 rounded-2xl transition-colors duration-300`}
-                >
-                  <h3
-                    className={`text-lg font-semibold ${
-                      isDark ? 'text-white' : 'text-gray-900'
-                    } mb-6 transition-colors duration-300`}
-                  >
-                    Schedule
-                  </h3>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label
-                        className={`block text-sm font-medium ${
-                          isDark ? 'text-gray-300' : 'text-gray-700'
-                        } mb-2 transition-colors duration-300`}
-                      >
-                        Start Date & Time *
-                      </label>
-                      <input
-                        type="datetime-local"
-                        name="eventStartTime"
-                        value={formData.eventStartTime}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 border ${
-                          isDark
-                            ? 'border-gray-600 bg-gray-700 text-white'
-                            : 'border-gray-300 bg-white text-gray-900'
-                        } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label
-                        className={`block text-sm font-medium ${
-                          isDark ? 'text-gray-300' : 'text-gray-700'
-                        } mb-2 transition-colors duration-300`}
-                      >
-                        End Date & Time *
-                      </label>
-                      <input
-                        type="datetime-local"
-                        name="eventEndTime"
-                        value={formData.eventEndTime}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 border ${
-                          isDark
-                            ? 'border-gray-600 bg-gray-700 text-white'
-                            : 'border-gray-300 bg-white text-gray-900'
-                        } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
-                        required
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Location */}
-                <div
-                  className={`${
-                    isDark ? 'bg-gray-800' : 'bg-gray-50'
-                  } p-6 rounded-2xl transition-colors duration-300`}
-                >
-                  <h3
-                    className={`text-lg font-semibold ${
-                      isDark ? 'text-white' : 'text-gray-900'
-                    } mb-6 transition-colors duration-300`}
-                  >
-                    Location
-                  </h3>
-
-                  {/* Venue */}
-                  <div className="mb-4">
-                    <label
-                      className={`block text-sm font-medium ${
-                        isDark ? 'text-gray-300' : 'text-gray-700'
-                      } mb-2 transition-colors duration-300`}
-                    >
-                      Venue Name *
-                    </label>
-                    <input
-                      type="text"
-                      name="venue"
-                      value={formData.venue}
-                      onChange={handleChange}
-                      className={`w-full px-4 py-3 border ${
-                        isDark
-                          ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
-                          : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-                      } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
-                      placeholder="Madison Square Garden"
-                      required
-                    />
-                  </div>
-
-                  {/* Country, State, City */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label
-                        className={`block text-sm font-medium ${
-                          isDark ? 'text-gray-300' : 'text-gray-700'
-                        } mb-2 transition-colors duration-300`}
-                      >
-                        Country *
-                      </label>
-                      <select
-                        name="country"
-                        value={formData.country}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 border ${
-                          isDark
-                            ? 'border-gray-600 bg-gray-700 text-white'
-                            : 'border-gray-300 bg-white text-gray-900'
-                        } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
-                        required
-                      >
-                        <option value="">Select Country</option>
-                        {locationData.map((country) => (
-                          <option key={country.id} value={country.id}>
-                            {country.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label
-                        className={`block text-sm font-medium ${
-                          isDark ? 'text-gray-300' : 'text-gray-700'
-                        } mb-2 transition-colors duration-300`}
-                      >
-                        State/Province *
-                      </label>
-                      <select
-                        name="state"
-                        value={formData.state}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 border ${
-                          isDark
-                            ? 'border-gray-600 bg-gray-700 text-white'
-                            : 'border-gray-300 bg-white text-gray-900'
-                        } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
-                        required
-                        disabled={!formData.country}
-                      >
-                        <option value="">Select State</option>
-                        {availableStates.map((state) => (
-                          <option key={state.id} value={state.id}>
-                            {state.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label
-                        className={`block text-sm font-medium ${
-                          isDark ? 'text-gray-300' : 'text-gray-700'
-                        } mb-2 transition-colors duration-300`}
-                      >
-                        City *
-                      </label>
-                      <select
-                        name="city"
-                        value={formData.city}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 border ${
-                          isDark
-                            ? 'border-gray-600 bg-gray-700 text-white'
-                            : 'border-gray-300 bg-white text-gray-900'
-                        } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
-                        required
-                        disabled={!formData.state}
-                      >
-                        <option value="">Select City</option>
-                        {availableCities.map((city) => (
-                          <option key={city.id} value={city.id}>
-                            {city.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Column */}
-              <div className="space-y-8">
-                {/* Event Images */}
-                <div
-                  className={`${
-                    isDark ? 'bg-gray-800' : 'bg-gray-50'
-                  } p-6 rounded-2xl transition-colors duration-300`}
-                >
-                  <h3
-                    className={`text-lg font-semibold ${
-                      isDark ? 'text-white' : 'text-gray-900'
-                    } mb-6 transition-colors duration-300`}
-                  >
-                    Event Images *
-                  </h3>
-
-                  <div
-                    {...getRootProps()}
-                    className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-200 ${
-                      isDragActive
-                        ? 'border-red-500 bg-red-50'
-                        : isDark
-                          ? 'border-gray-600 hover:border-red-400 hover:bg-gray-700'
-                          : 'border-gray-300 hover:border-red-400 hover:bg-gray-50'
-                    }`}
-                  >
-                    <input {...getInputProps()} />
-                    <div className="space-y-4">
-                      <div
-                        className={`mx-auto w-16 h-16 ${
-                          isDark ? 'bg-gray-700' : 'bg-gray-200'
-                        } rounded-full flex items-center justify-center transition-colors duration-300`}
-                      >
-                        <svg
-                          className={`w-8 h-8 ${
-                            isDark ? 'text-gray-400' : 'text-gray-400'
-                          }`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                          />
-                        </svg>
-                      </div>
                       <div>
-                        <p
-                          className={`text-lg font-medium ${
+                        <label
+                          className={`block text-sm font-medium ${
                             isDark ? 'text-gray-300' : 'text-gray-700'
-                          } transition-colors duration-300`}
+                          } mb-2 transition-colors duration-300`}
                         >
-                          {isDragActive
-                            ? 'Drop images here'
-                            : 'Drag & drop images here'}
-                        </p>
+                          NFT Symbol *
+                        </label>
+                        <input
+                          type="text"
+                          name="nftSymbol"
+                          value={formData.nftSymbol}
+                          onChange={handleChange}
+                          maxLength={10}
+                          className={`w-full px-4 py-3 border ${
+                            isDark
+                              ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                              : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                          } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 uppercase`}
+                          placeholder="MUSIC"
+                          required
+                        />
                         <p
-                          className={`text-sm ${
+                          className={`text-xs ${
                             isDark ? 'text-gray-400' : 'text-gray-500'
-                          } transition-colors duration-300`}
+                          } mt-1 transition-colors duration-300`}
                         >
-                          or click to browse (Max 5MB per image)
+                          2-10 uppercase letters (automatically converted)
                         </p>
                       </div>
-                    </div>
-                  </div>
-
-                  {/* Image Preview */}
-                  {formData.eventImages.length > 0 && (
-                    <div className="mt-6">
-                      <h4
-                        className={`text-sm font-medium ${
-                          isDark ? 'text-gray-300' : 'text-gray-700'
-                        } mb-3 transition-colors duration-300`}
-                      >
-                        Uploaded Images
-                      </h4>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                        {formData.eventImages.map((file, index) => (
-                          <div key={index} className="relative group">
-                            <img
-                              src={URL.createObjectURL(file)}
-                              alt={`Event ${index + 1}`}
-                              className="w-full h-24 object-cover rounded-lg"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => removeImage(index)}
-                              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                            >
-                              ×
-                            </button>
-                            <p
-                              className={`text-xs ${
-                                isDark ? 'text-gray-400' : 'text-gray-500'
-                              } mt-1 truncate transition-colors duration-300`}
-                            >
-                              {file.name}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* NFT Configuration */}
-                <div
-                  className={`${
-                    isDark ? 'bg-gray-800' : 'bg-gray-50'
-                  } p-6 rounded-2xl transition-colors duration-300`}
-                >
-                  <h3
-                    className={`text-lg font-semibold ${
-                      isDark ? 'text-white' : 'text-gray-900'
-                    } mb-6 transition-colors duration-300`}
-                  >
-                    NFT Configuration
-                  </h3>
-
-                  <div className="space-y-4">
-                    <div>
-                      <label
-                        className={`block text-sm font-medium ${
-                          isDark ? 'text-gray-300' : 'text-gray-700'
-                        } mb-2 transition-colors duration-300`}
-                      >
-                        NFT Collection Name *
-                      </label>
-                      <input
-                        type="text"
-                        name="nftName"
-                        value={formData.nftName}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 border ${
-                          isDark
-                            ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
-                            : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-                        } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
-                        placeholder="Summer Music Festival 2024 Tickets"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label
-                        className={`block text-sm font-medium ${
-                          isDark ? 'text-gray-300' : 'text-gray-700'
-                        } mb-2 transition-colors duration-300`}
-                      >
-                        NFT Symbol *
-                      </label>
-                      <input
-                        type="text"
-                        name="nftSymbol"
-                        value={formData.nftSymbol}
-                        onChange={handleChange}
-                        maxLength={10}
-                        className={`w-full px-4 py-3 border ${
-                          isDark
-                            ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
-                            : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-                        } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 uppercase`}
-                        placeholder="MUSIC"
-                        required
-                      />
-                      <p
-                        className={`text-xs ${
-                          isDark ? 'text-gray-400' : 'text-gray-500'
-                        } mt-1 transition-colors duration-300`}
-                      >
-                        2-10 uppercase letters (automatically converted)
-                      </p>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Submit Button */}
-            <div
-              className={`mt-12 pt-8 border-t ${
-                isDark ? 'border-gray-700' : 'border-gray-200'
-              } flex justify-end transition-colors duration-300`}
-            >
-              <button
-                type="submit"
-                disabled={isPending || isUploading}
-                className="bg-gradient-to-r from-red-600 to-red-700 text-white py-3 px-8 rounded-xl font-semibold hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+              {/* Submit Button */}
+              <div
+                className={`mt-12 pt-8 border-t ${
+                  isDark ? 'border-gray-700' : 'border-gray-200'
+                } flex justify-end transition-colors duration-300`}
               >
-                {isPending || isUploading ? (
-                  <div className="flex items-center justify-center">
-                    <svg
-                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                    {buttonText}
-                  </div>
-                ) : (
-                  'Create Event'
-                )}
-              </button>
+                <button
+                  type="submit"
+                  disabled={isPending || isUploading}
+                  className="bg-gradient-to-r from-red-600 to-red-700 text-white py-3 px-8 rounded-xl font-semibold hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+                >
+                  {isPending || isUploading ? (
+                    <div className="flex items-center justify-center">
+                      <svg
+                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      {buttonText}
+                    </div>
+                  ) : (
+                    'Create Event'
+                  )}
+                </button>
+              </div>
             </div>
-          </div>
-        </form>
+          </form>
+        )}
       </div>
     </div>
   );
