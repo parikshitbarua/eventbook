@@ -20,8 +20,6 @@ interface QRScannerModalProps {
   nftContractAddress: string;
 }
 
-const SERVER_URL = import.meta.env.VITE_SERVER_URL;
-
 const QRScannerModal: React.FC<QRScannerModalProps> = ({ isOpen, onClose, eventId, nftContractAddress }) => {
   const { isDark } = useTheme();
   const { isConnected } = useAccount();
