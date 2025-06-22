@@ -15,7 +15,6 @@ interface QRModalProps {
   onClose: () => void;
   type: 'success' | 'error';
   title: string;
-  message: string;
   qrData?: QRData | null; // For success case, to show QR data details
 }
 
@@ -24,7 +23,6 @@ const QRModal: React.FC<QRModalProps> = ({
   onClose,
   type,
   title,
-  message,
   qrData
 }) => {
   const { isDark } = useTheme();

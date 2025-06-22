@@ -90,8 +90,8 @@ const QRScannerModal: React.FC<QRScannerModalProps> = ({ isOpen, onClose, eventI
             setError('Invalid QR code format - could not parse JSON');
           }
         },
-        (error) => {
-          // console.log('QR scanning error:', error);
+        (_error) => {
+          // console.log('QR scanning error:', _error);
         }
       );
 

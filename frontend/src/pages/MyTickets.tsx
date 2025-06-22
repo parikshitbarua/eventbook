@@ -41,7 +41,6 @@ const MyTickets: React.FC = () => {
     isOpen: boolean;
     type: 'success' | 'error';
     title: string;
-    message: string;
     qrData?: {
       tokenId: number;
       eventId: number;
@@ -53,7 +52,6 @@ const MyTickets: React.FC = () => {
     isOpen: false,
     type: 'success',
     title: '',
-    message: '',
     qrData: null,
   });
 
@@ -197,7 +195,6 @@ const MyTickets: React.FC = () => {
         isOpen: true,
         type: 'error',
         title: 'Wallet Not Connected',
-        message: 'Please connect your wallet first to generate QR codes.',
         qrData: null,
       });
       return;
@@ -242,19 +239,16 @@ const MyTickets: React.FC = () => {
         isOpen: true,
         type: 'success',
         title: 'QR Code Generated!',
-        message: 'Your QR code has been successfully generated and is valid for 10 minutes.',
         qrData: data.data,
       });
 
     } catch (error: unknown) {
       console.error('Error generating QR:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to generate QR code';
       
       setModal({
         isOpen: true,
         type: 'error',
         title: 'QR Generation Failed',
-        message: errorMessage,
         qrData: null,
       });
     } finally {
@@ -267,7 +261,6 @@ const MyTickets: React.FC = () => {
       isOpen: false,
       type: 'success',
       title: '',
-      message: '',
       qrData: null,
     });
   };
@@ -778,7 +771,6 @@ const MyTickets: React.FC = () => {
         onClose={closeModal}
         type={modal.type}
         title={modal.title}
-        message={modal.message}
         qrData={modal.qrData}
       />
     </div>

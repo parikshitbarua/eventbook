@@ -90,7 +90,7 @@ const LandingPage = () => {
     },
   ];
 
-  const FloatingCard = ({ children, delay = 0 }) => (
+  const FloatingCard = ({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) => (
     <div
       className={`transform transition-all duration-1000 ${
         isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
