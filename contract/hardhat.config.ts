@@ -1,6 +1,8 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 import "@typechain/hardhat";
+const dotenv = require("dotenv");
+dotenv.config();
 
 const config: HardhatUserConfig = {
   defaultNetwork: "localhost",
@@ -12,6 +14,11 @@ const config: HardhatUserConfig = {
       url: "http://127.0.0.1:8545",
       chainId: 31337,
       allowUnlimitedContractSize: true, // Bypass contract size limit for local testing
+    },
+    baseTestnet: {
+      url: "https://sepolia.base.org", // Base Sepolia RPC
+      chainId: 84532,
+      accounts: [process.env.PRIVATE_KEY!], // Load from .env
     },
   },
   solidity: {

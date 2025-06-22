@@ -1,22 +1,26 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import "@openzeppelin/contracts/proxy/Clones.sol";
 import "./EventContract.sol";
 import "./EventTicketNFT.sol";
-import "./EventFactoryLib.sol";
 import "./Interfaces.sol";
 
 /**
- * @title EventFactory (Optimized with Library)
- * @dev Factory contract for creating and managing events - uses library for size optimization
+ * @title EventFactory (Optimized with Clones)
+ * @dev Factory contract for creating and managing events using minimal proxy pattern
  */
 contract EventFactory is IEventFactory {
-    using EventFactoryLib for *;
+    using Clones for address;
     
     uint256 public override platformFee = 250; // 2.5%
     address public override platformFeeRecipient;
     uint256 public override eventCounter;
     address private _owner;
+    
+    // Implementation contracts
+    address public immutable eventImplementation;
+    address public immutable nftImplementation;
     
     mapping(uint256 => EventInfo) public events;
     mapping(address => uint256[]) public organizerEventsList;
@@ -42,6 +46,10 @@ contract EventFactory is IEventFactory {
         require(_platformFeeRecipient != address(0), "Invalid fee recipient");
         _owner = msg.sender;
         platformFeeRecipient = _platformFeeRecipient;
+        
+        // Deploy implementation contracts
+        eventImplementation = address(new EventContract());
+        nftImplementation = address(new EventTicketNFT());
     }
     
     function createEvent(
@@ -57,17 +65,29 @@ contract EventFactory is IEventFactory {
         string memory _nftSymbol
     ) external override returns (uint256 eventId, address eventContract, address nftContract) {
         require(bytes(_title).length > 0, "Empty title");
-        require(_ticketPrice > 0, "Invalid price");
         require(_eventStartTime > block.timestamp, "Past event start");
         require(_eventEndTime > _eventStartTime, "Invalid times");
         
         eventId = ++eventCounter;
         
-        // Use library to deploy contracts
-        (eventContract, nftContract) = EventFactoryLib.deployEventContracts(
+        // Clone implementation contracts
+        eventContract = eventImplementation.clone();
+        nftContract = nftImplementation.clone();
+        
+        // Initialize event contract
+        EventContract(eventContract).initialize(
             _title, _description, msg.sender, _ticketPrice, _maxTickets,
-            _eventURI, _eventStartTime, _eventEndTime, _venue, _nftName, _nftSymbol
+            _eventURI, _eventStartTime, _eventEndTime, _venue,
+            eventId, address(this)
         );
+        
+        // Initialize NFT contract
+        EventTicketNFT(nftContract).initialize(
+            _nftName, _nftSymbol, eventContract, msg.sender
+        );
+        
+        // Link contracts
+        EventContract(eventContract).setNFTContract(nftContract);
         
         // Store event info
         events[eventId] = EventInfo({
@@ -106,7 +126,23 @@ contract EventFactory is IEventFactory {
     }
     
     function getActiveEvents() external view override returns (uint256[] memory) {
-        return EventFactoryLib.getActiveEventIds(allEventIds, events);
+        uint256 activeCount = 0;
+        uint256 length = allEventIds.length;
+        
+        for (uint256 i = 0; i < length; i++) {
+            if (events[allEventIds[i]].isActive) activeCount++;
+        }
+        
+        uint256[] memory activeEvents = new uint256[](activeCount);
+        uint256 index = 0;
+        
+        for (uint256 i = 0; i < length; i++) {
+            if (events[allEventIds[i]].isActive) {
+                activeEvents[index++] = allEventIds[i];
+            }
+        }
+        
+        return activeEvents;
     }
     
     function getOrganizerEvents(address organizer) external view override returns (uint256[] memory) {
@@ -153,8 +189,14 @@ contract EventFactory is IEventFactory {
             string memory venue
         ) {
         eventInfo = events[eventId];
-        (description, ticketPrice, maxTickets, eventURI, eventStartTime, eventEndTime, venue) = 
-            EventFactoryLib.getEventDetailsFromContract(eventInfo.eventContract);
+        EventContract ec = EventContract(eventInfo.eventContract);
+        description = ec.eventDescription();
+        ticketPrice = ec.ticketPrice();
+        maxTickets = ec.maxTickets();
+        eventURI = ec.eventURI();
+        eventStartTime = ec.eventStartTime();
+        eventEndTime = ec.eventEndTime();
+        venue = ec.venue();
     }
     
     function owner() external view returns (address) {

@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \\\"Error: no test specified\\\" && exit 1"
+    "test": "echo \\\"Error: no test specified\\\" && exit 1",
+    "node": "npx hardhat node",
+    "compile": "npx hardhat compile",
+    "deploy": "npx hardhat run scripts/deployFactory.ts --network localhost"
   },
   "keywords": [],
   "author": "",
@@ -17,5 +20,8 @@
     "ethers": "^6.14.3",
     "hardhat": "^2.24.0",
     "typechain": "^8.3.2"
+  },
+  "dependencies": {
+    "dotenv": "^16.5.0"
   }
 }

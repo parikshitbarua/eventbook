@@ -6,10 +6,14 @@ pragma solidity ^0.8.19;
 interface IEventContract {
     // Basic functions
     function organizer() external view returns (address);
-    function purchaseTickets(address buyer, uint256 quantity, uint256 categoryId) external payable;
+    function purchaseTickets(address buyer, uint256[] memory quantities, uint256[] memory categoryIds) external payable;
     function eventStartTime() external view returns (uint256);
     function eventEndTime() external view returns (uint256);
+    function salesStartTime() external view returns (uint256);
+    function salesEndTime() external view returns (uint256);
     function deactivateEvent() external;
+    function purchaseSingleTicket(address buyer, uint256 quantity) external payable;
+    function purchaseCategoryTickets(address buyer, uint256[] memory quantities, uint256[] memory categoryIds) external payable;
     
     // Additional required functions
     function ticketPrice() external view returns (uint256);
@@ -21,6 +25,20 @@ interface IEventContract {
     function eventURI() external view returns (string memory);
     function venue() external view returns (string memory);
     function createdAt() external view returns (uint256);
+    function getEventDetails() external view returns (
+        string memory title,
+        string memory description,
+        address eventOrganizer,
+        uint256 price,
+        uint256 maxTicketsCount,
+        uint256 ticketsSoldCount,
+        bool active,
+        string memory uri,
+        uint256 creationTime,
+        uint256 startTime,
+        uint256 endTime,
+        string memory eventVenue
+    );
 }
 
 /**
@@ -59,8 +77,17 @@ interface IEventTicketNFT {
     
     // State-changing functions
     function mintTicket(address to, string memory tokenURI, uint256 categoryId) external returns (uint256);
-    function batchMintTickets(address to, string[] memory tokenURIs, uint256 categoryId) external returns (uint256[] memory);
-    function purchaseTickets(uint256 quantity, uint256 categoryId, string[] memory tokenURIs) external payable returns (uint256[] memory);
+    function batchMintTickets(
+        address to,
+        string[] memory tokenURIs,
+        uint256[] memory categoryIds,
+        uint256[] memory quantities
+    ) external returns (uint256[] memory);
+    function purchaseTickets(
+        uint256[] memory quantities,
+        uint256[] memory categoryIds,
+        string[] memory tokenURIs
+    ) external payable returns (uint256[] memory);
     function useTicket(uint256 tokenId) external;
     
     // Royalty function

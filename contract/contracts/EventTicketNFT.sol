@@ -7,16 +7,21 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/interfaces/IERC2981.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "./Interfaces.sol";
 
 /**
  * @title EventTicketNFT
  * @dev NFT contract for minting and managing tickets
  */
-contract EventTicketNFT is ERC721, ERC721URIStorage, ERC721Enumerable, IERC2981, Ownable, ReentrancyGuard {
+contract EventTicketNFT is ERC721, ERC721URIStorage, ERC721Enumerable, IERC2981, Ownable, ReentrancyGuard, Initializable {
     address public eventContract;
     uint256 public constant ROYALTY_FEE = 500; // 5%
     uint256 private _tokenIdCounter;
+    
+    // Storage for dynamic name and symbol
+    string private _tokenName;
+    string private _tokenSymbol;
     
     struct Ticket {
         uint256 tokenId;
@@ -37,13 +42,29 @@ contract EventTicketNFT is ERC721, ERC721URIStorage, ERC721Enumerable, IERC2981,
         _;
     }
     
-    constructor(
+    constructor() ERC721("", "") Ownable(msg.sender) {
+        // Constructor is disabled for clones
+        _disableInitializers();
+    }
+    
+    function initialize(
         string memory _name,
         string memory _symbol,
         address _eventContract,
         address _owner
-    ) ERC721(_name, _symbol) Ownable(_owner) {
+    ) external initializer {
+        _transferOwnership(_owner);
         eventContract = _eventContract;
+        _tokenName = _name;
+        _tokenSymbol = _symbol;
+    }
+    
+    function name() public view virtual override returns (string memory) {
+        return _tokenName;
+    }
+    
+    function symbol() public view virtual override returns (string memory) {
+        return _tokenSymbol;
     }
     
     function mintTicket(
@@ -72,48 +93,181 @@ contract EventTicketNFT is ERC721, ERC721URIStorage, ERC721Enumerable, IERC2981,
     function batchMintTickets(
         address to,
         string[] memory _tokenURIs,
-        uint256 categoryId
+        uint256[] memory categoryIds,
+        uint256[] memory quantities
     ) public onlyEventContract returns (uint256[] memory) {
         require(_tokenURIs.length > 0 && _tokenURIs.length <= 10, "Invalid quantity");
+        require(_tokenURIs.length == quantities.length, "URI and quantity count mismatch");
+        require(_tokenURIs.length == categoryIds.length, "Category count mismatch");
         
-        uint256[] memory tokenIds = new uint256[](_tokenURIs.length);
+        // Calculate total number of tickets to mint
+        uint256 totalTickets;
+        for (uint256 i = 0; i < quantities.length; i++) {
+            unchecked {
+                totalTickets += quantities[i];
+            }
+        }
         
+        uint256[] memory tokenIds = new uint256[](totalTickets);
+        uint256 currentTokenIndex;
+        
+        // For each category
         for (uint256 i = 0; i < _tokenURIs.length; i++) {
-            uint256 tokenId = _tokenIdCounter;
-            _tokenIdCounter++;
+            string memory uri = _tokenURIs[i];
+            uint256 categoryId = categoryIds[i];
+            uint256 quantity = quantities[i];
             
-            _safeMint(to, tokenId);
-            _setTokenURI(tokenId, _tokenURIs[i]);
-            
-            tickets[tokenId] = Ticket({
-                tokenId: tokenId,
-                originalBuyer: to,
-                mintedAt: block.timestamp,
-                categoryId: categoryId,
-                isUsed: false
-            });
-            
-            tokenIds[i] = tokenId;
-            emit TicketMinted(tokenId, to, categoryId);
+            // Mint the specified quantity for this category
+            for (uint256 j = 0; j < quantity; j++) {
+                uint256 tokenId = _tokenIdCounter;
+                unchecked {
+                    _tokenIdCounter++;
+                }
+                
+                _safeMint(to, tokenId);
+                _setTokenURI(tokenId, uri);
+                
+                tickets[tokenId] = Ticket({
+                    tokenId: tokenId,
+                    originalBuyer: to,
+                    mintedAt: block.timestamp,
+                    categoryId: categoryId,
+                    isUsed: false
+                });
+                
+                tokenIds[currentTokenIndex] = tokenId;
+                unchecked {
+                    currentTokenIndex++;
+                }
+                emit TicketMinted(tokenId, to, categoryId);
+            }
         }
         
         return tokenIds;
     }
     
-    function purchaseTickets(
-        uint256 quantity,
-        uint256 categoryId,
-        string[] memory _tokenURIs
-    ) external payable nonReentrant returns (uint256[] memory) {
-        require(_tokenURIs.length == quantity, "URI count mismatch");
+    // Purchase functions
+    function purchaseSingleTicket(string memory uri, uint256 quantity) external payable returns (uint256[] memory) {
+        require(msg.sender == tx.origin, "Only EOA can purchase tickets");
+        require(msg.value > 0, "Payment amount must be greater than 0");
+        require(quantity > 0, "Quantity must be greater than 0");
+        require(quantity <= 100, "Quantity cannot exceed 100 tickets");
         
-        IEventContract(eventContract).purchaseTickets{value: msg.value}(
+        // Get event contract
+        address eventContractAddress = eventContract;
+        require(eventContractAddress != address(0), "Event contract not set");
+        
+        // Get event contract instance
+        IEventContract eventContractInstance = IEventContract(eventContractAddress);
+        
+        // Check event state before purchase
+        require(eventContractInstance.isActive(), "Event is not active");
+        require(block.timestamp >= eventContractInstance.salesStartTime(), "Sales have not started");
+        require(block.timestamp <= eventContractInstance.salesEndTime(), "Sales have ended");
+        
+        // Calculate expected payment
+        uint256 expectedPayment = eventContractInstance.ticketPrice() * quantity;
+        require(msg.value >= expectedPayment, "Insufficient payment amount");
+        
+        // Purchase tickets through event contract
+        try eventContractInstance.purchaseSingleTicket{value: msg.value}(msg.sender, quantity) {
+            // Mint NFTs
+            uint256[] memory tokenIds = new uint256[](quantity);
+            
+            for (uint256 i = 0; i < quantity; i++) {
+                uint256 tokenId = _tokenIdCounter;
+                unchecked {
+                    _tokenIdCounter++;
+                }
+                
+                _safeMint(msg.sender, tokenId);
+                _setTokenURI(tokenId, uri);
+                
+                tickets[tokenId] = Ticket({
+                    tokenId: tokenId,
+                    originalBuyer: msg.sender,
+                    mintedAt: block.timestamp,
+                    categoryId: 0, // Default category
+                    isUsed: false
+                });
+                
+                tokenIds[i] = tokenId;
+                emit TicketMinted(tokenId, msg.sender, 0);
+            }
+            
+            return tokenIds;
+        } catch Error(string memory reason) {
+            revert(string(abi.encodePacked("Event contract purchase failed: ", reason)));
+        } catch {
+            revert("Event contract purchase failed without reason");
+        }
+    }
+    
+    function purchaseCategoryTickets(
+        uint256[] memory quantities,
+        uint256[] memory categoryIds,
+        string[] memory uris
+    ) external payable returns (uint256[] memory) {
+        require(msg.sender == tx.origin, "Only EOA");
+        require(msg.value > 0, "Payment required");
+        require(quantities.length > 0 && quantities.length <= 10, "Invalid quantity");
+        require(quantities.length == categoryIds.length, "Array length mismatch");
+        require(quantities.length == uris.length, "Array length mismatch");
+        
+        // Get event contract
+        address eventContractAddress = eventContract;
+        require(eventContractAddress != address(0), "Event contract not set");
+        
+        // Purchase tickets through event contract
+        IEventContract(eventContractAddress).purchaseCategoryTickets{value: msg.value}(
             msg.sender,
-            quantity,
-            categoryId
+            quantities,
+            categoryIds
         );
         
-        return batchMintTickets(msg.sender, _tokenURIs, categoryId);
+        // Calculate total tickets to mint
+        uint256 totalTickets;
+        for (uint256 i = 0; i < quantities.length; i++) {
+            unchecked {
+                totalTickets += quantities[i];
+            }
+        }
+        
+        // Mint NFTs
+        uint256[] memory tokenIds = new uint256[](totalTickets);
+        uint256 currentTokenIndex;
+        
+        for (uint256 i = 0; i < quantities.length; i++) {
+            string memory uri = uris[i];
+            uint256 categoryId = categoryIds[i];
+            uint256 quantity = quantities[i];
+            
+            for (uint256 j = 0; j < quantity; j++) {
+                uint256 tokenId = _tokenIdCounter;
+                unchecked {
+                    _tokenIdCounter++;
+                }
+                
+                _safeMint(msg.sender, tokenId);
+                _setTokenURI(tokenId, uri);
+                
+                tickets[tokenId] = Ticket({
+                    tokenId: tokenId,
+                    originalBuyer: msg.sender,
+                    mintedAt: block.timestamp,
+                    categoryId: categoryId,
+                    isUsed: false
+                });
+                
+                tokenIds[currentTokenIndex] = tokenId;
+                unchecked {
+                    currentTokenIndex++;
+                }
+                emit TicketMinted(tokenId, msg.sender, categoryId);
+            }
+        }
+        
+        return tokenIds;
     }
     
     function useTicket(uint256 tokenId) external {

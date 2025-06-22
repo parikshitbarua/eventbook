@@ -1,9 +1,17 @@
-import { JsonRpcProvider, Contract } from 'ethers';
-import type { EventFactoryContract } from '../types/contracts';
+import { JsonRpcProvider, Contract, Signer } from 'ethers';
+import type { EventFactoryContract } from '../types/contracts.types.ts';
 import EventFactoryABI from '../contracts/EventFactory.sol/EventFactory.json';
 
-const FACTORY_ADDRESS = '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512';
-const RPC_URL = 'http://127.0.0.1:8545';
+const FACTORY_ADDRESS =
+  import.meta.env.VITE_FACTORY_ADDRESS ||
+  '0x5FbDB2315678afecb367f032d93F642f64180aa3';
+const RPC_URL = import.meta.env.VITE_NETWORK_URL || 'http://127.0.0.1:8545';
+
+console.log('🔍 Environment Debug:');
+console.log('VITE_FACTORY_ADDRESS:', import.meta.env.VITE_FACTORY_ADDRESS);
+console.log('VITE_NETWORK_URL:', import.meta.env.VITE_NETWORK_URL);
+console.log('Final FACTORY_ADDRESS:', FACTORY_ADDRESS);
+console.log('Final RPC_URL:', RPC_URL);
 
 /**
  * Get an instance of the EventFactory contract with full TypeScript support
@@ -21,7 +29,7 @@ export function getEventFactoryContract(): EventFactoryContract {
  * Get an instance of the EventFactory contract with a signer for transactions
  */
 export function getEventFactoryContractWithSigner(
-  signer,
+  signer: Signer,
 ): EventFactoryContract {
   return new Contract(
     FACTORY_ADDRESS,
@@ -114,12 +122,15 @@ export interface CreateEventParams {
   description: string;
   ticketPrice: string; // In ETH
   maxTickets: string;
-  eventURI: string;
   eventStartTime: string; // ISO date string
   eventEndTime: string; // ISO date string
   venue: string;
+  country: string;
+  state: string;
+  city: string;
   nftName: string;
   nftSymbol: string;
+  eventImages: File[];
 }
 
 /**
@@ -135,6 +146,7 @@ export interface ValidationResult {
  */
 export function validateEventForm(
   formData: CreateEventParams,
+  hasSingleCategory: boolean = false,
 ): ValidationResult {
   const {
     title,
@@ -144,7 +156,9 @@ export function validateEventForm(
     eventStartTime,
     eventEndTime,
     venue,
-    eventURI,
+    country,
+    state,
+    city,
     nftName,
     nftSymbol,
   } = formData;
@@ -154,8 +168,9 @@ export function validateEventForm(
   if (!description.trim())
     return { isValid: false, error: 'Description is required' };
   if (!venue.trim()) return { isValid: false, error: 'Venue is required' };
-  if (!eventURI.trim())
-    return { isValid: false, error: 'Event URI is required' };
+  if (!country.trim()) return { isValid: false, error: 'Country is required' };
+  if (!state.trim()) return { isValid: false, error: 'State is required' };
+  if (!city.trim()) return { isValid: false, error: 'City is required' };
   if (!nftName.trim()) return { isValid: false, error: 'NFT name is required' };
   if (!nftSymbol.trim())
     return { isValid: false, error: 'NFT symbol is required' };
@@ -171,41 +186,34 @@ export function validateEventForm(
   // Date validation
   const startDate = new Date(eventStartTime);
   const endDate = new Date(eventEndTime);
-  const now = new Date();
 
   if (isNaN(startDate.getTime()))
     return { isValid: false, error: 'Invalid start date' };
   if (isNaN(endDate.getTime()))
     return { isValid: false, error: 'Invalid end date' };
 
-  if (startDate <= now) {
-    return { isValid: false, error: 'Event start time must be in the future' };
-  }
-
   if (endDate <= startDate) {
     return { isValid: false, error: 'Event end time must be after start time' };
   }
 
-  // Numeric validation
-  const priceNum = parseFloat(ticketPrice);
-  const maxTicketsNum = parseInt(maxTickets);
+  // Numeric validation for single category events
+  if (hasSingleCategory) {
+    const priceNum = parseFloat(ticketPrice);
+    const maxTicketsNum = parseInt(maxTickets);
 
-  if (isNaN(priceNum) || priceNum < 0) {
-    return {
-      isValid: false,
-      error: 'Ticket price must be a valid positive number',
-    };
-  }
+    if (isNaN(priceNum) || priceNum < 0) {
+      return {
+        isValid: false,
+        error: 'Ticket price must be a valid positive number',
+      };
+    }
 
-  if (isNaN(maxTicketsNum) || maxTicketsNum <= 0) {
-    return { isValid: false, error: 'Max tickets must be a positive integer' };
-  }
-
-  // URL validation for eventURI
-  try {
-    new URL(eventURI);
-  } catch {
-    return { isValid: false, error: 'Event URI must be a valid URL' };
+    if (isNaN(maxTicketsNum) || maxTicketsNum <= 0) {
+      return {
+        isValid: false,
+        error: 'Max tickets must be a positive integer',
+      };
+    }
   }
 
   return { isValid: true };

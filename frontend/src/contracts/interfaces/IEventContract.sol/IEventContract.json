@@ -237,12 +237,12 @@
         },
         {
           "internalType": "uint256",
-          "name": "maxSupply",
+          "name": "maxTicketsCount",
           "type": "uint256"
         },
         {
           "internalType": "uint256",
-          "name": "sold",
+          "name": "ticketsSoldCount",
           "type": "uint256"
         },
         {
@@ -254,6 +254,11 @@
           "internalType": "string",
           "name": "uri",
           "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "creationTime",
+          "type": "uint256"
         },
         {
           "internalType": "uint256",
@@ -347,14 +352,14 @@
           "type": "address"
         },
         {
-          "internalType": "uint256",
-          "name": "quantity",
-          "type": "uint256"
+          "internalType": "uint256[]",
+          "name": "quantities",
+          "type": "uint256[]"
         },
         {
-          "internalType": "uint256",
-          "name": "categoryId",
-          "type": "uint256"
+          "internalType": "uint256[]",
+          "name": "categoryIds",
+          "type": "uint256[]"
         }
       ],
       "name": "purchaseTickets",

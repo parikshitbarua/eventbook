@@ -1,6 +1,26 @@
 {
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
-    "@commitlint/config-conventional": "^19.8.1"
+    "@commitlint/config-conventional": "^19.8.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.2"
+  },
+  "scripts": {
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "frontend/**/*.{js,jsx,ts,tsx}": [
+      "cd frontend && eslint --cache --fix --max-warnings=0"
+    ],
+    "frontend/**/*.{css,scss,sass}": [
+      "cd frontend && stylelint --fix --allow-empty-input --max-warnings=0"
+    ],
+    "frontend/**/*": [
+      "cd frontend && prettier --ignore-unknown --write"
+    ],
+    "backend/src/**/*.ts": [
+      "cd backend && prettier --write --config .prettierrc",
+      "cd backend && eslint --fix --max-warnings=0"
+    ]
   }
 }
