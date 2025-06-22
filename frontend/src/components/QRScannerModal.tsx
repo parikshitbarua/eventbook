@@ -3,6 +3,7 @@ import { Html5QrcodeScanner } from 'html5-qrcode';
 import { useTheme } from '../hooks/theme.hook.ts';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import EventTicketNFTABI from '../contracts/EventTicketNFT.sol/EventTicketNFT.json';
+import API_ENDPOINTS from "../config/api.config.ts";
 
 interface QRData {
   tokenId: string;
@@ -18,6 +19,8 @@ interface QRScannerModalProps {
   eventId: string;
   nftContractAddress: string;
 }
+
+const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 const QRScannerModal: React.FC<QRScannerModalProps> = ({ isOpen, onClose, eventId, nftContractAddress }) => {
   const { isDark } = useTheme();
@@ -159,7 +162,7 @@ const QRScannerModal: React.FC<QRScannerModalProps> = ({ isOpen, onClose, eventI
   const verifyQRData = async (qrData: QRData) => {
     setIsVerifying(true);
     try {
-      const response = await fetch('http://localhost:3000/api/use-ticket/verify-qr-data', {
+      const response = await fetch(API_ENDPOINTS.VERIFY_QR, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
