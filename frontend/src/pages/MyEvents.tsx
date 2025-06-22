@@ -4,9 +4,12 @@ import { useAccount } from 'wagmi';
 import { JsonRpcProvider, Contract } from 'ethers';
 import EventFactoryABI from '../contracts/EventFactory.sol/EventFactory.json';
 import { fetchFirstImageFromIPFS } from '../utils/ipfs-helper.util';
-import type { EventData } from '../types/event.types.ts';
+import type { EventData, EventDetailsResponseData } from '../types/event.types.ts';
 import { NETWORK_URL, FACTORY_ADDRESS } from '../config/app.config';
 import { useTheme } from '../hooks/theme.hook.ts';
+import EventContractABI from "../contracts/EventContract.sol/EventContract.json";
+import { TicketCategory } from "../types/ticket.types.ts";
+import QRScannerModal from '../components/QRScannerModal';
 
 const MyEvents: React.FC = () => {
   const { isDark } = useTheme();
@@ -15,9 +18,13 @@ const MyEvents: React.FC = () => {
   const [events, setEvents] = useState<EventData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isQRScannerOpen, setIsQRScannerOpen] = useState(false);
+  const [selectedEventId, setSelectedEventId] = useState<string>('');
+  const [selectedNftContract, setSelectedNftContract] = useState<string>('');
 
   const fetchEventDetails = useCallback(async (eventId: bigint) => {
     try {
+      let maxTickets = 0n;
       const provider = new JsonRpcProvider(NETWORK_URL);
       const factoryContract = new Contract(
         FACTORY_ADDRESS,
@@ -25,7 +32,23 @@ const MyEvents: React.FC = () => {
         provider,
       );
 
-      const eventDetails = await factoryContract.getEventDetails(eventId);
+      const eventDetails: EventDetailsResponseData = await factoryContract.getEventDetails(eventId);
+
+      if (eventDetails.ticketPrice === 0n && eventDetails.maxTickets === 0n) {
+        const eventContract = new Contract(
+            eventDetails.eventInfo.eventContract as `0x${string}`,
+            EventContractABI.abi,
+            provider,
+        );
+        const categories: TicketCategory[] =
+            await eventContract.getAllCategories();
+        if (categories.length > 0) {
+          maxTickets = categories.reduce((total, category) => {
+              total += category.maxSupply;
+              return total;
+          },0n)
+        }
+      }
 
       // Fetch first image from IPFS
       let firstImageUrl: string | null = null;
@@ -49,11 +72,10 @@ const MyEvents: React.FC = () => {
         description: eventDetails.description,
         organizer: eventDetails.eventInfo.organizer as `0x${string}`,
         ticketPrice: eventDetails.ticketPrice,
-        maxTickets: eventDetails.maxTickets,
+        maxTickets: maxTickets > 0n ? maxTickets : eventDetails.maxTickets,
         ticketsSold: eventDetails.eventInfo.ticketsSold,
-        ticketsLeft: BigInt(
-          eventDetails.maxTickets - eventDetails.eventInfo.ticketsSold,
-        ),
+        ticketsLeft: BigInt(maxTickets > 0n || eventDetails.maxTickets == null ? maxTickets - eventDetails.eventInfo.ticketsSold :
+          eventDetails.maxTickets - eventDetails.eventInfo.ticketsSold),
         isActive: eventDetails.eventInfo.isActive,
         eventURI: eventDetails.eventURI,
         createdAt: eventDetails.eventInfo.createdAt,
@@ -382,25 +404,46 @@ const MyEvents: React.FC = () => {
                     </span>{' '}
                     tickets sold
                   </div>
-                  <div className="flex flex-row sm:flex-row gap-2 w-full sm:w-auto">
-                    <button
-                      onClick={() => navigate(`/event/${event.eventId}`)}
-                      className={`flex-1 sm:flex-none px-4 py-2 text-sm ${
-                        isDark
-                          ? 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      } rounded-lg transition-colors`}
-                    >
-                      View
-                    </button>
+                  <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    <div className="flex flex-row gap-2">
+                      <button
+                        onClick={() => navigate(`/event/${event.eventId}`)}
+                        className={`flex-1 sm:flex-none px-3 py-1.5 text-xs font-medium ${
+                          isDark
+                            ? 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        } rounded-md transition-colors`}
+                      >
+                        View
+                      </button>
+                      {event.isActive && (
+                        <button
+                          onClick={() =>
+                            navigate(`/event/${event.eventId}/manage`)
+                          }
+                          className="flex-1 sm:flex-none px-3 py-1.5 text-xs font-medium bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                        >
+                          Manage
+                        </button>
+                      )}
+                    </div>
                     {event.isActive && (
                       <button
-                        onClick={() =>
-                          navigate(`/event/${event.eventId}/manage`)
-                        }
-                        className="flex-1 sm:flex-none px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                        onClick={() => {
+                          setSelectedEventId(event.eventId.toString());
+                          setSelectedNftContract(event.nftContract);
+                          setIsQRScannerOpen(true);
+                        }}
+                        className={`w-full sm:w-auto px-3 py-1.5 text-xs font-medium ${
+                          isDark
+                            ? 'bg-blue-600 hover:bg-blue-700'
+                            : 'bg-blue-600 hover:bg-blue-700'
+                        } text-white rounded-md transition-colors flex items-center justify-center gap-1.5`}
                       >
-                        Manage
+                        {/*<svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">*/}
+                        {/*  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v1m6 11a2 2 0 01-2 2H8a2 2 0 01-2-2V9a2 2 0 012-2h8a2 2 0 012 2v6zM8 9l8 8m0-8l-8 8" />*/}
+                        {/*</svg>*/}
+                        Scan Tickets
                       </button>
                     )}
                   </div>
@@ -410,6 +453,13 @@ const MyEvents: React.FC = () => {
           ))}
         </div>
       </div>
+      
+      <QRScannerModal
+        isOpen={isQRScannerOpen}
+        onClose={() => setIsQRScannerOpen(false)}
+        eventId={selectedEventId}
+        nftContractAddress={selectedNftContract}
+      />
     </div>
   );
 };

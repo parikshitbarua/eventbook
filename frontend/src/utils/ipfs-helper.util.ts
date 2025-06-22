@@ -106,6 +106,7 @@ export const createTicketURIHelperUtil = async (
 ) => {
   try {
     const client = await create();
+    await client.login('parikshitb04@gmail.com');
     await client.setCurrentSpace(import.meta.env.VITE_WEB3STORAGE_SPACE);
     // Create a single JSON file
     const jsonFile = makeJsonFile('event-metadata', ticketMetadata);

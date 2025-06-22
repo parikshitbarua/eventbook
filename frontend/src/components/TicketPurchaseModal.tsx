@@ -1,6 +1,7 @@
 import { Fragment, useState, useEffect, useCallback } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Contract, JsonRpcProvider, formatEther } from 'ethers';
+import { useAccount, useBalance } from 'wagmi';
 import type { EventData } from '../types/event.types.ts';
 import EventContractABI from '../contracts/EventContract.sol/EventContract.json';
 import {
@@ -36,6 +37,11 @@ const TicketPurchaseModal = ({
 }: TicketPurchaseModalProps) => {
   console.log('event', event);
   const { isDark } = useTheme();
+  const { address, isConnected } = useAccount();
+  const { data: balance } = useBalance({
+    address: address,
+  });
+  
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingCategories, setLoadingCategories] = useState(true);
@@ -44,6 +50,7 @@ const TicketPurchaseModal = ({
     CategorySelection[]
   >([]);
   const [hasCategories, setHasCategories] = useState(false);
+  const [balanceError, setBalanceError] = useState<string | null>(null);
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -159,9 +166,39 @@ const TicketPurchaseModal = ({
     );
   };
 
+  const checkSufficientBalance = () => {
+    if (!balance || !isConnected) {
+      setBalanceError('Wallet not connected');
+      return false;
+    }
+
+    const totalPriceEth = getTotalPrice();
+    const userBalanceEth = parseFloat(formatEther(balance.value));
+    
+    // Add some buffer for gas fees (estimate ~0.01 ETH)
+    const gasBuffer = 0.00001;
+    const requiredBalance = totalPriceEth + gasBuffer;
+
+    if (userBalanceEth < requiredBalance) {
+      setBalanceError(
+        `Insufficient balance. You need ${requiredBalance.toFixed(4)} ETH (including gas fees) but only have ${userBalanceEth.toFixed(4)} ETH`
+      );
+      return false;
+    }
+
+    setBalanceError(null);
+    return true;
+  };
+
   const handlePurchase = async () => {
     try {
       setIsLoading(true);
+
+      // First check if user has sufficient balance
+      if (!checkSufficientBalance()) {
+        setIsLoading(false);
+        return;
+      }
 
       if (!hasCategories) {
         // Single ticket purchase
@@ -545,9 +582,24 @@ const TicketPurchaseModal = ({
 
   const canPurchase = () => {
     if (isLoading) return false;
+    if (balanceError) return false;
     if (!hasCategories) return quantity > 0;
     return getTotalTickets() > 0;
   };
+
+  // Check balance whenever quantities change
+  useEffect(() => {
+    if (isOpen && balance) {
+      checkSufficientBalance();
+    }
+  }, [quantity, categorySelections, balance, isOpen]);
+
+  // Clear balance error when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setBalanceError(null);
+    }
+  }, [isOpen]);
 
   const truncateDescription = (text: string, maxLength: number = 150) => {
     if (text.length <= maxLength) return text;
@@ -639,6 +691,48 @@ const TicketPurchaseModal = ({
                     isDark ? 'border-gray-700' : 'border-gray-200'
                   } flex-shrink-0`}
                 >
+                  {/* Balance Error Display */}
+                  {balanceError && (
+                    <div className={`mb-4 p-3 rounded-md border ${
+                      isDark 
+                        ? 'bg-red-900/20 border-red-800/50' 
+                        : 'bg-red-50 border-red-200'
+                    }`}>
+                      <div className="flex">
+                        <div className="flex-shrink-0">
+                          <svg
+                            className={`h-5 w-5 ${
+                              isDark ? 'text-red-400' : 'text-red-400'
+                            }`}
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </div>
+                        <div className="ml-3">
+                          <p className={`text-sm font-medium ${
+                            isDark ? 'text-red-300' : 'text-red-800'
+                          }`}>
+                            {balanceError}
+                          </p>
+                          {balance && (
+                            <p className={`text-xs mt-1 ${
+                              isDark ? 'text-red-400' : 'text-red-600'
+                            }`}>
+                              Current balance: {parseFloat(formatEther(balance.value)).toFixed(4)} ETH
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="flex justify-end space-x-3">
                     <button
                       type="button"

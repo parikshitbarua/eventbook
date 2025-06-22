@@ -11,14 +11,12 @@ const getCorsOptions = (): cors.CorsOptions => {
 
   return {
     origin: (origin, callback) => {
-      console.log(`CORS: Request from origin: ${origin || 'no origin'}`);
       
       // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
 
       // Check if the origin is in the allowed list
       if (origins.includes(origin)) {
-        console.log(`CORS: Allowed origin: ${origin}`);
         return callback(null, true);
       }
 
@@ -44,7 +42,7 @@ const getCorsOptions = (): cors.CorsOptions => {
       "Pragma"
     ],
     exposedHeaders: ["Content-Length", "X-Foo", "X-Bar"],
-    maxAge: 86400, // 24 hours
+    maxAge: 86400,
     preflightContinue: false,
     optionsSuccessStatus: 200
   };
