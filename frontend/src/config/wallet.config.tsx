@@ -2,7 +2,7 @@ import { createAppKit } from '@reown/appkit/react';
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
 import type { AppKitNetwork } from '@reown/appkit/networks';
 import { defineChain } from '@reown/appkit/networks';
-import { baseSepolia, base } from '@reown/appkit/networks';
+import { baseSepolia } from '@reown/appkit/networks';
 
 // Get projectId from https://cloud.reown.com
 export const projectId = import.meta.env.VITE_PROJECT_ID;
@@ -48,11 +48,11 @@ const getNetworks = (): [AppKitNetwork, ...AppKitNetwork[]] => {
 
   // If using Base networks, prioritize them
   if (networkUrl?.includes('base.org')) {
-    return [baseSepolia, base, hardhatNetwork];
+    return [baseSepolia];
   }
 
   // Default to hardhat for local development
-  return [hardhatNetwork, baseSepolia, base];
+  return [hardhatNetwork, baseSepolia];
 };
 
 export const networks = getNetworks();
