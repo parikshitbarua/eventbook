@@ -78,3 +78,42 @@ export const appKit = createAppKit({
 });
 
 export const config = wagmiAdapter.wagmiConfig;
+
+// Function to clear stuck connection state
+export const clearWalletState = () => {
+  try {
+    // Clear localStorage items that might be causing issues
+    const keysToRemove = [
+      'wagmi.wallet',
+      'wagmi.connected',
+      'wagmi.store',
+      'wagmi.cache',
+      'wc@2:client:0.3//wc',
+      'wc@2:core:0.3//keychain',
+      'wc@2:core:0.3//history',
+      'wc@2:core:0.3//expirer',
+    ];
+    
+    keysToRemove.forEach(key => {
+      try {
+        localStorage.removeItem(key);
+      } catch (e) {
+        // Ignore errors
+      }
+    });
+
+    // Clear any items that start with wagmi or appkit
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const key = localStorage.key(i);
+      if (key && (key.startsWith('wagmi') || key.startsWith('appkit') || key.startsWith('wc@'))) {
+        try {
+          localStorage.removeItem(key);
+        } catch (e) {
+          // Ignore errors
+        }
+      }
+    }
+  } catch (error) {
+    console.warn('Failed to clear wallet state:', error);
+  }
+};
