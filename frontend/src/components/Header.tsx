@@ -3,7 +3,7 @@ import { useAccount } from 'wagmi';
 import { useState, useRef, useEffect } from 'react';
 import { UserCircleIcon, SunIcon, MoonIcon, WalletIcon } from '@heroicons/react/24/outline';
 import { useTheme } from '../hooks/theme.hook.ts';
-import { clearWalletState, appKit } from '../config/wallet.config.tsx';
+import { appKit } from '../config/wallet.config.tsx';
 
 const Header = () => {
   const { isConnected } = useAccount();
