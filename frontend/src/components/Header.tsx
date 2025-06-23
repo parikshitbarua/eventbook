@@ -6,12 +6,13 @@ import { useTheme } from '../hooks/theme.hook.ts';
 import { clearWalletState } from '../config/wallet.config.tsx';
 
 const Header = () => {
-  const { isConnected, isConnecting } = useAccount();
+  const { isConnected } = useAccount();
   const { isDark, toggleTheme } = useTheme();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showClearButton, setShowClearButton] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const connectingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const clearButtonTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const buttonCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -28,35 +29,73 @@ const Header = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Monitor wallet connection state and show clear button if stuck
+  // Monitor wallet connection state more aggressively
   useEffect(() => {
-    if (isConnecting && !isConnected) {
-      // Start timer when connecting
-      connectingTimeoutRef.current = setTimeout(() => {
+    // Clear any existing timers
+    if (clearButtonTimeoutRef.current) {
+      clearTimeout(clearButtonTimeoutRef.current);
+    }
+    if (buttonCheckIntervalRef.current) {
+      clearInterval(buttonCheckIntervalRef.current);
+    }
+
+    if (!isConnected) {
+      // Start timer to show clear button after 5 seconds if not connected
+      clearButtonTimeoutRef.current = setTimeout(() => {
         setShowClearButton(true);
-      }, 5000); // Show button after 5 seconds
+      }, 5000);
+
+      // Also monitor the actual button text for "connecting" state
+      buttonCheckIntervalRef.current = setInterval(() => {
+        const appkitButton = document.querySelector('appkit-button');
+        if (appkitButton) {
+          const buttonText = appkitButton.textContent?.toLowerCase() || '';
+          if (buttonText.includes('connecting') || buttonText.includes('loading')) {
+            // If still connecting after 3 seconds, show clear button
+            if (!showClearButton) {
+              setTimeout(() => setShowClearButton(true), 3000);
+            }
+          }
+        }
+      }, 1000);
     } else {
-      // Clear timer and hide button when connected or not connecting
-      if (connectingTimeoutRef.current) {
-        clearTimeout(connectingTimeoutRef.current);
-        connectingTimeoutRef.current = null;
-      }
+      // Connected - hide clear button
       setShowClearButton(false);
     }
 
-    // Cleanup on unmount
+    // Cleanup on unmount or dependency change
     return () => {
-      if (connectingTimeoutRef.current) {
-        clearTimeout(connectingTimeoutRef.current);
+      if (clearButtonTimeoutRef.current) {
+        clearTimeout(clearButtonTimeoutRef.current);
+      }
+      if (buttonCheckIntervalRef.current) {
+        clearInterval(buttonCheckIntervalRef.current);
       }
     };
-  }, [isConnecting, isConnected]);
+  }, [isConnected, showClearButton]);
 
   const handleClearWalletState = () => {
-    clearWalletState();
-    setShowClearButton(false);
-    // Reload the page to reset wallet state completely
-    window.location.reload();
+    try {
+      // Clear localStorage immediately
+      clearWalletState();
+      
+      // Clear all timers
+      if (clearButtonTimeoutRef.current) {
+        clearTimeout(clearButtonTimeoutRef.current);
+      }
+      if (buttonCheckIntervalRef.current) {
+        clearInterval(buttonCheckIntervalRef.current);
+      }
+      
+      setShowClearButton(false);
+      
+      // Force reload to completely reset state
+      window.location.reload();
+    } catch (error) {
+      console.error('Error clearing wallet state:', error);
+      // Fallback: just reload
+      window.location.reload();
+    }
   };
 
   return (
@@ -93,17 +132,17 @@ const Header = () => {
           </div>
 
           {/* Clear Connection Button - shows when wallet is stuck connecting */}
-          {showClearButton && (
+          {showClearButton && !isConnected && (
             <button
               onClick={handleClearWalletState}
-              className={`px-3 py-2 text-xs font-medium rounded-md transition-all duration-200 ${
+              className={`px-3 py-2 text-xs font-medium rounded-md transition-all duration-200 animate-pulse ${
                 isDark
                   ? 'bg-yellow-900/50 text-yellow-300 hover:bg-yellow-900/70 border border-yellow-700'
                   : 'bg-yellow-50 text-yellow-800 hover:bg-yellow-100 border border-yellow-300'
               }`}
-              title="Clear stuck wallet connection"
+              title="Clear stuck wallet connection and retry"
             >
-              Clear Connection
+              Reset Connection
             </button>
           )}
 
