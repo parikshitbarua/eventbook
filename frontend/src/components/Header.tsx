@@ -3,12 +3,15 @@ import { useAccount } from 'wagmi';
 import { useState, useRef, useEffect } from 'react';
 import { UserCircleIcon, SunIcon, MoonIcon } from '@heroicons/react/24/outline';
 import { useTheme } from '../hooks/theme.hook.ts';
+import { clearWalletState } from '../config/wallet.config.tsx';
 
 const Header = () => {
-  const { isConnected } = useAccount();
+  const { isConnected, isConnecting } = useAccount();
   const { isDark, toggleTheme } = useTheme();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [showClearButton, setShowClearButton] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const connectingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -24,6 +27,37 @@ const Header = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Monitor wallet connection state and show clear button if stuck
+  useEffect(() => {
+    if (isConnecting && !isConnected) {
+      // Start timer when connecting
+      connectingTimeoutRef.current = setTimeout(() => {
+        setShowClearButton(true);
+      }, 5000); // Show button after 5 seconds
+    } else {
+      // Clear timer and hide button when connected or not connecting
+      if (connectingTimeoutRef.current) {
+        clearTimeout(connectingTimeoutRef.current);
+        connectingTimeoutRef.current = null;
+      }
+      setShowClearButton(false);
+    }
+
+    // Cleanup on unmount
+    return () => {
+      if (connectingTimeoutRef.current) {
+        clearTimeout(connectingTimeoutRef.current);
+      }
+    };
+  }, [isConnecting, isConnected]);
+
+  const handleClearWalletState = () => {
+    clearWalletState();
+    setShowClearButton(false);
+    // Reload the page to reset wallet state completely
+    window.location.reload();
+  };
 
   return (
     <div
@@ -57,6 +91,21 @@ const Header = () => {
           <div className={`${isConnected ? 'scale-75 sm:scale-85 lg:scale-95' : 'scale-90 sm:scale-95 lg:scale-100'}`}>
             <appkit-button />
           </div>
+
+          {/* Clear Connection Button - shows when wallet is stuck connecting */}
+          {showClearButton && (
+            <button
+              onClick={handleClearWalletState}
+              className={`px-3 py-2 text-xs font-medium rounded-md transition-all duration-200 ${
+                isDark
+                  ? 'bg-yellow-900/50 text-yellow-300 hover:bg-yellow-900/70 border border-yellow-700'
+                  : 'bg-yellow-50 text-yellow-800 hover:bg-yellow-100 border border-yellow-300'
+              }`}
+              title="Clear stuck wallet connection"
+            >
+              Clear Connection
+            </button>
+          )}
 
           <div className="relative ml-1 sm:ml-2" ref={dropdownRef}>
             <button

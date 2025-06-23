@@ -14,7 +14,7 @@ if (!projectId) {
 export const metadata = {
   name: 'eventbook',
   description: 'AppKit Example',
-  url: 'https://localhost', // origin must match your domain & subdomain
+  url: 'https://eventbook-tau.vercel.app/',
   icons: ['https://avatars.githubusercontent.com/u/179229932'],
 };
 
