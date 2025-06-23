@@ -134,6 +134,15 @@ const MyEvents: React.FC = () => {
     fetchOrganizerEvents();
   }, [fetchOrganizerEvents, address, isConnected]);
 
+  // Watch for wallet connection changes and refresh
+  useEffect(() => {
+    if (isConnected && address && error) {
+      // Clear error state and refresh when wallet gets connected
+      setError(null);
+      fetchOrganizerEvents();
+    }
+  }, [isConnected, address, error, fetchOrganizerEvents]);
+
   const formatDate = (timestamp: bigint) => {
     const date = new Date(Number(timestamp) * 1000);
     return date.toLocaleDateString('en-US', {
@@ -189,34 +198,140 @@ const MyEvents: React.FC = () => {
       <div
         className={`min-h-screen ${
           isDark ? 'bg-black' : 'bg-gray-50'
-        } flex items-center justify-center transition-colors duration-300`}
+        } py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center transition-colors duration-300`}
       >
-        <div className="text-center">
-          <div className="text-red-500 mb-4">
-            <svg
-              className="w-16 h-16 mx-auto"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-          <h3
-            className={`text-xl font-semibold ${
-              isDark ? 'text-gray-300' : 'text-gray-700'
-            } mb-2 transition-colors duration-300`}
-          >
-            {error}
-          </h3>
-          {!isConnected && (
-            <div className="flex justify-center">
-              <appkit-button />
+        <div className="max-w-4xl mx-auto">
+          <div className={`${
+            isDark
+              ? 'bg-gray-900 shadow-2xl shadow-black/20'
+              : 'bg-white shadow-2xl'
+          } rounded-3xl overflow-hidden transition-colors duration-300`}>
+            <div className="px-8 py-16 sm:px-12 sm:py-20 text-center">
+              {/* Wallet Icon */}
+              <div className={`mx-auto w-24 h-24 ${
+                isDark ? 'bg-gray-800' : 'bg-gray-100'
+              } rounded-full flex items-center justify-center mb-8 transition-colors duration-300`}>
+                <svg
+                  className={`w-12 h-12 ${
+                    isDark ? 'text-gray-400' : 'text-gray-500'
+                  }`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                  />
+                </svg>
+              </div>
+
+              {/* Title */}
+              <h2
+                className={`text-3xl font-bold ${
+                  isDark ? 'text-white' : 'text-gray-900'
+                } mb-4 transition-colors duration-300`}
+              >
+                Connect Your Wallet to View Events
+              </h2>
+
+              {/* Description */}
+              <p
+                className={`text-lg ${
+                  isDark ? 'text-gray-300' : 'text-gray-600'
+                } mb-8 max-w-2xl mx-auto transition-colors duration-300`}
+              >
+                Your wallet connection is required to access and manage your blockchain events. 
+                Connect to view your created events and track their performance.
+              </p>
+
+              {/* Features List */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto">
+                <div className={`p-6 ${
+                  isDark ? 'bg-gray-800' : 'bg-gray-50'
+                } rounded-xl transition-colors duration-300`}>
+                  <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <h3 className={`font-semibold ${
+                    isDark ? 'text-white' : 'text-gray-900'
+                  } mb-2 transition-colors duration-300`}>
+                    Event Management
+                  </h3>
+                  <p className={`text-sm ${
+                    isDark ? 'text-gray-400' : 'text-gray-600'
+                  } transition-colors duration-300`}>
+                    View, edit, and manage all your blockchain events from one dashboard.
+                  </p>
+                </div>
+
+                <div className={`p-6 ${
+                  isDark ? 'bg-gray-800' : 'bg-gray-50'
+                } rounded-xl transition-colors duration-300`}>
+                  <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 00-2-2m0 0V5a2 2 0 012-2h2a2 2 0 00-2-2m0 0V9a2 2 0 012-2h2a2 2 0 00-2-2" />
+                    </svg>
+                  </div>
+                  <h3 className={`font-semibold ${
+                    isDark ? 'text-white' : 'text-gray-900'
+                  } mb-2 transition-colors duration-300`}>
+                    Revenue Analytics
+                  </h3>
+                  <p className={`text-sm ${
+                    isDark ? 'text-gray-400' : 'text-gray-600'
+                  } transition-colors duration-300`}>
+                    Track ticket sales, revenue, and attendance analytics in real-time.
+                  </p>
+                </div>
+
+                <div className={`p-6 ${
+                  isDark ? 'bg-gray-800' : 'bg-gray-50'
+                } rounded-xl transition-colors duration-300`}>
+                  <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                    </svg>
+                  </div>
+                  <h3 className={`font-semibold ${
+                    isDark ? 'text-white' : 'text-gray-900'
+                  } mb-2 transition-colors duration-300`}>
+                    Instant Payouts
+                  </h3>
+                  <p className={`text-sm ${
+                    isDark ? 'text-gray-400' : 'text-gray-600'
+                  } transition-colors duration-300`}>
+                    Receive payments directly to your wallet as tickets are sold.
+                  </p>
+                </div>
+              </div>
+
+              {/* Connect Button */}
+              <div className="flex justify-center">
+                <appkit-button />
+              </div>
+
+              {/* Help Text */}
+              <p className={`text-sm ${
+                isDark ? 'text-gray-400' : 'text-gray-500'
+              } mt-6 transition-colors duration-300`}>
+                Don't have a wallet? We recommend{' '}
+                <a 
+                  href="https://metamask.io" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-red-600 hover:text-red-700 underline"
+                >
+                  MetaMask
+                </a>{' '}
+                for beginners.
+              </p>
             </div>
-          )}
+          </div>
         </div>
       </div>
     );
@@ -300,6 +415,28 @@ const MyEvents: React.FC = () => {
           >
             My Events
           </h1>
+          <button
+            onClick={() => navigate('/new-event')}
+            className="px-4 sm:px-6 py-2 sm:py-3 bg-red-600 hover:bg-red-700 text-white border-red-600 
+            font-medium rounded-xl shadow-sm text-sm sm:text-base
+            transition-all duration-200 border flex items-center justify-center gap-2"
+          >
+            <svg 
+              className="w-4 h-4" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M12 4v16m8-8H4" 
+              />
+            </svg>
+            <span className="hidden sm:inline">New Event</span>
+            <span className="sm:hidden">New</span>
+          </button>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">

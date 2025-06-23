@@ -189,6 +189,15 @@ const MyTickets: React.FC = () => {
     fetchUserTickets();
   }, [fetchUserTickets]);
 
+  // Watch for wallet connection changes and refresh
+  useEffect(() => {
+    if (isConnected && address && error) {
+      // Clear error state and refresh when wallet gets connected
+      setError(null);
+      fetchUserTickets();
+    }
+  }, [isConnected, address, error, fetchUserTickets]);
+
   const handleGenerateQR = async (ticket: TicketNFT) => {
     if (!walletClient || !address) {
       setModal({
@@ -310,34 +319,140 @@ const MyTickets: React.FC = () => {
       <div
         className={`min-h-screen ${
           isDark ? 'bg-black' : 'bg-gray-50'
-        } flex items-center justify-center transition-colors duration-300`}
+        } py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center transition-colors duration-300`}
       >
-        <div className="text-center">
-          <div className="text-red-500 mb-4">
-            <svg
-              className="w-16 h-16 mx-auto"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-          <h3
-            className={`text-xl font-semibold ${
-              isDark ? 'text-gray-300' : 'text-gray-700'
-            } mb-2 transition-colors duration-300`}
-          >
-            {error}
-          </h3>
-          {!isConnected && (
-            <div className="flex justify-center">
-              <appkit-button />
+        <div className="max-w-4xl mx-auto">
+          <div className={`${
+            isDark
+              ? 'bg-gray-900 shadow-2xl shadow-black/20'
+              : 'bg-white shadow-2xl'
+          } rounded-3xl overflow-hidden transition-colors duration-300`}>
+            <div className="px-8 py-16 sm:px-12 sm:py-20 text-center">
+              {/* Wallet Icon */}
+              <div className={`mx-auto w-24 h-24 ${
+                isDark ? 'bg-gray-800' : 'bg-gray-100'
+              } rounded-full flex items-center justify-center mb-8 transition-colors duration-300`}>
+                <svg
+                  className={`w-12 h-12 ${
+                    isDark ? 'text-gray-400' : 'text-gray-500'
+                  }`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                  />
+                </svg>
+              </div>
+
+              {/* Title */}
+              <h2
+                className={`text-3xl font-bold ${
+                  isDark ? 'text-white' : 'text-gray-900'
+                } mb-4 transition-colors duration-300`}
+              >
+                Connect Your Wallet to View Tickets
+              </h2>
+
+              {/* Description */}
+              <p
+                className={`text-lg ${
+                  isDark ? 'text-gray-300' : 'text-gray-600'
+                } mb-8 max-w-2xl mx-auto transition-colors duration-300`}
+              >
+                Your wallet connection is required to access your NFT tickets. 
+                Connect to view, manage, and use your blockchain-based event tickets.
+              </p>
+
+              {/* Features List */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto">
+                <div className={`p-6 ${
+                  isDark ? 'bg-gray-800' : 'bg-gray-50'
+                } rounded-xl transition-colors duration-300`}>
+                  <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a1 1 0 001 1h1a1 1 0 001-1V7a2 2 0 00-2-2H5zM5 21a2 2 0 002-2v-3a1 1 0 00-1-1H5a1 1 0 00-1 1v3a2 2 0 002 2h0z" />
+                    </svg>
+                  </div>
+                  <h3 className={`font-semibold ${
+                    isDark ? 'text-white' : 'text-gray-900'
+                  } mb-2 transition-colors duration-300`}>
+                    NFT Ticket Collection
+                  </h3>
+                  <p className={`text-sm ${
+                    isDark ? 'text-gray-400' : 'text-gray-600'
+                  } transition-colors duration-300`}>
+                    View all your NFT tickets in one place, including used and unused tickets.
+                  </p>
+                </div>
+
+                <div className={`p-6 ${
+                  isDark ? 'bg-gray-800' : 'bg-gray-50'
+                } rounded-xl transition-colors duration-300`}>
+                  <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11a2 2 0 01-2 2H8a2 2 0 01-2-2V9a2 2 0 012-2h8a2 2 0 012 2v6zM8 9l8 8m0-8l-8 8" />
+                    </svg>
+                  </div>
+                  <h3 className={`font-semibold ${
+                    isDark ? 'text-white' : 'text-gray-900'
+                  } mb-2 transition-colors duration-300`}>
+                    QR Code Generation
+                  </h3>
+                  <p className={`text-sm ${
+                    isDark ? 'text-gray-400' : 'text-gray-600'
+                  } transition-colors duration-300`}>
+                    Generate secure QR codes for event entry and ticket validation.
+                  </p>
+                </div>
+
+                <div className={`p-6 ${
+                  isDark ? 'bg-gray-800' : 'bg-gray-50'
+                } rounded-xl transition-colors duration-300`}>
+                  <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                    </svg>
+                  </div>
+                  <h3 className={`font-semibold ${
+                    isDark ? 'text-white' : 'text-gray-900'
+                  } mb-2 transition-colors duration-300`}>
+                    Transferable Assets
+                  </h3>
+                  <p className={`text-sm ${
+                    isDark ? 'text-gray-400' : 'text-gray-600'
+                  } transition-colors duration-300`}>
+                    Transfer or trade your NFT tickets on secondary marketplaces.
+                  </p>
+                </div>
+              </div>
+
+              {/* Connect Button */}
+              <div className="flex justify-center">
+                <appkit-button />
+              </div>
+
+              {/* Help Text */}
+              <p className={`text-sm ${
+                isDark ? 'text-gray-400' : 'text-gray-500'
+              } mt-6 transition-colors duration-300`}>
+                Don't have a wallet? We recommend{' '}
+                <a 
+                  href="https://metamask.io" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-red-600 hover:text-red-700 underline"
+                >
+                  MetaMask
+                </a>{' '}
+                for beginners.
+              </p>
             </div>
-          )}
+          </div>
         </div>
       </div>
     );

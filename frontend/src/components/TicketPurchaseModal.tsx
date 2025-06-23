@@ -377,37 +377,79 @@ const TicketPurchaseModal = ({
         <div className="mb-6">
           <label
             htmlFor="quantity"
-            className={`block text-sm font-medium mb-2 transition-colors ${
+            className={`block text-sm font-medium mb-3 transition-colors ${
               isDark ? 'text-gray-300' : 'text-gray-700'
             }`}
           >
             Number of Tickets
           </label>
-          <input
-            type="number"
-            id="quantity"
-            min="1"
-            value={quantity}
-            onChange={(e) =>
-              setQuantity(Math.max(1, parseInt(e.target.value) || 1))
-            }
-            className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 transition-colors ${
-              isDark
-                ? 'bg-gray-800 border-gray-600 text-gray-100 placeholder-gray-400'
-                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-            }`}
-          />
+          
+          {/* Custom Quantity Selector */}
+          <div className="flex items-center justify-center space-x-4">
+            <button
+              type="button"
+              onClick={() => setQuantity(Math.max(1, quantity - 1))}
+              disabled={quantity <= 1}
+              className={`w-12 h-12 rounded-full border-2 flex items-center justify-center text-xl font-bold transition-all duration-200 ${
+                isDark
+                  ? 'border-gray-600 text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed'
+                  : 'border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
+              } ${quantity <= 1 ? 'opacity-50 cursor-not-allowed' : 'hover:border-red-500'}`}
+            >
+              -
+            </button>
+            
+            <div className="relative">
+              <input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={quantity.toString()}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/[^0-9]/g, '');
+                  const numValue = parseInt(value) || 1;
+                  setQuantity(Math.max(1, numValue));
+                }}
+                onFocus={(e) => e.target.select()}
+                className={`w-20 sm:w-24 px-3 py-3 text-center text-lg font-semibold border-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 ${
+                  isDark
+                    ? 'bg-gray-800 border-gray-600 text-gray-100 placeholder-gray-400'
+                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                }`}
+              />
+            </div>
+            
+            <button
+              type="button"
+              onClick={() => setQuantity(quantity + 1)}
+              className={`w-12 h-12 rounded-full border-2 flex items-center justify-center text-xl font-bold transition-all duration-200 ${
+                isDark
+                  ? 'border-gray-600 text-gray-300 hover:bg-gray-700 hover:border-red-500'
+                  : 'border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-red-500'
+              }`}
+            >
+              +
+            </button>
+          </div>
+          
+          <p className={`text-xs text-center mt-2 ${
+            isDark ? 'text-gray-400' : 'text-gray-500'
+          }`}>
+            Tap the buttons or enter a number
+          </p>
         </div>
 
-        <div className="flex justify-between items-center mb-6">
+        <div className={`flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 p-4 rounded-lg ${
+          isDark ? 'bg-gray-800' : 'bg-gray-50'
+        }`}>
           <span
-            className={`text-lg font-semibold transition-colors ${
+            className={`text-base sm:text-lg font-semibold mb-2 sm:mb-0 transition-colors ${
               isDark ? 'text-gray-100' : 'text-gray-900'
             }`}
           >
             Total Price:
           </span>
-          <span className="text-xl font-bold text-red-600">
+          <span className="text-xl sm:text-2xl font-bold text-red-600">
             {getTotalPrice().toFixed(6)} ETH
           </span>
         </div>
@@ -420,7 +462,7 @@ const TicketPurchaseModal = ({
       <div className="mt-2">
         {renderDescriptionSection()}
 
-        <div className="space-y-4 mb-6 max-h-96 overflow-y-auto">
+        <div className="space-y-4 mb-6 max-h-64 sm:max-h-96 overflow-y-auto">
           {categories.map((category, index) => {
             const available = Number(category.maxSupply - category.sold);
             const selection = categorySelections[index];
@@ -428,78 +470,120 @@ const TicketPurchaseModal = ({
             return (
               <div
                 key={index}
-                className={`border rounded-lg p-4 transition-colors ${
+                className={`border rounded-lg p-3 sm:p-4 transition-colors ${
                   isDark
                     ? 'border-gray-600 bg-gray-800'
                     : 'border-gray-200 bg-white'
                 }`}
               >
-                <div className="flex items-start space-x-4">
-                  {/* Category Image */}
-                  <img
-                    src={category.image}
-                    alt={category.name}
-                    className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
-                    onError={(e) => {
-                      e.currentTarget.src =
-                        'https://static.vecteezy.com/system/resources/previews/002/779/812/non_2x/cartoon-illustration-of-ticket-free-vector.jpg';
-                    }}
-                  />
+                <div className="flex flex-col sm:flex-row items-start space-y-3 sm:space-y-0 sm:space-x-4">
+                  {/* Category Image and Details */}
+                  <div className="flex items-start space-x-3 sm:space-x-4 flex-1 w-full sm:w-auto">
+                    <img
+                      src={category.image}
+                      alt={category.name}
+                      className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-lg flex-shrink-0"
+                      onError={(e) => {
+                        e.currentTarget.src =
+                          'https://static.vecteezy.com/system/resources/previews/002/779/812/non_2x/cartoon-illustration-of-ticket-free-vector.jpg';
+                      }}
+                    />
 
-                  {/* Category Details */}
-                  <div className="flex-1 min-w-0">
-                    <h4
-                      className={`text-lg font-semibold truncate transition-colors ${
-                        isDark ? 'text-gray-100' : 'text-gray-900'
-                      }`}
-                    >
-                      {category.name}
-                    </h4>
-                    <p
-                      className={`text-sm mb-2 transition-colors ${
-                        isDark ? 'text-gray-300' : 'text-gray-600'
-                      }`}
-                    >
-                      {formatEther(category.price)} ETH per ticket
-                    </p>
-                    <p
-                      className={`text-sm transition-colors ${
-                        isDark ? 'text-gray-400' : 'text-gray-500'
-                      }`}
-                    >
-                      {available > 0
-                        ? `${available} tickets available`
-                        : 'Sold out'}
-                    </p>
+                    <div className="flex-1 min-w-0">
+                      <h4
+                        className={`text-base sm:text-lg font-semibold truncate transition-colors ${
+                          isDark ? 'text-gray-100' : 'text-gray-900'
+                        }`}
+                      >
+                        {category.name}
+                      </h4>
+                      <p
+                        className={`text-sm mb-1 sm:mb-2 transition-colors ${
+                          isDark ? 'text-gray-300' : 'text-gray-600'
+                        }`}
+                      >
+                        {formatEther(category.price)} ETH per ticket
+                      </p>
+                      <p
+                        className={`text-xs sm:text-sm transition-colors ${
+                          isDark ? 'text-gray-400' : 'text-gray-500'
+                        }`}
+                      >
+                        {available > 0
+                          ? `${available} tickets available`
+                          : 'Sold out'}
+                      </p>
+                    </div>
                   </div>
 
-                  {/* Quantity Input */}
-                  <div className="flex-shrink-0 w-24">
+                  {/* Quantity Controls */}
+                  <div className="flex items-center justify-between sm:justify-center w-full sm:w-auto">
                     <label
-                      className={`block text-xs font-medium mb-1 transition-colors ${
+                      className={`text-xs sm:text-sm font-medium mr-3 sm:hidden transition-colors ${
                         isDark ? 'text-gray-300' : 'text-gray-700'
                       }`}
                     >
-                      Quantity
+                      Quantity:
                     </label>
-                    <input
-                      type="number"
-                      min="0"
-                      max={available}
-                      value={selection?.quantity || 0}
-                      onChange={(e) =>
-                        updateCategoryQuantity(
-                          index,
-                          parseInt(e.target.value) || 0,
-                        )
-                      }
-                      disabled={available === 0}
-                      className={`w-full px-2 py-1 text-sm border rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 transition-colors ${
-                        isDark
-                          ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400 disabled:bg-gray-800 disabled:text-gray-500'
-                          : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 disabled:bg-gray-100 disabled:text-gray-500'
-                      }`}
-                    />
+                    
+                    <div className="flex items-center space-x-2 sm:space-x-3">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updateCategoryQuantity(
+                            index,
+                            Math.max(0, (selection?.quantity || 0) - 1)
+                          )
+                        }
+                        disabled={available === 0 || (selection?.quantity || 0) <= 0}
+                        className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 flex items-center justify-center text-sm sm:text-base font-bold transition-all duration-200 ${
+                          isDark
+                            ? 'border-gray-600 text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed'
+                            : 'border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
+                        } ${available === 0 || (selection?.quantity || 0) <= 0 ? 'opacity-50 cursor-not-allowed' : 'hover:border-red-500'}`}
+                      >
+                        -
+                      </button>
+                      
+                      <div className="relative">
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          value={(selection?.quantity || 0).toString()}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/[^0-9]/g, '');
+                            const numValue = parseInt(value) || 0;
+                            updateCategoryQuantity(index, Math.min(available, Math.max(0, numValue)));
+                          }}
+                          onFocus={(e) => e.target.select()}
+                          disabled={available === 0}
+                          className={`w-12 sm:w-16 px-2 py-2 text-center text-sm sm:text-base font-semibold border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors ${
+                            isDark
+                              ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400 disabled:bg-gray-800 disabled:text-gray-500'
+                              : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 disabled:bg-gray-100 disabled:text-gray-500'
+                          }`}
+                        />
+                      </div>
+                      
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updateCategoryQuantity(
+                            index,
+                            Math.min(available, (selection?.quantity || 0) + 1)
+                          )
+                        }
+                        disabled={available === 0 || (selection?.quantity || 0) >= available}
+                        className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 flex items-center justify-center text-sm sm:text-base font-bold transition-all duration-200 ${
+                          isDark
+                            ? 'border-gray-600 text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed'
+                            : 'border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
+                        } ${available === 0 || (selection?.quantity || 0) >= available ? 'opacity-50 cursor-not-allowed' : 'hover:border-red-500'}`}
+                      >
+                        +
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -513,33 +597,37 @@ const TicketPurchaseModal = ({
             isDark ? 'bg-gray-800' : 'bg-gray-50'
           }`}
         >
-          <div className="flex justify-between items-center mb-2">
-            <span
-              className={`text-sm font-medium transition-colors ${
-                isDark ? 'text-gray-300' : 'text-gray-700'
-              }`}
-            >
-              Total Tickets:
-            </span>
-            <span
-              className={`text-sm font-semibold transition-colors ${
-                isDark ? 'text-gray-100' : 'text-gray-900'
-              }`}
-            >
-              {getTotalTickets()}
-            </span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span
-              className={`text-lg font-semibold transition-colors ${
-                isDark ? 'text-gray-100' : 'text-gray-900'
-              }`}
-            >
-              Total Price:
-            </span>
-            <span className="text-xl font-bold text-red-600">
-              {getTotalPrice().toFixed(6)} ETH
-            </span>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-6">
+              <div className="flex justify-between items-center sm:block mb-2 sm:mb-0">
+                <span
+                  className={`text-sm font-medium transition-colors ${
+                    isDark ? 'text-gray-300' : 'text-gray-700'
+                  }`}
+                >
+                  Total Tickets:
+                </span>
+                <span
+                  className={`text-sm font-semibold ml-2 sm:ml-0 transition-colors ${
+                    isDark ? 'text-gray-100' : 'text-gray-900'
+                  }`}
+                >
+                  {getTotalTickets()}
+                </span>
+              </div>
+            </div>
+            <div className="flex justify-between items-center w-full sm:w-auto">
+              <span
+                className={`text-base sm:text-lg font-semibold transition-colors ${
+                  isDark ? 'text-gray-100' : 'text-gray-900'
+                }`}
+              >
+                Total Price:
+              </span>
+              <span className="text-lg sm:text-xl font-bold text-red-600 ml-4">
+                {getTotalPrice().toFixed(6)} ETH
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -645,7 +733,7 @@ const TicketPurchaseModal = ({
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4 text-center">
+          <div className="flex min-h-full items-center justify-center p-4 pt-16 sm:pt-4 text-center">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -656,28 +744,28 @@ const TicketPurchaseModal = ({
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel
-                className={`w-full max-w-2xl max-h-[90vh] transform overflow-hidden rounded-2xl ${
+                className={`w-full max-w-xs sm:max-w-lg lg:max-w-2xl max-h-[90vh] mx-4 transform overflow-hidden rounded-xl sm:rounded-2xl ${
                   isDark ? 'bg-gray-900' : 'bg-white'
                 } text-left align-middle shadow-xl transition-all flex flex-col`}
               >
                 {/* Fixed Header */}
                 <div
-                  className={`px-6 py-4 border-b ${
+                  className={`px-4 sm:px-6 py-3 sm:py-4 border-b ${
                     isDark ? 'border-gray-700' : 'border-gray-200'
                   } flex-shrink-0`}
                 >
                   <Dialog.Title
                     as="h3"
-                    className={`text-2xl font-bold leading-6 ${
+                    className={`text-lg sm:text-xl lg:text-2xl font-bold leading-6 ${
                       isDark ? 'text-white' : 'text-gray-900'
-                    } transition-colors duration-300`}
+                    } transition-colors duration-300 truncate`}
                   >
                     {event.title}
                   </Dialog.Title>
                 </div>
 
                 {/* Scrollable Content */}
-                <div className="flex-1 overflow-y-auto px-6 py-4">
+                <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-3 sm:py-4">
                   {loadingCategories
                     ? renderLoadingState()
                     : hasCategories
@@ -687,7 +775,7 @@ const TicketPurchaseModal = ({
 
                 {/* Fixed Footer */}
                 <div
-                  className={`px-6 py-4 border-t ${
+                  className={`px-4 sm:px-6 py-3 sm:py-4 border-t ${
                     isDark ? 'border-gray-700' : 'border-gray-200'
                   } flex-shrink-0`}
                 >
@@ -733,21 +821,21 @@ const TicketPurchaseModal = ({
                     </div>
                   )}
 
-                  <div className="flex justify-end space-x-3">
+                  <div className="flex flex-col sm:flex-row justify-end gap-4 sm:gap-3">
                     <button
                       type="button"
-                      className={`inline-flex justify-center rounded-md border border-transparent ${
+                      className={`inline-flex justify-center rounded-lg border border-transparent ${
                         isDark
                           ? 'bg-gray-700 text-gray-200 hover:bg-gray-600'
                           : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
-                      } px-4 py-2 text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2 transition-colors duration-200`}
+                      } px-4 py-3 sm:py-2 text-sm sm:text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2 transition-colors duration-200 order-2 sm:order-1`}
                       onClick={onClose}
                     >
                       Cancel
                     </button>
                     <button
                       type="button"
-                      className="inline-flex justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                      className="inline-flex justify-center rounded-lg border border-transparent bg-red-600 px-4 py-3 sm:py-2 text-sm sm:text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 order-1 sm:order-2"
                       onClick={handlePurchase}
                       disabled={!canPurchase()}
                     >
