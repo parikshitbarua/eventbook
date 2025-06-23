@@ -42,13 +42,15 @@ const TicketPurchaseModal = ({
     address: address,
   });
   
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(0);
+  const [quantityInput, setQuantityInput] = useState('0'); // String state for input display
   const [isLoading, setIsLoading] = useState(false);
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [categories, setCategories] = useState<TicketCategory[]>([]);
   const [categorySelections, setCategorySelections] = useState<
     CategorySelection[]
   >([]);
+  const [categoryInputs, setCategoryInputs] = useState<string[]>([]); // String states for category inputs
   const [hasCategories, setHasCategories] = useState(false);
   const [balanceError, setBalanceError] = useState<string | null>(null);
 
@@ -111,6 +113,9 @@ const TicketPurchaseModal = ({
             quantity: 0,
           })),
         );
+
+        // Initialize input strings for each category
+        setCategoryInputs(categoriesWithImages.map(() => '0'));
       } else {
         setHasCategories(false);
       }
@@ -133,13 +138,21 @@ const TicketPurchaseModal = ({
     categoryIndex: number,
     newQuantity: number,
   ) => {
+    const finalQuantity = Math.max(0, newQuantity);
     setCategorySelections((prev) =>
       prev.map((selection) =>
         selection.categoryIndex === categoryIndex
-          ? { ...selection, quantity: Math.max(0, newQuantity) }
+          ? { ...selection, quantity: finalQuantity }
           : selection,
       ),
     );
+    
+    // Update the input string to match the new quantity
+    setCategoryInputs(prev => {
+      const newInputs = [...prev];
+      newInputs[categoryIndex] = finalQuantity.toString();
+      return newInputs;
+    });
   };
 
   const getTotalPrice = () => {
@@ -388,13 +401,17 @@ const TicketPurchaseModal = ({
           <div className="flex items-center justify-center space-x-4">
             <button
               type="button"
-              onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              disabled={quantity <= 1}
+              onClick={() => {
+                const newQuantity = Math.max(0, quantity - 1);
+                setQuantity(newQuantity);
+                setQuantityInput(newQuantity.toString());
+              }}
+              disabled={quantity <= 0}
               className={`w-12 h-12 rounded-full border-2 flex items-center justify-center text-xl font-bold transition-all duration-200 ${
                 isDark
                   ? 'border-gray-600 text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed'
                   : 'border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-              } ${quantity <= 1 ? 'opacity-50 cursor-not-allowed' : 'hover:border-red-500'}`}
+              } ${quantity <= 0 ? 'opacity-50 cursor-not-allowed' : 'hover:border-red-500'}`}
             >
               -
             </button>
@@ -404,13 +421,26 @@ const TicketPurchaseModal = ({
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"
-                value={quantity.toString()}
+                value={quantityInput}
                 onChange={(e) => {
                   const value = e.target.value.replace(/[^0-9]/g, '');
-                  const numValue = parseInt(value) || 1;
-                  setQuantity(Math.max(1, numValue));
+                  setQuantityInput(value);
+                  // Allow any number including 0
+                  if (value === '') {
+                    setQuantity(0); // Use 0 for calculations when empty
+                  } else {
+                    setQuantity(parseInt(value));
+                  }
                 }}
                 onFocus={(e) => e.target.select()}
+                onBlur={() => {
+                  // Ensure input shows a valid value when leaving field
+                  const numValue = parseInt(quantityInput);
+                  if (quantityInput === '' || isNaN(numValue) || numValue < 0) {
+                    setQuantityInput('0');
+                    setQuantity(0);
+                  }
+                }}
                 className={`w-20 sm:w-24 px-3 py-3 text-center text-lg font-semibold border-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 ${
                   isDark
                     ? 'bg-gray-800 border-gray-600 text-gray-100 placeholder-gray-400'
@@ -421,7 +451,11 @@ const TicketPurchaseModal = ({
             
             <button
               type="button"
-              onClick={() => setQuantity(quantity + 1)}
+              onClick={() => {
+                const newQuantity = quantity + 1;
+                setQuantity(newQuantity);
+                setQuantityInput(newQuantity.toString());
+              }}
               className={`w-12 h-12 rounded-full border-2 flex items-center justify-center text-xl font-bold transition-all duration-200 ${
                 isDark
                   ? 'border-gray-600 text-gray-300 hover:bg-gray-700 hover:border-red-500'
@@ -550,13 +584,28 @@ const TicketPurchaseModal = ({
                           type="text"
                           inputMode="numeric"
                           pattern="[0-9]*"
-                          value={(selection?.quantity || 0).toString()}
+                          value={categoryInputs[index] || ''}
                           onChange={(e) => {
                             const value = e.target.value.replace(/[^0-9]/g, '');
-                            const numValue = parseInt(value) || 0;
-                            updateCategoryQuantity(index, Math.min(available, Math.max(0, numValue)));
+                            setCategoryInputs(prev => {
+                              const newInputs = [...prev];
+                              newInputs[index] = value;
+                              return newInputs;
+                            });
+                            updateCategoryQuantity(index, Math.min(available, parseInt(value) || 0));
                           }}
                           onFocus={(e) => e.target.select()}
+                          onBlur={() => {
+                            // Ensure input shows the actual quantity when leaving field
+                            const currentSelection = categorySelections[index];
+                            if (!categoryInputs[index] || parseInt(categoryInputs[index]) !== currentSelection?.quantity) {
+                              setCategoryInputs(prev => {
+                                const newInputs = [...prev];
+                                newInputs[index] = (currentSelection?.quantity || 0).toString();
+                                return newInputs;
+                              });
+                            }
+                          }}
                           disabled={available === 0}
                           className={`w-12 sm:w-16 px-2 py-2 text-center text-sm sm:text-base font-semibold border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors ${
                             isDark
