@@ -53,6 +53,9 @@ const TicketPurchaseModal = ({
   const [categoryInputs, setCategoryInputs] = useState<string[]>([]); // String states for category inputs
   const [hasCategories, setHasCategories] = useState(false);
   const [balanceError, setBalanceError] = useState<string | null>(null);
+  const [maxTicketsPerWallet, setMaxTicketsPerWallet] = useState<number>(0);
+  const [currentUserTickets, setCurrentUserTickets] = useState<number>(0);
+  const [walletLimitError, setWalletLimitError] = useState<string | null>(null);
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -66,7 +69,39 @@ const TicketPurchaseModal = ({
         provider,
       );
 
-      const categoriesData = await contract.getAllCategories();
+      // Fetch maxTicketsPerWallet and current user balance in parallel
+      const [categoriesData, maxTicketsLimit] = await Promise.all([
+        contract.getAllCategories(),
+        contract.maxTicketsPerWallet(),
+      ]);
+
+      setMaxTicketsPerWallet(Number(maxTicketsLimit));
+
+      // Fetch current user ticket balance if wallet is connected and NFT contract exists
+      if (address && event.nftContract) {
+        try {
+          const nftContract = new Contract(
+            event.nftContract,
+            [
+              {
+                inputs: [{ name: 'owner', type: 'address' }],
+                name: 'balanceOf',
+                outputs: [{ name: '', type: 'uint256' }],
+                stateMutability: 'view',
+                type: 'function',
+              },
+            ],
+            provider,
+          );
+          const userBalance = await nftContract.balanceOf(address);
+          setCurrentUserTickets(Number(userBalance));
+        } catch (error) {
+          console.error('Failed to fetch user ticket balance:', error);
+          setCurrentUserTickets(0);
+        }
+      } else {
+        setCurrentUserTickets(0);
+      }
 
       if (categoriesData.length > 0) {
         setHasCategories(true);
@@ -138,7 +173,8 @@ const TicketPurchaseModal = ({
     categoryIndex: number,
     newQuantity: number,
   ) => {
-    const finalQuantity = Math.max(0, newQuantity);
+    const finalQuantity = validateQuantity(Math.max(0, newQuantity), categoryIndex);
+    
     setCategorySelections((prev) =>
       prev.map((selection) =>
         selection.categoryIndex === categoryIndex
@@ -179,6 +215,61 @@ const TicketPurchaseModal = ({
     );
   };
 
+  const getMaxAllowedQuantity = () => {
+    if (maxTicketsPerWallet === 0) return Infinity; // No limit
+    return Math.max(0, maxTicketsPerWallet - currentUserTickets);
+  };
+
+  const validateQuantity = (newQuantity: number, categoryIndex?: number) => {
+    const maxAllowed = getMaxAllowedQuantity();
+    
+    if (!hasCategories) {
+      // Single ticket mode
+      return Math.min(newQuantity, maxAllowed);
+    } else {
+      // Category mode - check total across all categories
+      const currentSelections = [...categorySelections];
+      if (categoryIndex !== undefined) {
+        currentSelections[categoryIndex] = { categoryIndex, quantity: newQuantity };
+      }
+      
+      const totalSelected = currentSelections.reduce((sum, sel) => sum + sel.quantity, 0);
+      
+      if (totalSelected <= maxAllowed) {
+        return newQuantity;
+      } else {
+        // Calculate how many we can add to this category
+        const otherTickets = currentSelections
+          .filter((_, idx) => idx !== categoryIndex)
+          .reduce((sum, sel) => sum + sel.quantity, 0);
+        return Math.max(0, maxAllowed - otherTickets);
+      }
+    }
+  };
+
+  const checkWalletLimit = () => {
+    if (maxTicketsPerWallet === 0) {
+      setWalletLimitError(null);
+      return true; // No limit set
+    }
+
+    const totalTicketsRequested = getTotalTickets();
+    const newTotalTickets = currentUserTickets + totalTicketsRequested;
+
+    if (newTotalTickets > maxTicketsPerWallet) {
+      const availableSlots = maxTicketsPerWallet - currentUserTickets;
+      setWalletLimitError(
+        availableSlots <= 0
+          ? `Wallet limit reached. Maximum ${maxTicketsPerWallet} tickets per wallet allowed.`
+          : `Wallet limit exceeded. You can only purchase ${availableSlots} more ticket${availableSlots === 1 ? '' : 's'} (${currentUserTickets}/${maxTicketsPerWallet} currently owned).`
+      );
+      return false;
+    }
+
+    setWalletLimitError(null);
+    return true;
+  };
+
   const checkSufficientBalance = () => {
     if (!balance || !isConnected) {
       setBalanceError('Wallet not connected');
@@ -207,8 +298,8 @@ const TicketPurchaseModal = ({
     try {
       setIsLoading(true);
 
-      // First check if user has sufficient balance
-      if (!checkSufficientBalance()) {
+      // First check if user has sufficient balance and wallet limits
+      if (!checkSufficientBalance() || !checkWalletLimit()) {
         setIsLoading(false);
         return;
       }
@@ -397,6 +488,44 @@ const TicketPurchaseModal = ({
             Number of Tickets
           </label>
           
+          {/* Wallet Status Info */}
+          {maxTicketsPerWallet > 0 && isConnected && (
+            <div className={`mb-4 p-3 rounded-lg border transition-colors ${
+              isDark 
+                ? 'bg-blue-900/20 border-blue-800/50' 
+                : 'bg-blue-50 border-blue-200'
+            }`}>
+              <div className="flex items-center">
+                <svg
+                  className={`h-4 w-4 ${
+                    isDark ? 'text-blue-400' : 'text-blue-600'
+                  }`}
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span className={`ml-2 text-xs font-medium ${
+                  isDark ? 'text-blue-300' : 'text-blue-800'
+                }`}>
+                  Wallet Status: You currently own {currentUserTickets} tickets. You can purchase up to a maximum of {maxTicketsPerWallet} tickets for this event
+                  {maxTicketsPerWallet - currentUserTickets > 0 && (
+                    <span className={`ml-1 ${
+                      isDark ? 'text-blue-400' : 'text-blue-600'
+                    }`}>
+                      ({maxTicketsPerWallet - currentUserTickets} remaining)
+                    </span>
+                  )}
+                </span>
+              </div>
+            </div>
+          )}
+
           {/* Custom Quantity Selector */}
           <div className="flex items-center justify-center space-x-4">
             <button
@@ -425,11 +554,13 @@ const TicketPurchaseModal = ({
                 onChange={(e) => {
                   const value = e.target.value.replace(/[^0-9]/g, '');
                   setQuantityInput(value);
-                  // Allow any number including 0
+                  // Allow any number including 0, but cap at wallet limit
                   if (value === '') {
                     setQuantity(0); // Use 0 for calculations when empty
                   } else {
-                    setQuantity(parseInt(value));
+                    const parsedValue = parseInt(value);
+                    const validatedQuantity = validateQuantity(parsedValue);
+                    setQuantity(validatedQuantity);
                   }
                 }}
                 onFocus={(e) => e.target.select()}
@@ -452,14 +583,15 @@ const TicketPurchaseModal = ({
             <button
               type="button"
               onClick={() => {
-                const newQuantity = quantity + 1;
+                const newQuantity = validateQuantity(quantity + 1);
                 setQuantity(newQuantity);
                 setQuantityInput(newQuantity.toString());
               }}
+              disabled={maxTicketsPerWallet > 0 && currentUserTickets + quantity >= maxTicketsPerWallet}
               className={`w-12 h-12 rounded-full border-2 flex items-center justify-center text-xl font-bold transition-all duration-200 ${
                 isDark
-                  ? 'border-gray-600 text-gray-300 hover:bg-gray-700 hover:border-red-500'
-                  : 'border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-red-500'
+                  ? 'border-gray-600 text-gray-300 hover:bg-gray-700 hover:border-red-500 disabled:opacity-50 disabled:cursor-not-allowed'
+                  : 'border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-red-500 disabled:opacity-50 disabled:cursor-not-allowed'
               }`}
             >
               +
@@ -646,6 +778,42 @@ const TicketPurchaseModal = ({
             isDark ? 'bg-gray-800' : 'bg-gray-50'
           }`}
         >
+          {/* Wallet Status Info for Categories */}
+          {maxTicketsPerWallet > 0 && isConnected && (
+            <div className={`mb-3 pb-3 border-b transition-colors ${
+              isDark ? 'border-gray-700' : 'border-gray-200'
+            }`}>
+              <div className="flex items-center">
+                <svg
+                  className={`h-4 w-4 ${
+                    isDark ? 'text-blue-400' : 'text-blue-600'
+                  }`}
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span className={`ml-2 text-xs font-medium ${
+                  isDark ? 'text-blue-300' : 'text-blue-800'
+                }`}>
+                  Wallet Status: You currently own {currentUserTickets} tickets. You can purchase up to a maximum of {maxTicketsPerWallet} tickets for this event
+                  {maxTicketsPerWallet - currentUserTickets > 0 && (
+                    <span className={`ml-1 ${
+                      isDark ? 'text-blue-400' : 'text-blue-600'
+                    }`}>
+                      ({maxTicketsPerWallet - currentUserTickets} remaining)
+                    </span>
+                  )}
+                </span>
+              </div>
+            </div>
+          )}
+          
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0">
             <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-6">
               <div className="flex justify-between items-center sm:block mb-2 sm:mb-0">
@@ -719,22 +887,26 @@ const TicketPurchaseModal = ({
 
   const canPurchase = () => {
     if (isLoading) return false;
-    if (balanceError) return false;
+    if (balanceError || walletLimitError) return false;
     if (!hasCategories) return quantity > 0;
     return getTotalTickets() > 0;
   };
 
-  // Check balance whenever quantities change
+  // Check balance and wallet limits whenever quantities change
   useEffect(() => {
     if (isOpen && balance) {
       checkSufficientBalance();
     }
-  }, [quantity, categorySelections, balance, isOpen]);
+    if (isOpen && maxTicketsPerWallet > 0) {
+      checkWalletLimit();
+    }
+  }, [quantity, categorySelections, balance, isOpen, maxTicketsPerWallet, currentUserTickets]);
 
-  // Clear balance error when modal closes
+  // Clear errors when modal closes
   useEffect(() => {
     if (!isOpen) {
       setBalanceError(null);
+      setWalletLimitError(null);
     }
   }, [isOpen]);
 
@@ -863,6 +1035,48 @@ const TicketPurchaseModal = ({
                               isDark ? 'text-red-400' : 'text-red-600'
                             }`}>
                               Current balance: {parseFloat(formatEther(balance.value)).toFixed(4)} ETH
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Wallet Limit Error Display */}
+                  {walletLimitError && (
+                    <div className={`mb-4 p-3 rounded-md border ${
+                      isDark 
+                        ? 'bg-orange-900/20 border-orange-800/50' 
+                        : 'bg-orange-50 border-orange-200'
+                    }`}>
+                      <div className="flex">
+                        <div className="flex-shrink-0">
+                          <svg
+                            className={`h-5 w-5 ${
+                              isDark ? 'text-orange-400' : 'text-orange-400'
+                            }`}
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </div>
+                        <div className="ml-3">
+                          <p className={`text-sm font-medium ${
+                            isDark ? 'text-orange-300' : 'text-orange-800'
+                          }`}>
+                            {walletLimitError}
+                          </p>
+                          {maxTicketsPerWallet > 0 && (
+                            <p className={`text-xs mt-1 ${
+                              isDark ? 'text-orange-400' : 'text-orange-600'
+                            }`}>
+                              Wallet limit: {maxTicketsPerWallet} tickets maximum
                             </p>
                           )}
                         </div>
