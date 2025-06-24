@@ -265,12 +265,239 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* How It Works Section */}
+      <section className="py-20 px-6 bg-gradient-to-b from-black to-gray-900">
+        <div className="max-w-7xl mx-auto">
+          <FloatingCard delay={1200}>
+            <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 text-white">
+              How <span className="text-[#e43636]">eventChain</span> Works
+            </h2>
+            <p className="text-xl text-gray-400 text-center mb-16 max-w-3xl mx-auto">
+              Getting started is easier than ordering pizza! Here's how you can create or attend events in just 4 simple steps.
+            </p>
+          </FloatingCard>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            {/* Step 1 & 2 */}
+            <div className="space-y-12">
+              <FloatingCard delay={1400}>
+                <div className="flex items-start space-x-6">
+                  <div className="flex-shrink-0">
+                    <div className="w-16 h-16 bg-[#e43636] rounded-full border-4 border-white shadow-lg flex items-center justify-center">
+                      <span className="text-2xl font-bold text-white">1</span>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white mb-3">Create Your Event</h3>
+                    <p className="text-gray-300 text-lg leading-relaxed">
+                      Event organizers use our platform to create and list their events, just like Ticketmaster or Eventbrite.
+                      The difference? Everything is stored on the blockchain, so ticket sales, event details, and attendance records
+                      are completely transparent and can never be manipulated or hidden.
+                    </p>
+                  </div>
+                </div>
+              </FloatingCard>
+
+              <FloatingCard delay={1600}>
+                <div className="flex items-start space-x-6">
+                  <div className="flex-shrink-0">
+                    <div className="w-16 h-16 bg-[#e43636] rounded-full border-4 border-white shadow-lg flex items-center justify-center">
+                      <span className="text-2xl font-bold text-white">2</span>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white mb-3">Buy Your NFT Ticket</h3>
+                    <p className="text-gray-300 text-lg leading-relaxed">
+                      Instead of regular tickets, you buy special digital tickets called NFTs.
+                      It's like buying a concert ticket, but this one lives in your digital wallet and proves you own it - no one can steal or copy it!
+                    </p>
+                  </div>
+                </div>
+              </FloatingCard>
+            </div>
+
+            {/* Animated Visual for Steps 1 & 2 */}
+            <div className="relative h-96 flex items-center justify-center">
+              <div className="absolute inset-0">
+                {/* Blockchain Background */}
+                <div className="absolute inset-0 bg-gradient-to-br from-[#e43636]/20 to-transparent rounded-3xl border border-[#e43636]/30"></div>
+
+                {/* Step 1 Animation - Event Creation */}
+                <div className="absolute top-8 left-8 animate-pulse">
+                  <div className="w-20 h-20 bg-[#e43636] rounded-2xl border-4 border-white shadow-lg flex items-center justify-center">
+                    <Calendar className="w-8 h-8 text-white" />
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-white rounded-full border-2 border-[#e43636] animate-ping"></div>
+                </div>
+
+                {/* Arrow */}
+                <div className="absolute top-20 left-32 animate-bounce" style={{ animationDelay: '0.5s' }}>
+                  <ChevronRight className="w-8 h-8 text-[#e43636]" />
+                </div>
+
+                {/* Step 2 Animation - NFT Ticket */}
+                <div className="absolute top-8 right-8 animate-bounce" style={{ animationDelay: '1s' }}>
+                  <div className="w-20 h-14 bg-gradient-to-r from-[#e43636] to-red-500 rounded-lg border-4 border-white shadow-lg flex items-center justify-center transform rotate-6">
+                    <Ticket className="w-8 h-8 text-white" />
+                  </div>
+                  <div className="absolute -bottom-1 -left-1 w-4 h-4 bg-yellow-400 rounded-full animate-pulse"></div>
+                </div>
+
+                {/* Floating Elements */}
+                <div className="absolute bottom-12 left-12 w-12 h-12 bg-[#e43636]/30 rounded-full border-2 border-[#e43636] animate-pulse" style={{ animationDelay: '2s' }}>
+                  <div className="w-full h-full flex items-center justify-center">
+                    <Shield className="w-6 h-6 text-[#e43636]" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-20">
+            {/* Animated Visual for Steps 3 & 4 */}
+            <div className="relative h-96 flex items-center justify-center order-2 lg:order-1">
+              <div className="absolute inset-0">
+                {/* Background */}
+                <div className="absolute inset-0 bg-gradient-to-bl from-[#e43636]/20 to-transparent rounded-3xl border border-[#e43636]/30"></div>
+
+                {/* Step 3 Animation - Phone with QR */}
+                <div className="absolute top-8 left-8">
+                  <div className="w-16 h-24 bg-gray-900 rounded-lg border-4 border-white shadow-lg relative">
+                    <div className="w-full h-full bg-gradient-to-b from-gray-800 to-gray-900 rounded-md p-2">
+                      <div className="w-full h-full bg-white rounded border animate-pulse flex items-center justify-center">
+                        <div className="w-8 h-8 bg-black opacity-80 grid grid-cols-3 gap-0.5">
+                          {[...Array(9)].map((_, i) => (
+                              <div key={i} className={`w-full h-full ${Math.random() > 0.5 ? 'bg-black' : 'bg-white'}`}></div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full animate-ping"></div>
+                </div>
+
+                {/* Arrow */}
+                <div className="absolute top-32 left-28 animate-bounce" style={{ animationDelay: '0.5s' }}>
+                  <ChevronRight className="w-8 h-8 text-[#e43636]" />
+                </div>
+
+                {/* Step 4 Animation - Scanner */}
+                <div className="absolute top-8 right-8 animate-pulse" style={{ animationDelay: '1s' }}>
+                  <div className="w-20 h-16 bg-gray-800 rounded-lg border-4 border-white shadow-lg relative">
+                    <div className="absolute top-2 left-2 right-2 h-1 bg-[#e43636] animate-pulse"></div>
+                    <div className="w-full h-full flex items-center justify-center">
+                      <div className="w-8 h-8 border-2 border-[#e43636] rounded animate-spin"></div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Success Checkmark */}
+                <div className="absolute bottom-8 right-12 animate-bounce" style={{ animationDelay: '2s' }}>
+                  <div className="w-12 h-12 bg-green-500 rounded-full border-4 border-white shadow-lg flex items-center justify-center">
+                    <div className="w-6 h-6 border-b-2 border-r-2 border-white transform rotate-45 translate-x-0.5 -translate-y-0.5"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Step 3 & 4 */}
+            <div className="space-y-12 order-1 lg:order-2">
+              <FloatingCard delay={1800}>
+                <div className="flex items-start space-x-6">
+                  <div className="flex-shrink-0">
+                    <div className="w-16 h-16 bg-[#e43636] rounded-full border-4 border-white shadow-lg flex items-center justify-center">
+                      <span className="text-2xl font-bold text-white">3</span>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white mb-3">Generate Your QR Code</h3>
+                    <p className="text-gray-300 text-lg leading-relaxed">
+                      On event day, open your digital wallet and create a special QR code from your NFT ticket.
+                      It's like showing your ID - the code proves the ticket is really yours and hasn't been used before.
+                    </p>
+                  </div>
+                </div>
+              </FloatingCard>
+
+              <FloatingCard delay={2000}>
+                <div className="flex items-start space-x-6">
+                  <div className="flex-shrink-0">
+                    <div className="w-16 h-16 bg-[#e43636] rounded-full border-4 border-white shadow-lg flex items-center justify-center">
+                      <span className="text-2xl font-bold text-white">4</span>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white mb-3">Enter the Event</h3>
+                    <p className="text-gray-300 text-lg leading-relaxed">
+                      Walk up to the event entrance and show your QR code to the scanner - just like scanning groceries at a store!
+                      If your ticket is valid, you're in. If someone tries to use a fake ticket, the scanner will know instantly.
+                    </p>
+                  </div>
+                </div>
+              </FloatingCard>
+            </div>
+          </div>
+
+          {/* Bottom CTA */}
+          <FloatingCard delay={2200}>
+            <div className="text-center mt-16 p-8 bg-[#e43636]/10 rounded-3xl border border-[#e43636]/30">
+              <h3 className="text-2xl font-bold text-white mb-4">
+                That's It! Simple as 1-2-3-4 🎉
+              </h3>
+              <p className="text-gray-300 text-lg mb-6">
+                No complex tech knowledge needed. If you can use a smartphone, you can use EventChain!
+              </p>
+              <button
+                  onClick={() => (window.location.href = '/home')}
+                  className="bg-[#e43636] hover:bg-[#e43636]/90 px-8 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 border-2 border-white text-white"
+              >
+                Try It Now - It's Free!
+              </button>
+            </div>
+          </FloatingCard>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-20 px-6 bg-[#e43636]/10 border-y border-[#e43636]/20">
+        <div className="max-w-7xl mx-auto">
+          <FloatingCard delay={1400}>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+              <div>
+                <div className="text-4xl md:text-5xl font-bold text-[#e43636] mb-2">
+                  100%
+                </div>
+                <div className="text-white">Transparent</div>
+              </div>
+              <div>
+                <div className="text-4xl md:text-5xl font-bold text-[#e43636] mb-2">
+                  0%
+                </div>
+                <div className="text-white">Hidden Fees</div>
+              </div>
+              <div>
+                <div className="text-4xl md:text-5xl font-bold text-[#e43636] mb-2">
+                  ∞
+                </div>
+                <div className="text-white">Scalability</div>
+              </div>
+              <div>
+                <div className="text-4xl md:text-5xl font-bold text-[#e43636] mb-2">
+                  24/7
+                </div>
+                <div className="text-white">Global Access</div>
+              </div>
+            </div>
+          </FloatingCard>
+        </div>
+      </section>
+
       {/* Features Showcase */}
       <section className="py-20 px-6">
         <div className="max-w-7xl mx-auto">
           <FloatingCard delay={600}>
             <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 text-white">
-              Why Choose <span className="text-[#e43636]">EventChain</span>?
+              Why Choose <span className="text-[#e43636]">eventChain</span>?
             </h2>
             <p className="text-xl text-gray-400 text-center mb-16 max-w-3xl mx-auto">
               Powered by blockchain technology, we're revolutionizing how events
@@ -360,7 +587,7 @@ const LandingPage = () => {
               onClick={() => (window.location.href = '/home')}
               className="bg-[#e43636] hover:bg-[#e43636]/90 px-12 py-4 rounded-full font-semibold text-xl transition-all duration-300 transform hover:scale-110 border-2 border-white text-white"
             >
-              Launch EventChain
+              Launch eventChain
             </button>
           </FloatingCard>
         </div>
