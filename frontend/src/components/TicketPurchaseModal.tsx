@@ -16,6 +16,8 @@ import {
 import { TicketCategory } from '../types/ticket.types.ts';
 import { APP_DOMAIN } from '../config/app.config.ts';
 import { useTheme } from '../hooks/theme.hook.ts';
+import LoadingModal from './LoadingModal';
+import { useLoadingModal } from '../hooks/useLoadingModal.hook';
 
 interface CategorySelection {
   categoryIndex: number;
@@ -42,9 +44,26 @@ const TicketPurchaseModal = ({
     address: address,
   });
   
+  // Loading modal state
+  const {
+    isOpen: isLoadingModalOpen,
+    action: loadingAction,
+    customMessage: loadingMessage,
+    progress: loadingProgress,
+    onClose: modalOnClose,
+    actionButton: modalActionButton,
+    showTicketPurchaseModal,
+    showTransactionPendingModal,
+    showMetadataUploadModal,
+    showSuccessModal,
+    showErrorModal,
+    hideLoadingModal,
+    updateMessage,
+    updateProgress,
+  } = useLoadingModal();
+  
   const [quantity, setQuantity] = useState(0);
   const [quantityInput, setQuantityInput] = useState('0'); // String state for input display
-  const [isLoading, setIsLoading] = useState(false);
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [categories, setCategories] = useState<TicketCategory[]>([]);
   const [categorySelections, setCategorySelections] = useState<
@@ -296,16 +315,18 @@ const TicketPurchaseModal = ({
 
   const handlePurchase = async () => {
     try {
-      setIsLoading(true);
+      // Show initial loading modal
+      showTicketPurchaseModal('Preparing your ticket purchase...');
 
       // First check if user has sufficient balance and wallet limits
       if (!checkSufficientBalance() || !checkWalletLimit()) {
-        setIsLoading(false);
+        hideLoadingModal();
         return;
       }
 
       if (!hasCategories) {
         // Single ticket purchase
+        updateMessage('Fetching event images...');
         const eventPrimaryImage = await fetchFirstImageFromIPFS(
           event.eventImages,
         );
@@ -315,6 +336,9 @@ const TicketPurchaseModal = ({
           'https://static.vecteezy.com/system/resources/previews/002/779/812/non_2x/cartoon-illustration-of-ticket-free-vector.jpg';
         const finalImage = eventPrimaryImage || defaultImage;
 
+        // Show metadata upload progress
+        showMetadataUploadModal('Creating ticket metadata...', 0);
+        
         const ticketMetadata: TicketPurchaseInput = {
           description: event.title || 'eventbook',
           external_url: `${APP_DOMAIN}/event/${event.eventId}`,
@@ -332,10 +356,19 @@ const TicketPurchaseModal = ({
           ],
         };
         console.log('Ticket metadata being uploaded:', ticketMetadata);
+        
+        updateProgress(50);
+        updateMessage('Uploading ticket metadata to IPFS...');
+        
         const ticketURI = await createTicketURIHelperUtil(ticketMetadata);
         if (!ticketURI) {
           throw new Error('Failed to create ticket URI');
         }
+
+        updateProgress(100);
+
+        // Switch to transaction pending
+        showTransactionPendingModal('Initiating purchase transaction...');
 
         // Calculate total price in wei
         if (!event.ticketPrice) {
@@ -353,6 +386,8 @@ const TicketPurchaseModal = ({
         const totalPriceInWei = BigInt(event.ticketPrice) * BigInt(quantity);
         console.log('Total Price in Wei:', totalPriceInWei.toString());
 
+        updateMessage('Waiting for wallet confirmation...');
+
         // Call purchaseSingleTicket directly
         const hash = await purchaseSingleTicket({
           nftContractAddress: event.nftContract,
@@ -361,7 +396,12 @@ const TicketPurchaseModal = ({
           totalPrice: totalPriceInWei.toString(),
         });
 
+        updateMessage('Transaction submitted to blockchain...');
         console.log('Single ticket purchase hash:', hash);
+        
+        // Simulate transaction confirmation wait
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
       } else {
         // Category-based purchase
         const selectedCategories = categorySelections.filter(
@@ -371,6 +411,8 @@ const TicketPurchaseModal = ({
           throw new Error('No tickets selected');
         }
 
+        showMetadataUploadModal('Processing ticket categories...', 0);
+
         console.log('Starting ticket purchase process...');
         console.log('Selected categories:', selectedCategories);
 
@@ -379,10 +421,16 @@ const TicketPurchaseModal = ({
         const tokenURIs: string[] = [];
         let totalPriceInWei = 0n;
 
-        for (const selection of selectedCategories) {
+        const totalCategories = selectedCategories.length;
+
+        for (let i = 0; i < selectedCategories.length; i++) {
+          const selection = selectedCategories[i];
           console.log('Processing category selection:', selection);
           const category = categories[selection.categoryIndex];
           console.log('Category details:', category);
+
+          updateProgress((i / totalCategories) * 80); // 80% for metadata creation
+          updateMessage(`Processing ${category.name} tickets...`);
 
           const eventPrimaryImage = category.image;
           const defaultImage =
@@ -433,6 +481,14 @@ const TicketPurchaseModal = ({
           });
         }
 
+        updateProgress(90);
+        updateMessage('Uploading all metadata to IPFS...');
+        
+        // Small delay to show completion
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        updateProgress(100);
+
         console.log('Final purchase parameters:', {
           nftContractAddress: event.nftContract,
           quantities,
@@ -440,6 +496,11 @@ const TicketPurchaseModal = ({
           tokenURIs,
           totalPrice: totalPriceInWei.toString(),
         });
+
+        // Switch to transaction pending
+        showTransactionPendingModal('Initiating purchase transaction...');
+
+        updateMessage('Waiting for wallet confirmation...');
 
         // Call purchaseCategoryTickets directly
         try {
@@ -451,25 +512,47 @@ const TicketPurchaseModal = ({
             tokenURIs,
             totalPrice: totalPriceInWei.toString(),
           });
+          
+          updateMessage('Transaction submitted to blockchain...');
           console.log('Category tickets purchase successful! Hash:', hash);
+          
+          // Simulate transaction confirmation wait
+          await new Promise(resolve => setTimeout(resolve, 2000));
         } catch (error) {
           console.error('Error in purchaseCategoryTickets:', error);
           throw error;
         }
       }
 
-      onClose();
-      // Call success callback after closing modal
-      if (onSuccess) {
-        setTimeout(() => {
-          onSuccess();
-        }, 100); // Small delay to ensure modal is closed first
-      }
+      // Show success modal
+      showSuccessModal(
+        'Ticket purchase completed successfully! 🎉',
+        undefined,
+        () => {
+          hideLoadingModal();
+          onClose();
+          if (onSuccess) {
+            onSuccess();
+          }
+        }
+      );
     } catch (error) {
       console.error('Purchase failed:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
+      
+      // Show error modal
+      showErrorModal(
+        `Purchase failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        {
+          text: 'Try Again',
+          onClick: () => {
+            hideLoadingModal();
+            // Don't close the modal, let user try again
+          }
+        },
+        () => {
+          hideLoadingModal();
+        }
+      );
     }
   };
 
@@ -886,7 +969,7 @@ const TicketPurchaseModal = ({
   );
 
   const canPurchase = () => {
-    if (isLoading) return false;
+    if (isLoadingModalOpen) return false;
     if (balanceError || walletLimitError) return false;
     if (!hasCategories) return quantity > 0;
     return getTotalTickets() > 0;
@@ -1102,7 +1185,7 @@ const TicketPurchaseModal = ({
                       onClick={handlePurchase}
                       disabled={!canPurchase()}
                     >
-                      {isLoading ? 'Processing...' : 'Buy Now'}
+                      {isLoadingModalOpen ? 'Processing...' : 'Buy Now'}
                     </button>
                   </div>
                 </div>
@@ -1111,6 +1194,16 @@ const TicketPurchaseModal = ({
           </div>
         </div>
       </Dialog>
+      
+      {/* Loading Modal */}
+      <LoadingModal
+        isOpen={isLoadingModalOpen}
+        action={loadingAction}
+        customMessage={loadingMessage}
+        progress={loadingProgress}
+        onClose={modalOnClose}
+        actionButton={modalActionButton}
+      />
     </Transition>
   );
 };

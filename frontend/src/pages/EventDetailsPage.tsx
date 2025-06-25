@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { JsonRpcProvider, Contract } from 'ethers';
-import Confetti from 'react-confetti';
+
 import TicketPurchaseModal from '../components/TicketPurchaseModal';
 import type { EventData } from '../types/event.types.ts';
 import EventFactoryABI from '../contracts/EventFactory.sol/EventFactory.json';
@@ -61,11 +61,7 @@ const EventDetailsPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [windowDimensions, setWindowDimensions] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
-  });
+
   const { isDark } = useTheme();
 
   const fetchEventStats = useCallback(
@@ -209,26 +205,8 @@ const EventDetailsPage = () => {
     }
   }, [eventId, fetchEventDetails]);
 
-  // Handle window resize for confetti
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowDimensions({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // Handle success state
   const handlePurchaseSuccess = () => {
-    setShowSuccess(true);
-    // Auto-hide success message after 5 seconds
-    setTimeout(() => {
-      setShowSuccess(false);
-    }, 5000);
+    // Success is now handled by the LoadingModal
   };
 
   const formatDate = (timestamp: bigint) => {
@@ -352,72 +330,7 @@ const EventDetailsPage = () => {
         isDark ? 'bg-gray-900' : 'bg-gray-50'
       }`}
     >
-      {/* Confetti Animation */}
-      {showSuccess && (
-        <Confetti
-          width={windowDimensions.width}
-          height={windowDimensions.height}
-          recycle={false}
-          numberOfPieces={200}
-          gravity={0.3}
-        />
-      )}
 
-      {/* Success Message */}
-      {showSuccess && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-          <div
-            className={`max-w-md mx-4 p-6 rounded-2xl shadow-2xl transform transition-all duration-500 ${
-              isDark
-                ? 'bg-gray-800 border border-gray-700'
-                : 'bg-white border border-gray-200'
-            }`}
-          >
-            <div className="text-center">
-              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
-                <svg
-                  className="h-8 w-8 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-              </div>
-              <h3
-                className={`text-lg font-semibold mb-2 transition-colors ${
-                  isDark ? 'text-gray-100' : 'text-gray-900'
-                }`}
-              >
-                🎉 Purchase Successful!
-              </h3>
-              <p
-                className={`text-sm transition-colors ${
-                  isDark ? 'text-gray-300' : 'text-gray-600'
-                }`}
-              >
-                Your tickets have been successfully purchased! Check your wallet
-                for the NFT tickets.
-              </p>
-              <button
-                onClick={() => setShowSuccess(false)}
-                className={`mt-4 px-4 py-2 rounded-lg text-sm font-medium transition-colors pointer-events-auto ${
-                  isDark
-                    ? 'bg-gray-700 text-gray-200 hover:bg-gray-600'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                Dismiss
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
       {/* Hero Section */}
       <div className="relative h-96 md:h-[500px] overflow-hidden">
         <img
