@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
 import { useWriteContract, useAccount } from 'wagmi';
 import { parseEther } from 'ethers';
-import Confetti from 'react-confetti';
+
 import type { AddTicketsNavigationState } from '../types/navigation.types.ts';
 import {
   uploadImageToIPFSHelperUtil,
@@ -12,6 +12,8 @@ import {
 } from '../utils/ipfs-helper.util.ts';
 import EventContractABI from '../contracts/EventContract.sol/EventContract.json';
 import { useTheme } from '../hooks/theme.hook.ts';
+import LoadingModal from '../components/LoadingModal';
+import { useLoadingModal } from '../hooks/useLoadingModal.hook';
 
 interface TicketCategory {
   id: string;
@@ -32,35 +34,32 @@ const AddTicketsPage = () => {
   // Get the navigation state with contract addresses and event details
   const navigationState = location.state as AddTicketsNavigationState | null;
 
+  // Loading modal state
+  const {
+    isOpen: isLoadingModalOpen,
+    action: loadingAction,
+    customMessage: loadingMessage,
+    progress: loadingProgress,
+    onClose: modalOnClose,
+    actionButton: modalActionButton,
+    showMetadataUploadModal,
+    showContractDeploymentModal,
+    showTransactionPendingModal,
+    showSuccessModal,
+    showErrorModal,
+    hideLoadingModal,
+    updateMessage,
+    updateProgress,
+  } = useLoadingModal();
+
   // State management
   const [categories, setCategories] = useState<TicketCategory[]>([]);
   const [showCategoryForm, setShowCategoryForm] = useState(false);
   const [editingCategory, setEditingCategory] = useState<TicketCategory | null>(
     null,
   );
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [buttonText, setButtonText] = useState('Add Ticket Categories');
 
-  // Success state management
-  const [showConfetti, setShowConfetti] = useState(false);
-  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const [windowDimensions, setWindowDimensions] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
-  });
 
-  // Update window dimensions for confetti
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowDimensions({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   // Category management functions
   const addCategory = () => {
@@ -105,34 +104,36 @@ const AddTicketsPage = () => {
 
   const handleTicketCategoriesAdded = async () => {
     try {
-      setIsSubmitting(true);
-
       // Check wallet connection
       if (!isConnected || !address) {
         alert('Please connect your wallet to add ticket categories');
-        setIsSubmitting(false);
         return;
       }
 
       // Check if we have an event contract address
       if (!navigationState?.eventContract) {
         alert('Event contract address not found');
-        setIsSubmitting(false);
         return;
       }
 
       if (categories.length === 0) {
         alert('Please add at least one ticket category');
-        setIsSubmitting(false);
         return;
       }
 
+      // Show initial loading modal
+      showMetadataUploadModal('Processing ticket categories...', 0);
+
       // Process all categories using Promise.all to handle async operations properly
       const processedCategories = await Promise.all(
-        categories.map(async (category) => {
+        categories.map(async (category, index) => {
+          const progress = ((index + 1) / categories.length) * 60; // 60% for image processing
+          updateProgress(progress);
+          updateMessage(`Processing ${category.name} category...`);
+
           let imageURI;
           if (category.image) {
-            setButtonText('Uploading Ticket Images');
+            updateMessage(`Uploading ${category.name} image to IPFS...`);
             const imageCID = await uploadImageToIPFSHelperUtil(category.image);
             imageURI = `https://${imageCID}.ipfs.w3s.link`;
           } else {
@@ -149,7 +150,7 @@ const AddTicketsPage = () => {
             admits: 1,
           };
 
-          setButtonText('Generating Ticket Metadata');
+          updateMessage(`Creating metadata for ${category.name}...`);
           const ticketURI = await createTicketURIHelperUtil(ticketMetadata);
           if (!ticketURI) {
             throw new Error(
@@ -166,7 +167,17 @@ const AddTicketsPage = () => {
         }),
       );
 
-      setButtonText('Storing Ticket Details');
+      updateProgress(80);
+      updateMessage('Finalizing ticket metadata...');
+      
+      // Small delay to show completion
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      updateProgress(100);
+
+      // Switch to contract deployment modal
+      showContractDeploymentModal('Adding ticket categories to smart contract...');
+      updateMessage('Waiting for wallet confirmation...');
 
       // Call the smart contract
       try {
@@ -178,32 +189,66 @@ const AddTicketsPage = () => {
         });
 
         console.log('Transaction hash:', result);
-        setButtonText('Transaction Submitted');
+        
+        // Show transaction pending
+        showTransactionPendingModal('Transaction submitted to blockchain...');
+        updateMessage('Waiting for blockchain confirmation...');
 
-        // Show confetti and success dialog
-        setShowConfetti(true);
-        setShowSuccessDialog(true);
+        // Simulate transaction confirmation wait
+        await new Promise(resolve => setTimeout(resolve, 3000));
 
-        // Stop confetti after 5 seconds
-        setTimeout(() => {
-          setShowConfetti(false);
-        }, 5000);
+        // Show success modal
+        showSuccessModal(
+          'Ticket categories added successfully! 🎉',
+          {
+            text: 'Continue to Home',
+            onClick: () => {
+              hideLoadingModal();
+              navigate('/');
+            }
+          },
+          () => {
+            hideLoadingModal();
+            navigate('/');
+          }
+        );
       } catch (contractError) {
         console.error('Contract call failed:', contractError);
         const errorMessage =
           contractError instanceof Error
             ? contractError.message
             : 'Unknown contract error';
-        alert(`Failed to add ticket categories: ${errorMessage}`);
+        
+        showErrorModal(
+          `Failed to add ticket categories: ${errorMessage}`,
+          {
+            text: 'Try Again',
+            onClick: () => {
+              hideLoadingModal();
+            }
+          },
+          () => {
+            hideLoadingModal();
+          }
+        );
       }
     } catch (error) {
       console.error('Error processing categories:', error);
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error occurred';
-      alert(`Error processing categories: ${errorMessage}`);
-    } finally {
-      setIsSubmitting(false);
-      setButtonText('Add Ticket Categories');
+      
+      showErrorModal(
+        `Error processing categories: ${errorMessage}`,
+        {
+          text: 'Try Again',
+          onClick: () => {
+            hideLoadingModal();
+          }
+        },
+        () => {
+          hideLoadingModal();
+        }
+      );
     }
   };
 
@@ -512,61 +557,8 @@ const AddTicketsPage = () => {
     );
   };
 
-  // Success Dialog Component
-  const SuccessDialog = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
-      <div
-        className={`${
-          isDark ? 'bg-gray-900' : 'bg-white'
-        } rounded-2xl max-w-md w-full p-8 text-center transition-colors duration-300`}
-      >
-        {/* Success Icon */}
-        <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6">
-          <svg
-            className="w-8 h-8 text-red-600"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 13l4 4L19 7"
-            />
-          </svg>
-        </div>
+  
 
-        {/* Success Message */}
-        <h3
-          className={`text-2xl font-bold ${
-            isDark ? 'text-white' : 'text-gray-900'
-          } mb-2 transition-colors duration-300`}
-        >
-          Event Has Been Successfully Created! 🎉
-        </h3>
-        <p
-          className={`${
-            isDark ? 'text-gray-400' : 'text-gray-600'
-          } mb-8 transition-colors duration-300`}
-        >
-          Your event tickets have been added to the blockchain and are ready for
-          sale.
-        </p>
-
-        {/* Action Button */}
-        <button
-          onClick={() => {
-            setShowSuccessDialog(false);
-            navigate('/');
-          }}
-          className="w-full px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors font-medium"
-        >
-          Continue to Home
-        </button>
-      </div>
-    </div>
-  );
 
   // If no state was passed, redirect back to create event
   useEffect(() => {
@@ -860,15 +852,15 @@ const AddTicketsPage = () => {
             Back
           </button>
           <button
-            disabled={isSubmitting}
+            disabled={isLoadingModalOpen}
             onClick={handleTicketCategoriesAdded}
             className={`px-8 py-3 rounded-xl transition-colors font-medium ${
-              isSubmitting
+              isLoadingModalOpen
                 ? 'bg-red-400 text-gray-200 cursor-not-allowed'
                 : 'bg-red-600 text-white hover:bg-red-700'
             }`}
           >
-            {isSubmitting ? (
+            {isLoadingModalOpen ? (
               <div className="flex items-center justify-center">
                 <svg
                   className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
@@ -890,7 +882,7 @@ const AddTicketsPage = () => {
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   ></path>
                 </svg>
-                {buttonText}
+                Processing...
               </div>
             ) : (
               'Add Ticket Categories'
@@ -911,16 +903,17 @@ const AddTicketsPage = () => {
         />
       )}
 
-      {/* Confetti */}
-      {showConfetti && (
-        <Confetti
-          width={windowDimensions.width}
-          height={windowDimensions.height}
-        />
-      )}
 
-      {/* Success Dialog */}
-      {showSuccessDialog && <SuccessDialog />}
+      
+              {/* Loading Modal */}
+        <LoadingModal
+          isOpen={isLoadingModalOpen}
+          action={loadingAction}
+          customMessage={loadingMessage}
+          progress={loadingProgress}
+          onClose={modalOnClose}
+          actionButton={modalActionButton}
+        />
     </div>
   );
 };

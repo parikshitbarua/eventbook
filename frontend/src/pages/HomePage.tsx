@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { JsonRpcProvider, Contract } from 'ethers';
-import Confetti from 'react-confetti';
+
 import type { EventData } from '../types/event.types.ts';
 import type { EventFactoryContract } from '../types/contracts.types.ts';
 import TicketPurchaseModal from '../components/TicketPurchaseModal';
@@ -20,15 +20,39 @@ const NETWORK_URL = import.meta.env.VITE_NETWORK_URL || 'http://127.0.0.1:8545';
 const HomePage = () => {
   const { isDark } = useTheme();
   const [allEvents, setAllEvents] = useState<EventData[]>([]);
+  const [liveEvents, setLiveEvents] = useState<EventData[]>([]);
+  const [upcomingEvents, setUpcomingEvents] = useState<EventData[]>([]);
+  const [pastEvents, setPastEvents] = useState<EventData[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<EventData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [windowDimensions, setWindowDimensions] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
-  });
+
   const navigate = useNavigate();
+
+  // Function to categorize events based on current time
+  const categorizeEvents = (events: EventData[]) => {
+    const now = Date.now() / 1000; // Current time in seconds
+    const live: EventData[] = [];
+    const upcoming: EventData[] = [];
+    const past: EventData[] = [];
+
+    events.forEach(event => {
+      const eventEndTime = Number(event.eventEndTime);
+      const hoursUntilEnd = (eventEndTime - now) / 3600; // Convert to hours
+      console.log(eventEndTime, now);
+      if (now > eventEndTime) {
+        past.push(event);
+      } else if (hoursUntilEnd <= 24) {
+        live.push(event);
+      } else {
+        upcoming.push(event);
+      }
+    });
+
+    setLiveEvents(live);
+    setUpcomingEvents(upcoming);
+    setPastEvents(past);
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -140,6 +164,7 @@ const HomePage = () => {
         );
 
         setAllEvents(eventData);
+        categorizeEvents(eventData);
       } catch (err) {
         console.error('Contract call failed', err);
       } finally {
@@ -150,26 +175,123 @@ const HomePage = () => {
     fetchData();
   }, []);
 
-  // Handle window resize for confetti
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowDimensions({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
+  const handlePurchaseSuccess = () => {
+    // Success is now handled by the LoadingModal
+  };
+
+  // EventCard component for reusability
+  const EventCard = ({ event, eventType }: { event: EventData; eventType: 'live' | 'upcoming' | 'past' }) => {
+    const getBadgeConfig = () => {
+      switch (eventType) {
+        case 'live':
+          return { text: 'Live', bgColor: 'bg-red-500', textColor: 'text-white' };
+        case 'upcoming':
+          return { text: 'Upcoming', bgColor: 'bg-blue-500', textColor: 'text-white' };
+        case 'past':
+          return { text: 'Ended', bgColor: 'bg-gray-500', textColor: 'text-white' };
+        default:
+          return { text: 'Live', bgColor: 'bg-red-500', textColor: 'text-white' };
+      }
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    const badge = getBadgeConfig();
 
-  // Handle success state
-  const handlePurchaseSuccess = () => {
-    setShowSuccess(true);
-    // Auto-hide success message after 5 seconds
-    setTimeout(() => {
-      setShowSuccess(false);
-    }, 5000);
+    return (
+      <div
+        key={event.eventId}
+        className={`${
+          isDark
+            ? 'bg-gray-900 border-gray-700 shadow-lg shadow-black/20 hover:shadow-black/40'
+            : 'bg-white border-gray-200 shadow-lg hover:shadow-xl'
+        } rounded-2xl overflow-hidden border transition-all duration-500 ease-in-out hover:scale-105 cursor-pointer ${
+          eventType === 'past' ? 'opacity-75' : ''
+        }`}
+        onClick={() => navigate(`/event/${event.eventId}`)}
+      >
+        <div className="relative">
+          <img
+            src={
+              event.eventImages
+                ? event.eventImages
+                : 'https://djmag.com/sites/default/files/styles/djm_23_961x540_jpg/public/2024-07/Tomorrowland.jpg?itok=IhV-aC4t'
+            }
+            alt={event.title}
+            className="h-48 w-full object-cover"
+          />
+          <div className={`absolute top-4 right-4 px-2 py-1 rounded-full text-xs font-semibold ${badge.bgColor} ${badge.textColor}`}>
+            {badge.text}
+          </div>
+        </div>
+      <div className="p-4 flex flex-col justify-between h-48">
+        <div>
+          <h2
+            className={`text-xl font-semibold ${
+              isDark ? 'text-white' : 'text-gray-800'
+            } mb-2 transition-colors duration-300`}
+          >
+            {event.title}
+          </h2>
+          <p
+            className={`text-sm ${
+              isDark ? 'text-gray-400' : 'text-gray-600'
+            } line-clamp-3 transition-colors duration-300`}
+          >
+            {event.description}
+          </p>
+        </div>
+        <div className="mt-4 flex justify-between items-center">
+          <span className="text-lg font-bold text-red-600">
+            {event.ticketPrice ? Number(event.ticketPrice) / 1e18 : 0}{' '}
+            ETH
+          </span>
+          {eventType !== 'past' && (
+            <button
+              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium"
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent card click event
+                setSelectedEvent(event);
+                setIsModalOpen(true);
+              }}
+            >
+              Buy Ticket
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+    );
+  };
+
+  // EventSection component for reusability
+  const EventSection = ({ 
+    title, 
+    events, 
+    eventType 
+  }: { 
+    title: string; 
+    events: EventData[]; 
+    eventType: 'live' | 'upcoming' | 'past';
+  }) => {
+    if (events.length === 0) return null;
+
+    return (
+      <div className="mb-16">
+        <h2 className={`text-3xl font-bold text-center mb-8 ${
+          title === 'Live Events' 
+            ? 'text-red-600' 
+            : title === 'Upcoming Events'
+            ? 'text-blue-600'
+            : 'text-gray-600'
+        }`}>
+          {title}
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+          {events.map((event) => (
+            <EventCard key={event.eventId} event={event} eventType={eventType} />
+          ))}
+        </div>
+      </div>
+    );
   };
 
   // Loading Spinner Component
@@ -284,76 +406,6 @@ const HomePage = () => {
         isDark ? 'bg-black' : 'bg-white'
       } px-6 py-10 transition-colors duration-300`}
     >
-      {/* Confetti Animation */}
-      {showSuccess && (
-        <Confetti
-          width={windowDimensions.width}
-          height={windowDimensions.height}
-          recycle={false}
-          numberOfPieces={200}
-          gravity={0.3}
-        />
-      )}
-
-      {/* Success Message */}
-      {showSuccess && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-          <div
-            className={`max-w-md mx-4 p-6 rounded-2xl shadow-2xl transform transition-all duration-500 ${
-              isDark
-                ? 'bg-gray-800 border border-gray-700'
-                : 'bg-white border border-gray-200'
-            }`}
-          >
-            <div className="text-center">
-              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
-                <svg
-                  className="h-8 w-8 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-              </div>
-              <h3
-                className={`text-lg font-semibold mb-2 transition-colors ${
-                  isDark ? 'text-gray-100' : 'text-gray-900'
-                }`}
-              >
-                🎉 Purchase Successful!
-              </h3>
-              <p
-                className={`text-sm transition-colors ${
-                  isDark ? 'text-gray-300' : 'text-gray-600'
-                }`}
-              >
-                Your tickets have been successfully purchased! Check your wallet
-                for the NFT tickets.
-              </p>
-              <button
-                onClick={() => setShowSuccess(false)}
-                className={`mt-4 px-4 py-2 rounded-lg text-sm font-medium transition-colors pointer-events-auto ${
-                  isDark
-                    ? 'bg-gray-700 text-gray-200 hover:bg-gray-600'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                Dismiss
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      <h1 className="text-4xl font-bold text-red-600 text-center mb-10">
-        Upcoming Events
-      </h1>
-
       {allEvents.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20">
           <div
@@ -386,68 +438,16 @@ const HomePage = () => {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-          {allEvents.map((event) => (
-            <div
-              key={event.eventId}
-              className={`${
-                isDark
-                  ? 'bg-gray-900 border-gray-700 shadow-lg shadow-black/20 hover:shadow-black/40'
-                  : 'bg-white border-gray-200 shadow-lg hover:shadow-xl'
-              } rounded-2xl overflow-hidden border transition-all duration-500 ease-in-out hover:scale-105 cursor-pointer`}
-              onClick={() => navigate(`/event/${event.eventId}`)}
-            >
-              <div className="relative">
-                <img
-                  src={
-                    event.eventImages
-                      ? event.eventImages
-                      : 'https://djmag.com/sites/default/files/styles/djm_23_961x540_jpg/public/2024-07/Tomorrowland.jpg?itok=IhV-aC4t'
-                  }
-                  alt={event.title}
-                  className="h-48 w-full object-cover"
-                />
-                <div className="absolute top-4 right-4 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
-                  Live
-                </div>
-              </div>
-              <div className="p-4 flex flex-col justify-between h-48">
-                <div>
-                  <h2
-                    className={`text-xl font-semibold ${
-                      isDark ? 'text-white' : 'text-gray-800'
-                    } mb-2 transition-colors duration-300`}
-                  >
-                    {event.title}
-                  </h2>
-                  <p
-                    className={`text-sm ${
-                      isDark ? 'text-gray-400' : 'text-gray-600'
-                    } line-clamp-3 transition-colors duration-300`}
-                  >
-                    {event.description}
-                  </p>
-                </div>
-                <div className="mt-4 flex justify-between items-center">
-                  <span className="text-lg font-bold text-red-600">
-                    {event.ticketPrice ? Number(event.ticketPrice) / 1e18 : 0}{' '}
-                    ETH
-                  </span>
-                  <button
-                    className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium"
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent card click event
-                      setSelectedEvent(event);
-                      setIsModalOpen(true);
-                    }}
-                  >
-                    Buy Ticket
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <>
+          {/* Live Events Section */}
+          <EventSection title="Live Events" events={liveEvents} eventType="live" />
+          
+          {/* Upcoming Events Section */}
+          <EventSection title="Upcoming Events" events={upcomingEvents} eventType="upcoming" />
+          
+          {/* Past Events Section */}
+          <EventSection title="Past Events" events={pastEvents} eventType="past" />
+        </>
       )}
 
       {selectedEvent && (

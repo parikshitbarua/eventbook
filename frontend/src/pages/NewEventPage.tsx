@@ -24,8 +24,10 @@ import {
   uploadImagesToIPFSHelperUtil,
   createEventURIHelper,
 } from '../utils/ipfs-helper.util.ts';
-import Confetti from 'react-confetti';
+
 import { useTheme } from '../hooks/theme.hook.ts';
+import LoadingModal from '../components/LoadingModal';
+import { useLoadingModal } from '../hooks/useLoadingModal.hook';
 
 const NewEventPage = () => {
   const { isDark } = useTheme();
@@ -36,18 +38,31 @@ const NewEventPage = () => {
   } = useWriteContract();
   const { address, isConnected } = useAccount();
   const navigate = useNavigate();
-  const [isUploading, setIsUploading] = useState(false);
-  const [buttonText, setButtonText] = useState('Create Event');
+  
+  // Loading modal state
+  const {
+    isOpen: isLoadingModalOpen,
+    action: loadingAction,
+    customMessage: loadingMessage,
+    progress: loadingProgress,
+    onClose: modalOnClose,
+    actionButton: modalActionButton,
+    showEventCreationModal,
+    showMetadataUploadModal,
+    showContractDeploymentModal,
+    showTransactionPendingModal,
+    showSuccessModal,
+    showErrorModal,
+    hideLoadingModal,
+    updateMessage,
+    updateProgress,
+  } = useLoadingModal();
+  
   const [availableStates, setAvailableStates] = useState<State[]>([]);
   const [availableCities, setAvailableCities] = useState<City[]>([]);
   const [txHash, setTxHash] = useState<`0x${string}`>('0x');
   const { data: receipt } = useWaitForTransactionReceipt({ hash: txHash });
   const [hasSingleCategory, setHasSingleCategory] = useState(false);
-  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const [windowDimensions, setWindowDimensions] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
-  });
 
   const [formData, setFormData] = useState<CreateEventParams>({
     title: '',
@@ -126,18 +141,7 @@ const NewEventPage = () => {
     hasSingleCategory,
   ]);
 
-  // Update window dimensions for confetti
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowDimensions({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -204,7 +208,7 @@ const NewEventPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (isPending || isUploading) return;
+    if (isPending || isLoadingModalOpen) return;
 
     // Check wallet connection first
     if (!isConnected || !address) {
@@ -212,14 +216,13 @@ const NewEventPage = () => {
       return;
     }
 
-    setIsUploading(true);
-    setButtonText('Uploading Images');
+    // Show initial loading modal
+    showEventCreationModal('Preparing to create your event...');
 
     // Validate form data
     const validation = validateEventForm(formData, hasSingleCategory);
     if (!validation.isValid) {
-      setIsUploading(false);
-      setButtonText('Create Event');
+      hideLoadingModal();
       alert(validation.error);
       return;
     }
@@ -242,15 +245,27 @@ const NewEventPage = () => {
     try {
       let imageDirectoryCID: string | undefined;
       if (formData.eventImages && formData.eventImages.length > 0) {
+        // Show metadata upload with progress
+        showMetadataUploadModal('Uploading event images to IPFS...', 0);
+        
+        // Simulate progress during image upload
+        updateProgress(20);
         imageDirectoryCID = await uploadImagesToIPFSHelperUtil(
           formData.eventImages,
         );
+        
         if (!imageDirectoryCID) {
+          hideLoadingModal();
           alert('Failed to upload images. Please try again.');
           return;
         }
+        
+        updateProgress(60);
       }
-      setButtonText('Uploading Event Data');
+      
+      updateMessage('Creating event metadata...');
+      updateProgress(80);
+      
       const eventURI = await createEventURIHelper(
         title,
         description,
@@ -260,6 +275,9 @@ const NewEventPage = () => {
         venue,
         imageDirectoryCID || '',
       );
+      
+      updateProgress(100);
+      
       // Convert dates to Unix timestamps
       const startTimestamp = Math.floor(
         new Date(eventStartTime).getTime() / 1000,
@@ -292,7 +310,10 @@ const NewEventPage = () => {
         nftSymbol,
       });
 
-      setButtonText('Creating Event');
+      // Show contract deployment modal
+      showContractDeploymentModal('Deploying your event smart contract...');
+      updateMessage('Waiting for wallet confirmation...');
+      
       console.log('Calling writeContractAsync...');
       const tx = await writeContractAsync({
         address: CONTRACT_CONFIG.address,
@@ -311,74 +332,58 @@ const NewEventPage = () => {
           nftSymbol,
         ],
       });
+      
       console.log('Transaction successful:', tx);
       setTxHash(tx as `0x${string}`);
 
+      // Show transaction pending
+      showTransactionPendingModal('Event creation transaction submitted to blockchain...');
+      updateMessage('Waiting for blockchain confirmation...');
+
       if (hasSingleCategory) {
-        setShowSuccessDialog(true);
+        // For single category events, show success modal
+        setTimeout(() => {
+          showSuccessModal(
+            'Event has been successfully created! 🎉',
+            {
+              text: 'Continue to Home',
+              onClick: () => {
+                hideLoadingModal();
+                navigate('/');
+              }
+            },
+            () => {
+              hideLoadingModal();
+              navigate('/');
+            }
+          );
+        }, 2000);
+      } else {
+        // For multi-category events, hide modal and navigate
+        setTimeout(() => {
+          hideLoadingModal();
+        }, 2000);
       }
     } catch (err) {
       console.error('Contract call failed:', err);
       console.error('Error details:', err);
-      setIsUploading(false);
-      setButtonText('Create Event');
+      
+      showErrorModal(
+        `Failed to create event: ${err instanceof Error ? err.message : 'Unknown error'}`,
+        {
+          text: 'Try Again',
+          onClick: () => {
+            hideLoadingModal();
+          }
+        },
+        () => {
+          hideLoadingModal();
+        }
+      );
     }
   };
 
-  // Success Dialog Component
-  const SuccessDialog = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
-      <div
-        className={`${
-          isDark ? 'bg-gray-900' : 'bg-white'
-        } rounded-2xl max-w-md w-full p-8 text-center transition-colors duration-300`}
-      >
-        {/* Success Icon */}
-        <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6">
-          <svg
-            className="w-8 h-8 text-red-600"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 13l4 4L19 7"
-            />
-          </svg>
-        </div>
 
-        {/* Success Message */}
-        <h3
-          className={`text-2xl font-bold ${
-            isDark ? 'text-white' : 'text-gray-900'
-          } mb-2 transition-colors duration-300`}
-        >
-          Event Has Been Successfully Created! 🎉
-        </h3>
-        <p
-          className={`${
-            isDark ? 'text-gray-400' : 'text-gray-600'
-          } mb-8 transition-colors duration-300`}
-        >
-          Your event has been created on the blockchain and is ready to go.
-        </p>
-
-        {/* Action Button */}
-        <button
-          onClick={() => {
-            setShowSuccessDialog(false);
-            navigate('/');
-          }}
-          className="w-full px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors font-medium"
-        >
-          Continue to Home
-        </button>
-      </div>
-    </div>
-  );
 
   return (
     <div
@@ -388,18 +393,7 @@ const NewEventPage = () => {
           : 'bg-gradient-to-br from-gray-50 to-gray-100'
       } py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300`}
     >
-      {/* Confetti */}
-      {showSuccessDialog && (
-        <Confetti
-          width={windowDimensions.width}
-          height={windowDimensions.height}
-          recycle={false}
-          numberOfPieces={500}
-        />
-      )}
 
-      {/* Success Dialog */}
-      {showSuccessDialog && <SuccessDialog />}
 
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
@@ -1075,10 +1069,10 @@ const NewEventPage = () => {
               >
                 <button
                   type="submit"
-                  disabled={isPending || isUploading}
+                  disabled={isPending || isLoadingModalOpen}
                   className="bg-gradient-to-r from-red-600 to-red-700 text-white py-3 px-8 rounded-xl font-semibold hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
-                  {isPending || isUploading ? (
+                  {isPending || isLoadingModalOpen ? (
                     <div className="flex items-center justify-center">
                       <svg
                         className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
@@ -1100,7 +1094,7 @@ const NewEventPage = () => {
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                         ></path>
                       </svg>
-                      {buttonText}
+                      Processing...
                     </div>
                   ) : (
                     'Create Event'
@@ -1111,6 +1105,16 @@ const NewEventPage = () => {
           </form>
         )}
       </div>
+      
+      {/* Loading Modal */}
+      <LoadingModal
+        isOpen={isLoadingModalOpen}
+        action={loadingAction}
+        customMessage={loadingMessage}
+        progress={loadingProgress}
+        onClose={modalOnClose}
+        actionButton={modalActionButton}
+      />
     </div>
   );
 };
