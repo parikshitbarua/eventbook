@@ -6,3 +6,5 @@ export const NETWORK_URL =
 
 export const APP_DOMAIN =
   import.meta.env.VITE_APP_DOMAIN || 'http://localhost:5173';
+
+export const SECONDARY_MARKET_LINK = 'https://testnets.opensea.io/';
