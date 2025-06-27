@@ -4,6 +4,7 @@ import NewEventPage from './pages/NewEventPage.tsx';
 import HomePage from './pages/HomePage.tsx';
 import AddTicketsPage from './pages/AddTicketsPage.tsx';
 import EventDetailsPage from './pages/EventDetailsPage.tsx';
+import EventStatsPage from './pages/EventStatsPage.tsx';
 import MyEvents from './pages/MyEvents.tsx';
 import MyTickets from './pages/MyTickets.tsx';
 import LandingPage from './pages/LandingPage.tsx';
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
       {
         path: '/event/:eventId',
         element: <EventDetailsPage />,
+      },
+      {
+        path: '/stats/:eventId',
+        element: <EventStatsPage />,
       },
       {
         path: '/profile/my-events',

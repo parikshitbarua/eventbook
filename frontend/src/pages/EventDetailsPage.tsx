@@ -6,14 +6,11 @@ import TicketPurchaseModal from '../components/TicketPurchaseModal';
 import type { EventData } from '../types/event.types.ts';
 import EventFactoryABI from '../contracts/EventFactory.sol/EventFactory.json';
 import EventContractABI from '../contracts/EventContract.sol/EventContract.json';
+import EventTicketNFTABI from '../contracts/EventTicketNFT.sol/EventTicketNFT.json';
 import { fetchFirstImageFromIPFS } from '../utils/ipfs-helper.util';
 import { EventDetailsResponseData } from '../types/event.types.ts';
 import { useTheme } from '../hooks/theme.hook.ts';
-
-const FACTORY_ADDRESS =
-  import.meta.env.VITE_FACTORY_ADDRESS ||
-  '0x5FbDB2315678afecb367f032d93F642f64180aa3';
-const NETWORK_URL = import.meta.env.VITE_NETWORK_URL || 'http://127.0.0.1:8545';
+import { FACTORY_ADDRESS, NETWORK_URL, SECONDARY_MARKET_LINK } from "../config/app.config.ts";
 
 interface EventMetadata {
   name?: string;
@@ -58,6 +55,7 @@ const EventDetailsPage = () => {
     null,
   );
   const [eventStats, setEventStats] = useState<EventStats | null>(null);
+  const [nftSymbol, setNftSymbol] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -164,6 +162,21 @@ const EventDetailsPage = () => {
         eventDetails,
       );
 
+      // Fetch NFT symbol
+      let symbol = '';
+      try {
+        const nftContract = new Contract(
+          eventDetails.eventInfo.nftContract,
+          EventTicketNFTABI.abi,
+          provider,
+        );
+        symbol = await nftContract.symbol();
+      } catch (err) {
+        console.error('Failed to fetch NFT symbol:', err);
+        // Fallback to using contract address
+        symbol = eventDetails.eventInfo.nftContract;
+      }
+
       const eventData: EventData = {
         eventId: Number(eventId),
         title: eventDetails.eventInfo.title,
@@ -191,6 +204,7 @@ const EventDetailsPage = () => {
       setEvent(eventData);
       setEventMetadata(metadata);
       setEventStats(stats);
+      setNftSymbol(symbol);
     } catch (err) {
       console.error('Failed to fetch event details:', err);
       setError('Failed to load event details');
@@ -835,6 +849,130 @@ const EventDetailsPage = () => {
                     )}
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* Secondary Market */}
+            <div
+              className={`rounded-2xl p-8 shadow-sm transition-colors ${
+                isDark ? 'bg-gray-800' : 'bg-white'
+              }`}
+            >
+              <h3
+                className={`text-xl font-bold mb-6 transition-colors ${
+                  isDark ? 'text-gray-100' : 'text-gray-900'
+                }`}
+              >
+                Secondary Market
+              </h3>
+              <div className="space-y-4">
+                <a
+                  href={`${SECONDARY_MARKET_LINK}collection/${nftSymbol.toLowerCase()}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`flex items-center p-4 rounded-xl border-2 transition-all hover:shadow-lg ${
+                    isDark
+                      ? 'border-gray-700 hover:border-gray-600 text-gray-300 hover:text-white'
+                      : 'border-gray-200 hover:border-gray-300 text-gray-700 hover:text-gray-900'
+                  }`}
+                >
+                  <div className="flex items-center">
+                    <svg
+                      className="w-8 h-8 mr-4"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    <div>
+                      <div className="font-semibold">View on OpenSea</div>
+                      <div className={`text-sm transition-colors ${
+                        isDark ? 'text-gray-400' : 'text-gray-500'
+                      }`}>
+                        Trade tickets on the secondary market
+                      </div>
+                    </div>
+                  </div>
+                  <svg
+                    className={`w-5 h-5 ml-auto transition-colors ${
+                      isDark ? 'text-gray-400' : 'text-gray-500'
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    />
+                  </svg>
+                </a>
+              </div>
+            </div>
+
+            {/* View Detailed Stats */}
+            <div
+              className={`rounded-2xl p-8 shadow-sm transition-colors ${
+                isDark ? 'bg-gray-800' : 'bg-white'
+              }`}
+            >
+              <h3
+                className={`text-xl font-bold mb-6 transition-colors ${
+                  isDark ? 'text-gray-100' : 'text-gray-900'
+                }`}
+              >
+                Analytics & Insights
+              </h3>
+              <div className="space-y-4">
+                <button
+                  onClick={() => navigate(`/stats/${eventId}`)}
+                  className={`w-full flex items-center p-4 rounded-xl border-2 transition-all hover:shadow-lg ${
+                    isDark
+                      ? 'border-gray-700 hover:border-gray-600 text-gray-300 hover:text-white'
+                      : 'border-gray-200 hover:border-gray-300 text-gray-700 hover:text-gray-900'
+                  }`}
+                >
+                  <div className="flex items-center">
+                    <svg
+                      className="w-8 h-8 mr-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                      />
+                    </svg>
+                    <div>
+                      <div className="font-semibold">View Detailed Stats</div>
+                      <div className={`text-sm transition-colors ${
+                        isDark ? 'text-gray-400' : 'text-gray-500'
+                      }`}>
+                        Revenue, royalties, and comprehensive analytics
+                      </div>
+                    </div>
+                  </div>
+                  <svg
+                    className={`w-5 h-5 ml-auto transition-colors ${
+                      isDark ? 'text-gray-400' : 'text-gray-500'
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </button>
               </div>
             </div>
 

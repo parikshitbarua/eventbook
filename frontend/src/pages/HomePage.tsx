@@ -38,8 +38,7 @@ const HomePage = () => {
 
     events.forEach(event => {
       const eventEndTime = Number(event.eventEndTime);
-      const hoursUntilEnd = (eventEndTime - now) / 3600; // Convert to hours
-      console.log(eventEndTime, now);
+      const hoursUntilEnd = (eventEndTime - now) / 3600;
       if (now > eventEndTime) {
         past.push(event);
       } else if (hoursUntilEnd <= 24) {
@@ -278,9 +277,9 @@ const HomePage = () => {
       <div className="mb-16">
         <h2 className={`text-3xl font-bold text-center mb-8 ${
           title === 'Live Events' 
-            ? 'text-red-600' 
+            ? 'text-green-600' 
             : title === 'Upcoming Events'
-            ? 'text-blue-600'
+            ? 'text-red-600'
             : 'text-gray-600'
         }`}>
           {title}
