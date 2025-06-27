@@ -7,12 +7,6 @@ const FACTORY_ADDRESS =
   '0x5FbDB2315678afecb367f032d93F642f64180aa3';
 const RPC_URL = import.meta.env.VITE_NETWORK_URL || 'http://127.0.0.1:8545';
 
-console.log('🔍 Environment Debug:');
-console.log('VITE_FACTORY_ADDRESS:', import.meta.env.VITE_FACTORY_ADDRESS);
-console.log('VITE_NETWORK_URL:', import.meta.env.VITE_NETWORK_URL);
-console.log('Final FACTORY_ADDRESS:', FACTORY_ADDRESS);
-console.log('Final RPC_URL:', RPC_URL);
-
 /**
  * Get an instance of the EventFactory contract with full TypeScript support
  */
