@@ -47,3 +47,4 @@ pids/
 
 # Keys
 src/keys/
+/src/generated/prisma

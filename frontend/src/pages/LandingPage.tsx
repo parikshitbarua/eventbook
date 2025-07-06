@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import {
   ChevronRight,
   Calendar,
@@ -15,18 +16,124 @@ import {
   Heart,
   Star,
 } from 'lucide-react';
+import API_ENDPOINTS from "../config/api.config.ts";
+
+const trackUserEvent = async (userId: string, eventData: any = {}) => {
+  try {
+    const response = await fetch(API_ENDPOINTS.ADD_USER, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        user_id: userId,
+        event_type: 'page_view',
+        event_name: 'landing_page_view',
+        event_data: eventData,
+        page_url: window.location.pathname,
+        user_agent: navigator.userAgent,
+        ip_address: null, // Will be handled by backend
+      }),
+    });
+
+    if (!response.ok) {
+      console.error('Failed to track user event:', response.statusText);
+    } else {
+      const result = await response.json();
+      console.log('User event tracked successfully:', result);
+    }
+  } catch (error) {
+    console.error('Error tracking user event:', error);
+  }
+};
 
 const LandingPage = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [currentFeature, setCurrentFeature] = useState(0);
+  const [userId, setUserId] = useState<string>('');
 
   useEffect(() => {
+    // Generate or retrieve user ID
+    let storedUserId = localStorage.getItem('eventchain_user_id');
+    
+    if (!storedUserId) {
+      // Generate new UUID for first-time visitor using proper uuid package
+      storedUserId = uuidv4();
+      localStorage.setItem('eventchain_user_id', storedUserId);
+      console.log('Generated new user ID:', storedUserId);
+    } else {
+      console.log('Retrieved existing user ID:', storedUserId);
+    }
+    
+    setUserId(storedUserId);
+
+    // Track landing page view
+    trackUserEvent(storedUserId, {
+      is_first_visit: !localStorage.getItem('eventchain_user_id'),
+      referrer: document.referrer || 'direct',
+      timestamp: new Date().toISOString(),
+      viewport: {
+        width: window.innerWidth,
+        height: window.innerHeight,
+      },
+    });
+
+    // Set visibility for animations
     setIsVisible(true);
+    
+    // Feature rotation interval
     const interval = setInterval(() => {
       setCurrentFeature((prev) => (prev + 1) % 10);
     }, 3000);
+    
     return () => clearInterval(interval);
   }, []);
+
+  // Track button clicks
+  const handleLaunchAppClick = () => {
+    trackUserEvent(userId, {
+      action: 'launch_app_click',
+      button_location: 'navigation',
+      timestamp: new Date().toISOString(),
+    });
+    window.location.href = '/home';
+  };
+
+  const handleGetStartedClick = () => {
+    trackUserEvent(userId, {
+      action: 'get_started_click',
+      button_location: 'hero_section',
+      timestamp: new Date().toISOString(),
+    });
+    window.location.href = '/home';
+  };
+
+  const handleWatchDemoClick = () => {
+    trackUserEvent(userId, {
+      action: 'watch_demo_click',
+      button_location: 'hero_section',
+      timestamp: new Date().toISOString(),
+    });
+    // Add demo functionality here
+  };
+
+  const handleTryItNowClick = () => {
+    trackUserEvent(userId, {
+      action: 'try_it_now_click',
+      button_location: 'how_it_works_section',
+      timestamp: new Date().toISOString(),
+    });
+    window.location.href = '/home';
+  };
+
+  const handleFinalLaunchClick = () => {
+    trackUserEvent(userId, {
+      action: 'final_launch_click',
+      button_location: 'cta_section',
+      timestamp: new Date().toISOString(),
+    });
+    window.location.href = '/home';
+  };
 
   const features = [
     {
@@ -223,7 +330,7 @@ const LandingPage = () => {
             </span>
           </div>
           <button
-            onClick={() => (window.location.href = '/home')}
+            onClick={handleLaunchAppClick}
             className="bg-[#e43636] hover:bg-[#e43636]/90 px-6 py-2 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 border-2 border-white text-white"
           >
             Launch App
@@ -252,12 +359,15 @@ const LandingPage = () => {
           <FloatingCard delay={400}>
             <div className="flex flex-col sm:flex-row justify-center gap-4 mb-16">
               <button
-                onClick={() => (window.location.href = '/home')}
+                onClick={handleGetStartedClick}
                 className="bg-[#e43636] hover:bg-[#e43636]/90 px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 transform hover:scale-105 border-2 border-white text-white flex items-center justify-center gap-2"
               >
                 Get Started <ChevronRight className="w-5 h-5" />
               </button>
-              <button className="border-2 border-[#e43636] text-[#e43636] hover:bg-[#e43636] hover:text-white px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 transform hover:scale-105">
+              <button 
+                onClick={handleWatchDemoClick}
+                className="border-2 border-[#e43636] text-[#e43636] hover:bg-[#e43636] hover:text-white px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 transform hover:scale-105"
+              >
                 Watch Demo
               </button>
             </div>
@@ -448,7 +558,7 @@ const LandingPage = () => {
                 No complex tech knowledge needed. If you can use a smartphone, you can use EventChain!
               </p>
               <button
-                  onClick={() => (window.location.href = '/home')}
+                  onClick={handleTryItNowClick}
                   className="bg-[#e43636] hover:bg-[#e43636]/90 px-8 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 border-2 border-white text-white"
               >
                 Try It Now - It's Free!
@@ -584,7 +694,7 @@ const LandingPage = () => {
               events like never before.
             </p>
             <button
-              onClick={() => (window.location.href = '/home')}
+              onClick={handleFinalLaunchClick}
               className="bg-[#e43636] hover:bg-[#e43636]/90 px-12 py-4 rounded-full font-semibold text-xl transition-all duration-300 transform hover:scale-110 border-2 border-white text-white"
             >
               Launch eventChain
