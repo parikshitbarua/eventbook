@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 import {
   ChevronRight,
   Calendar,
@@ -15,18 +17,168 @@ import {
   Heart,
   Star,
 } from 'lucide-react';
+import API_ENDPOINTS from "../config/api.config.ts";
+
+const trackPageView = async (userId: string, eventData: any = {}) => {
+  try {
+    const response = await fetch(API_ENDPOINTS.ADD_EVENT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        user_id: userId,
+        event_type: 'page_view',
+        event_name: 'landing_page_view',
+        event_data: eventData,
+        page_url: window.location.pathname,
+        user_agent: navigator.userAgent,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error('Failed to track page view:', response.statusText);
+    } else {
+      const result = await response.json();
+      console.log('Page view tracked successfully:', result);
+    }
+  } catch (error) {
+    console.error('Error tracking page view:', error);
+  }
+};
 
 const LandingPage = () => {
+  const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
   const [currentFeature, setCurrentFeature] = useState(0);
 
   useEffect(() => {
+    // Generate or retrieve user ID
+    let storedUserId = localStorage.getItem('eventchain_user_id');
+    
+    if (!storedUserId) {
+      // Generate new UUID for first-time visitor using proper uuid package
+      storedUserId = uuidv4();
+      localStorage.setItem('eventchain_user_id', storedUserId);
+      console.log('Generated new user ID:', storedUserId);
+    } else {
+      console.log('Retrieved existing user ID:', storedUserId);
+    }
+
+    // Track landing page view
+    trackPageView(storedUserId, {
+      is_first_visit: !localStorage.getItem('eventchain_user_id'),
+      referrer: document.referrer || 'direct',
+      timestamp: new Date().toISOString(),
+      viewport: {
+        width: window.innerWidth,
+        height: window.innerHeight,
+      },
+    });
+
+    // Set visibility for animations
     setIsVisible(true);
+    
+    // Feature rotation interval
     const interval = setInterval(() => {
       setCurrentFeature((prev) => (prev + 1) % 10);
     }, 3000);
+    
     return () => clearInterval(interval);
   }, []);
+
+  const trackButtonClick = (eventName: string, eventData: any = {}) => {
+    // Get or generate user_id from localStorage (same as Header approach)
+    let currentUserId = localStorage.getItem('eventchain_user_id');
+    if (!currentUserId) {
+      currentUserId = uuidv4();
+      localStorage.setItem('eventchain_user_id', currentUserId);
+    }
+
+    const payload = JSON.stringify({
+      user_id: currentUserId,
+      event_type: 'button_click',
+      event_name: eventName,
+      event_data: eventData,
+      page_url: window.location.pathname,
+      user_agent: navigator.userAgent,
+    });
+
+    console.log('Attempting to track button click:', eventName);
+
+    fetch(API_ENDPOINTS.ADD_EVENT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: payload,
+      keepalive: true,
+    })
+      .then(response => {
+        if (response.ok) {
+          console.log('Button click tracked successfully with fetch:', eventName);
+          return response.json();
+        } else {
+          console.error('Button click tracking failed:', response.status, response.statusText);
+          throw new Error(`HTTP ${response.status}`);
+        }
+      })
+      .then(data => {
+        console.log('Button click response:', data);
+      })
+      .catch(error => {
+        console.error('Fetch failed, trying sendBeacon:', error);
+        if (navigator.sendBeacon) {
+          const blob = new Blob([payload], { type: 'application/json' });
+          const success = navigator.sendBeacon(API_ENDPOINTS.ADD_EVENT, blob);
+          if (success) {
+            console.log('Button click tracked successfully with sendBeacon');
+          } else {
+            console.error('Failed to track button click with sendBeacon');
+          }
+        }
+      });
+  };
+
+  const handleLaunchAppClick = () => {
+    trackButtonClick('launch_app_button_click', {
+      button_location: 'navigation',
+      timestamp: new Date().toISOString(),
+    });
+    navigate('/home');
+  };
+
+  const handleGetStartedClick = () => {
+    trackButtonClick('get_started_button_click', {
+      button_location: 'hero_section',
+      timestamp: new Date().toISOString(),
+    });
+    navigate('/home');
+  };
+
+  const handleWatchDemoClick = () => {
+    trackButtonClick('watch_demo_button_click', {
+      button_location: 'hero_section',
+      timestamp: new Date().toISOString(),
+    });
+    // Add demo functionality here
+  };
+
+  const handleTryItNowClick = () => {
+    trackButtonClick('try_it_now_button_click', {
+      button_location: 'how_it_works_section',
+      timestamp: new Date().toISOString(),
+    });
+    navigate('/home');
+  };
+
+  const handleFinalLaunchClick = () => {
+    trackButtonClick('final_launch_button_click', {
+      button_location: 'cta_section',
+      timestamp: new Date().toISOString(),
+    });
+    navigate('/home');
+  };
 
   const features = [
     {
@@ -223,7 +375,7 @@ const LandingPage = () => {
             </span>
           </div>
           <button
-            onClick={() => (window.location.href = '/home')}
+            onClick={handleLaunchAppClick}
             className="bg-[#e43636] hover:bg-[#e43636]/90 px-6 py-2 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 border-2 border-white text-white"
           >
             Launch App
@@ -252,12 +404,15 @@ const LandingPage = () => {
           <FloatingCard delay={400}>
             <div className="flex flex-col sm:flex-row justify-center gap-4 mb-16">
               <button
-                onClick={() => (window.location.href = '/home')}
+                onClick={handleGetStartedClick}
                 className="bg-[#e43636] hover:bg-[#e43636]/90 px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 transform hover:scale-105 border-2 border-white text-white flex items-center justify-center gap-2"
               >
                 Get Started <ChevronRight className="w-5 h-5" />
               </button>
-              <button className="border-2 border-[#e43636] text-[#e43636] hover:bg-[#e43636] hover:text-white px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 transform hover:scale-105">
+              <button 
+                onClick={handleWatchDemoClick}
+                className="border-2 border-[#e43636] text-[#e43636] hover:bg-[#e43636] hover:text-white px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 transform hover:scale-105"
+              >
                 Watch Demo
               </button>
             </div>
@@ -448,7 +603,7 @@ const LandingPage = () => {
                 No complex tech knowledge needed. If you can use a smartphone, you can use EventChain!
               </p>
               <button
-                  onClick={() => (window.location.href = '/home')}
+                  onClick={handleTryItNowClick}
                   className="bg-[#e43636] hover:bg-[#e43636]/90 px-8 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 border-2 border-white text-white"
               >
                 Try It Now - It's Free!
@@ -584,7 +739,7 @@ const LandingPage = () => {
               events like never before.
             </p>
             <button
-              onClick={() => (window.location.href = '/home')}
+              onClick={handleFinalLaunchClick}
               className="bg-[#e43636] hover:bg-[#e43636]/90 px-12 py-4 rounded-full font-semibold text-xl transition-all duration-300 transform hover:scale-110 border-2 border-white text-white"
             >
               Launch eventChain

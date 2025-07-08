@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  user_id      String   @unique @db.Uuid
+  wallet_address String?  @unique
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  events       UserEvent[]
+
+  @@map("users")
+}
+
+model UserEvent {
+  id           Int      @id @default(autoincrement())
+  user_id      String   @db.Uuid
+  event_type   String   // e.g., "page_view", "button_click", "form_submit"
+  event_name   String   // e.g., "landing_page_view", "signup_button_click"
+  event_data   Json?    // Additional event data as JSON
+  page_url     String?  // URL where the event occurred
+  user_agent   String?  // Browser/device information
+  ip_address   String?  // IP address of the user
+  created_at   DateTime @default(now())
+
+  user         User     @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+
+  @@map("user_events")
+}

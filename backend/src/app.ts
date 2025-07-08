@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import { errorHandlerMiddleware } from "./middleware/error-handler.middleware";
 import useTicketRoutes from "./routes/use-ticket.route";
+import trackEventsRoutes from "./routes/track-events.route";
 import getCorsOptions from "./config/cors.config";
 
 const app = express();
@@ -33,6 +34,9 @@ app.get("/api/health", (_, res) => {
 
 // Use ticket routes
 app.use("/api/use-ticket", useTicketRoutes);
+
+// Track events routes
+app.use("/api/track-events", trackEventsRoutes);
 
 // Global error handler (should be after all routes)
 app.use(errorHandlerMiddleware);

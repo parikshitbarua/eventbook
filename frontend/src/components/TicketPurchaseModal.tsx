@@ -18,6 +18,8 @@ import { APP_DOMAIN } from '../config/app.config.ts';
 import { useTheme } from '../hooks/theme.hook.ts';
 import LoadingModal from './LoadingModal';
 import { useLoadingModal } from '../hooks/useLoadingModal.hook';
+import { v4 as uuidv4 } from 'uuid';
+import API_ENDPOINTS from '../config/api.config.ts';
 
 interface CategorySelection {
   categoryIndex: number;
@@ -313,6 +315,68 @@ const TicketPurchaseModal = ({
     return true;
   };
 
+  const trackTicketPurchase = () => {
+    // Get or generate user_id from localStorage
+    let userId = localStorage.getItem('eventchain_user_id');
+    if (!userId) {
+      userId = uuidv4();
+      localStorage.setItem('eventchain_user_id', userId);
+    }
+
+    const payload = JSON.stringify({
+      user_id: userId,
+      event_type: 'button_click',
+      event_name: 'ticket_purchased_button_click',
+      event_data: {
+        button_location: 'ticket_purchase_modal',
+        timestamp: new Date().toISOString(),
+        event_id: event.eventId,
+        event_title: event.title,
+        event_organizer: event.organizer,
+        total_price: getTotalPrice(),
+        total_tickets: getTotalTickets(),
+        has_categories: hasCategories,
+        ticket_details: hasCategories 
+          ? categorySelections.filter(selection => selection.quantity > 0).map(selection => ({
+              category_index: selection.categoryIndex,
+              category_name: categories[selection.categoryIndex]?.name,
+              quantity: selection.quantity,
+              price_per_ticket: Number(categories[selection.categoryIndex]?.price || 0) / 1e18
+            }))
+          : [{ 
+              category_name: 'single_ticket',
+              quantity: quantity,
+              price_per_ticket: Number(event.ticketPrice || 0) / 1e18
+            }]
+      },
+      page_url: window.location.pathname,
+      user_agent: navigator.userAgent,
+    });
+
+    // Use sendBeacon for reliable tracking
+    if (navigator.sendBeacon) {
+      const blob = new Blob([payload], { type: 'application/json' });
+      const success = navigator.sendBeacon(API_ENDPOINTS.ADD_EVENT, blob);
+      if (success) {
+        console.log('Ticket purchase tracked successfully');
+      } else {
+        console.error('Failed to track ticket purchase');
+      }
+    } else {
+      // Fallback for browsers that don't support sendBeacon
+      fetch(API_ENDPOINTS.ADD_EVENT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: payload,
+        keepalive: true,
+      }).catch(error => {
+        console.error('Error tracking ticket purchase:', error);
+      });
+    }
+  };
+
   const handlePurchase = async () => {
     try {
       // Show initial loading modal
@@ -323,6 +387,9 @@ const TicketPurchaseModal = ({
         hideLoadingModal();
         return;
       }
+
+      // Track the ticket purchase attempt
+      trackTicketPurchase();
 
       if (!hasCategories) {
         // Single ticket purchase

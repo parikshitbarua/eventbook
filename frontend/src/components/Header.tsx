@@ -1,12 +1,15 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAccount } from 'wagmi';
 import { useState, useRef, useEffect } from 'react';
-import { UserCircleIcon, SunIcon, MoonIcon, WalletIcon } from '@heroicons/react/24/outline';
+import { UserCircleIcon, SunIcon, MoonIcon, WalletIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { useTheme } from '../hooks/theme.hook.ts';
 import { appKit } from '../config/wallet.config.tsx';
+import { v4 as uuidv4 } from 'uuid';
+import API_ENDPOINTS from '../config/api.config.ts';
 
 const Header = () => {
-  const { isConnected } = useAccount();
+  const navigate = useNavigate();
+  const { isConnected, address } = useAccount();
   const { isDark, toggleTheme } = useTheme();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -26,12 +29,138 @@ const Header = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    if (isConnected && address) {
+      // Get or generate user_id from localStorage
+      let userId = localStorage.getItem('eventchain_user_id');
+      if (!userId) {
+        userId = uuidv4();
+        localStorage.setItem('eventchain_user_id', userId);
+      }
 
+      // Update user with wallet address (upsert only, no event tracking)
+      const updateUserWalletAddress = async () => {
+        try {
+          const response = await fetch(API_ENDPOINTS.ADD_USER, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              user_id: userId,
+              wallet_address: address,
+              // No event tracking data here - just user upsert
+            }),
+          });
 
+          if (response.ok) {
+            const result = await response.json();
+            console.log('User wallet address updated successfully:', result);
+          } else {
+            console.error('Failed to update user wallet address:', response.statusText);
+          }
+        } catch (error) {
+          console.error('Error updating user wallet address:', error);
+        }
+      };
 
+      updateUserWalletAddress();
+    }
+  }, [isConnected, address]);
 
-  const handleConnectWallet = () => {
+    const trackWalletButtonClick = async () => {
+    // Get or generate user_id from localStorage
+    let userId = localStorage.getItem('eventchain_user_id');
+    if (!userId) {
+      userId = uuidv4();
+      localStorage.setItem('eventchain_user_id', userId);
+    }
+
+    const payload = JSON.stringify({
+      user_id: userId,
+      event_type: 'button_click',
+      event_name: 'wallet_connect_button_click',
+      event_data: {
+        button_location: 'header_dropdown',
+        timestamp: new Date().toISOString(),
+        connection_method: 'header_wallet_button',
+      },
+      page_url: window.location.pathname,
+      user_agent: navigator.userAgent,
+    });
+
+    fetch(API_ENDPOINTS.ADD_EVENT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: payload,
+      keepalive: true,
+    })
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error(`HTTP ${response.status}`);
+        }
+      })
+      .then(data => {
+        console.log('🎉 Success response:', data);
+      })
+      .catch(error => {
+        console.error('💥 Error tracking wallet connect button click:', error);
+      });
+  };
+
+  const trackCreateButtonClick = () => {
+    // Get or generate user_id from localStorage
+    let userId = localStorage.getItem('eventchain_user_id');
+    if (!userId) {
+      userId = uuidv4();
+      localStorage.setItem('eventchain_user_id', userId);
+    }
+
+    const payload = JSON.stringify({
+      user_id: userId,
+      event_type: 'button_click',
+      event_name: 'new_event_button_click',
+      event_data: {
+        button_location: 'header_navigation',
+        timestamp: new Date().toISOString(),
+      },
+      page_url: window.location.pathname,
+      user_agent: navigator.userAgent,
+    });
+
+    // Use sendBeacon for reliable tracking during navigation
+    if (navigator.sendBeacon) {
+      const blob = new Blob([payload], { type: 'application/json' });
+      const success = navigator.sendBeacon(API_ENDPOINTS.ADD_EVENT, blob);
+      if (success) {
+        console.log('Create button click tracked successfully');
+      } else {
+        console.error('Failed to track create button click');
+      }
+    } else {
+      // Fallback for browsers that don't support sendBeacon
+      fetch(API_ENDPOINTS.ADD_EVENT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: payload,
+        keepalive: true,
+      }).catch(error => {
+        console.error('Error tracking create button click:', error);
+      });
+    }
+  };
+
+  const handleConnectWallet = async () => {
     setIsDropdownOpen(false);
+
+    // Track the button click
+    await trackWalletButtonClick();
     
     // Use the proper AppKit API to open the modal
     try {
@@ -46,6 +175,14 @@ const Header = () => {
         }
       }, 100);
     }
+  };
+
+  const handleCreateClick = () => {
+    // Track the button click
+    trackCreateButtonClick();
+    
+    // Navigate to new event page
+    navigate('/new-event');
   };
 
   return (
@@ -75,13 +212,26 @@ const Header = () => {
 
         <div className={`flex items-center ${isConnected ? 'gap-1.5 sm:gap-2 lg:gap-3' : 'gap-2 sm:gap-3 lg:gap-4'}`}>
           
-          
           {/* Wallet address - always visible, but will be styled for different states */}
-          <div className={`${isConnected ? 'scale-75 sm:scale-85 lg:scale-95' : 'scale-90 sm:scale-95 lg:scale-100'}`}>
+          <div
+              className={`${isConnected ? 'scale-75 sm:scale-85 lg:scale-95' : 'scale-90 sm:scale-95 lg:scale-100'}`}
+              onClick={handleConnectWallet}
+          >
             <appkit-button />
           </div>
 
-
+          {/* Create Event Button - positioned between wallet and profile */}
+          <button
+            onClick={handleCreateClick}
+            className={`flex items-center gap-1 px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2 lg:py-2.5 text-xs sm:text-sm lg:text-base font-medium transition-all duration-200 rounded-xl ${
+              isDark
+                ? 'bg-red-600 hover:bg-red-700 text-white border border-red-500 hover:border-red-600'
+                : 'bg-red-600 hover:bg-red-700 text-white border border-red-500 hover:border-red-600'
+            } transform hover:scale-105 shadow-sm hover:shadow-md`}
+          >
+            <PlusIcon className="h-3 w-3 sm:h-4 sm:w-4 lg:h-5 lg:w-5" />
+            <span className="hidden sm:inline">Create</span>
+          </button>
 
           <div className="relative ml-1 sm:ml-2" ref={dropdownRef}>
             <button
