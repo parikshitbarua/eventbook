@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import {
   ChevronRight,
@@ -18,9 +19,9 @@ import {
 } from 'lucide-react';
 import API_ENDPOINTS from "../config/api.config.ts";
 
-const trackUserEvent = async (userId: string, eventData: any = {}) => {
+const trackPageView = async (userId: string, eventData: any = {}) => {
   try {
-    const response = await fetch(API_ENDPOINTS.ADD_USER, {
+    const response = await fetch(API_ENDPOINTS.ADD_EVENT, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -32,25 +33,24 @@ const trackUserEvent = async (userId: string, eventData: any = {}) => {
         event_data: eventData,
         page_url: window.location.pathname,
         user_agent: navigator.userAgent,
-        ip_address: null, // Will be handled by backend
       }),
     });
 
     if (!response.ok) {
-      console.error('Failed to track user event:', response.statusText);
+      console.error('Failed to track page view:', response.statusText);
     } else {
       const result = await response.json();
-      console.log('User event tracked successfully:', result);
+      console.log('Page view tracked successfully:', result);
     }
   } catch (error) {
-    console.error('Error tracking user event:', error);
+    console.error('Error tracking page view:', error);
   }
 };
 
 const LandingPage = () => {
+  const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
   const [currentFeature, setCurrentFeature] = useState(0);
-  const [userId, setUserId] = useState<string>('');
 
   useEffect(() => {
     // Generate or retrieve user ID
@@ -64,11 +64,9 @@ const LandingPage = () => {
     } else {
       console.log('Retrieved existing user ID:', storedUserId);
     }
-    
-    setUserId(storedUserId);
 
     // Track landing page view
-    trackUserEvent(storedUserId, {
+    trackPageView(storedUserId, {
       is_first_visit: !localStorage.getItem('eventchain_user_id'),
       referrer: document.referrer || 'direct',
       timestamp: new Date().toISOString(),
@@ -89,28 +87,77 @@ const LandingPage = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Track button clicks
+  const trackButtonClick = (eventName: string, eventData: any = {}) => {
+    // Get or generate user_id from localStorage (same as Header approach)
+    let currentUserId = localStorage.getItem('eventchain_user_id');
+    if (!currentUserId) {
+      currentUserId = uuidv4();
+      localStorage.setItem('eventchain_user_id', currentUserId);
+    }
+
+    const payload = JSON.stringify({
+      user_id: currentUserId,
+      event_type: 'button_click',
+      event_name: eventName,
+      event_data: eventData,
+      page_url: window.location.pathname,
+      user_agent: navigator.userAgent,
+    });
+
+    console.log('Attempting to track button click:', eventName);
+
+    fetch(API_ENDPOINTS.ADD_EVENT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: payload,
+      keepalive: true,
+    })
+      .then(response => {
+        if (response.ok) {
+          console.log('Button click tracked successfully with fetch:', eventName);
+          return response.json();
+        } else {
+          console.error('Button click tracking failed:', response.status, response.statusText);
+          throw new Error(`HTTP ${response.status}`);
+        }
+      })
+      .then(data => {
+        console.log('Button click response:', data);
+      })
+      .catch(error => {
+        console.error('Fetch failed, trying sendBeacon:', error);
+        if (navigator.sendBeacon) {
+          const blob = new Blob([payload], { type: 'application/json' });
+          const success = navigator.sendBeacon(API_ENDPOINTS.ADD_EVENT, blob);
+          if (success) {
+            console.log('Button click tracked successfully with sendBeacon');
+          } else {
+            console.error('Failed to track button click with sendBeacon');
+          }
+        }
+      });
+  };
+
   const handleLaunchAppClick = () => {
-    trackUserEvent(userId, {
-      action: 'launch_app_click',
+    trackButtonClick('launch_app_button_click', {
       button_location: 'navigation',
       timestamp: new Date().toISOString(),
     });
-    window.location.href = '/home';
+    navigate('/home');
   };
 
   const handleGetStartedClick = () => {
-    trackUserEvent(userId, {
-      action: 'get_started_click',
+    trackButtonClick('get_started_button_click', {
       button_location: 'hero_section',
       timestamp: new Date().toISOString(),
     });
-    window.location.href = '/home';
+    navigate('/home');
   };
 
   const handleWatchDemoClick = () => {
-    trackUserEvent(userId, {
-      action: 'watch_demo_click',
+    trackButtonClick('watch_demo_button_click', {
       button_location: 'hero_section',
       timestamp: new Date().toISOString(),
     });
@@ -118,21 +165,19 @@ const LandingPage = () => {
   };
 
   const handleTryItNowClick = () => {
-    trackUserEvent(userId, {
-      action: 'try_it_now_click',
+    trackButtonClick('try_it_now_button_click', {
       button_location: 'how_it_works_section',
       timestamp: new Date().toISOString(),
     });
-    window.location.href = '/home';
+    navigate('/home');
   };
 
   const handleFinalLaunchClick = () => {
-    trackUserEvent(userId, {
-      action: 'final_launch_click',
+    trackButtonClick('final_launch_button_click', {
       button_location: 'cta_section',
       timestamp: new Date().toISOString(),
     });
-    window.location.href = '/home';
+    navigate('/home');
   };
 
   const features = [

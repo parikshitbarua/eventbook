@@ -17,8 +17,8 @@ export const upsertUserTrackEventsController = async (req: Request, res: Respons
     const {
       user_id,
       wallet_address,
-      event_type = "page_view",
-      event_name = "landing_page_view",
+      event_type,
+      event_name,
       event_data,
       page_url,
       user_agent,
@@ -33,6 +33,7 @@ export const upsertUserTrackEventsController = async (req: Request, res: Respons
       return;
     }
 
+    // Always upsert the user
     const user = await prisma.user.upsert({
       where: {
         user_id: user_id
@@ -47,42 +48,65 @@ export const upsertUserTrackEventsController = async (req: Request, res: Respons
       }
     });
 
-    const event = await prisma.userEvent.create({
-      data: {
+    // Only create event if event data is provided
+    let event = null;
+    const shouldTrackEvent = event_type || event_name;
+
+    if (shouldTrackEvent) {
+      event = await prisma.userEvent.create({
+        data: {
+          user_id: user.user_id,
+          event_type: event_type || "page_view",
+          event_name: event_name || "default_event",
+          event_data: event_data || null,
+          page_url,
+          user_agent,
+          ip_address
+        }
+      });
+    }
+
+    // Prepare response data
+    const responseData: any = {
+      user: {
+        id: user.id,
         user_id: user.user_id,
-        event_type,
-        event_name,
-        event_data: event_data || null,
-        page_url,
-        user_agent,
-        ip_address
+        wallet_address: user.wallet_address,
+        created_at: user.created_at,
+        updated_at: user.updated_at
       }
-    });
+    };
+
+    // Add event data to response if event was created
+    if (event) {
+      responseData.event = {
+        id: event.id,
+        event_type: event.event_type,
+        event_name: event.event_name,
+        created_at: event.created_at
+      };
+    }
+
+    // Dynamic response message
+    let message = "";
+    if (event && user.wallet_address) {
+      message = "User wallet address updated and event tracked successfully";
+    } else if (event && !user.wallet_address) {
+      message = "User created and event tracked successfully";
+    } else if (!event && user.wallet_address) {
+      message = "User wallet address updated successfully";
+    } else {
+      message = "User created successfully";
+    }
 
     res.status(200).json({
-      data: {
-        user: {
-          id: user.id,
-          user_id: user.user_id,
-          wallet_address: user.wallet_address,
-          created_at: user.created_at,
-          updated_at: user.updated_at
-        },
-        event: {
-          id: event.id,
-          event_type: event.event_type,
-          event_name: event.event_name,
-          created_at: event.created_at
-        }
-      },
-      message: user.wallet_address 
-        ? "User wallet address updated and event tracked successfully"
-        : "User created and event tracked successfully"
+      data: responseData,
+      message
     });
 
   } catch (error: any) {
     console.error("Error in upsertUserTrackEventsController:", error);
-    
+
     // Handle specific Prisma errors
     if (error?.code === 'P2002') {
       res.status(409).json({
@@ -128,7 +152,6 @@ export const newEventTrackEventController = async (req: Request, res: Response):
       return;
     }
 
-    // Check if user exists
     const existingUser = await prisma.user.findUnique({
       where: { user_id }
     });
@@ -141,7 +164,6 @@ export const newEventTrackEventController = async (req: Request, res: Response):
       return;
     }
 
-    // Create event record
     const event = await prisma.userEvent.create({
       data: {
         user_id,
@@ -168,7 +190,7 @@ export const newEventTrackEventController = async (req: Request, res: Response):
 
   } catch (error: any) {
     console.error("Error in newEventTrackEventController:", error);
-    
+
     res.status(500).json({
       data: null,
       message: "Internal server error while tracking event"
