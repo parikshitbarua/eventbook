@@ -51,7 +51,6 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
   const [currentFeature, setCurrentFeature] = useState(0);
-  const [userId, setUserId] = useState<string>('');
 
   useEffect(() => {
     // Generate or retrieve user ID
@@ -65,8 +64,6 @@ const LandingPage = () => {
     } else {
       console.log('Retrieved existing user ID:', storedUserId);
     }
-    
-    setUserId(storedUserId);
 
     // Track landing page view
     trackPageView(storedUserId, {
