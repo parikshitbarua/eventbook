@@ -28,6 +28,8 @@ import {
 import { useTheme } from '../hooks/theme.hook.ts';
 import LoadingModal from '../components/LoadingModal';
 import { useLoadingModal } from '../hooks/useLoadingModal.hook';
+import { v4 as uuidv4 } from 'uuid';
+import API_ENDPOINTS from '../config/api.config.ts';
 
 const NewEventPage = () => {
   const { isDark } = useTheme();
@@ -205,6 +207,55 @@ const NewEventPage = () => {
     maxSize: 5 * 1024 * 1024, // 5MB
   });
 
+  const trackCreateEventSubmit = () => {
+    // Get or generate user_id from localStorage
+    let userId = localStorage.getItem('eventchain_user_id');
+    if (!userId) {
+      userId = uuidv4();
+      localStorage.setItem('eventchain_user_id', userId);
+    }
+
+    const payload = JSON.stringify({
+      user_id: userId,
+      event_type: 'button_click',
+      event_name: 'create_event_button_click',
+      event_data: {
+        button_location: 'new_event_page',
+        timestamp: new Date().toISOString(),
+        event_title: formData.title,
+        event_venue: formData.venue,
+        ticket_price: formData.ticketPrice,
+        max_tickets: formData.maxTickets,
+        has_single_category: hasSingleCategory,
+      },
+      page_url: window.location.pathname,
+      user_agent: navigator.userAgent,
+    });
+
+    // Use sendBeacon for reliable tracking
+    if (navigator.sendBeacon) {
+      const blob = new Blob([payload], { type: 'application/json' });
+      const success = navigator.sendBeacon(API_ENDPOINTS.ADD_EVENT, blob);
+      if (success) {
+        console.log('Create event submission tracked successfully');
+      } else {
+        console.error('Failed to track create event submission');
+      }
+    } else {
+      // Fallback for browsers that don't support sendBeacon
+      fetch(API_ENDPOINTS.ADD_EVENT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: payload,
+        keepalive: true,
+      }).catch(error => {
+        console.error('Error tracking create event submission:', error);
+      });
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -226,6 +277,9 @@ const NewEventPage = () => {
       alert(validation.error);
       return;
     }
+
+    // Track the create event submission
+    trackCreateEventSubmit();
 
     const {
       title,
