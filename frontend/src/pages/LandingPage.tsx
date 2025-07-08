@@ -21,7 +21,7 @@ import API_ENDPOINTS from "../config/api.config.ts";
 
 const trackPageView = async (userId: string, eventData: any = {}) => {
   try {
-    const response = await fetch(API_ENDPOINTS.ADD_EVENT, {
+    const response = await fetch(API_ENDPOINTS.ADD_USER, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
