@@ -25,6 +25,9 @@ contract EventContract is Ownable, ReentrancyGuard, Initializable {
     uint256 public eventEndTime;
     string public venue;
     
+    // Event edit permission - set once during initialization
+    bool public isEventEditAllowed;
+    
     // Associated NFT contract
     address public nftContract;
     
@@ -108,13 +111,19 @@ contract EventContract is Ownable, ReentrancyGuard, Initializable {
         uint256 _eventEndTime,
         string memory _venue,
         uint256 _eventId,
-        address _factory
+        address _factory,
+        bool _isEventEditAllowed,
+        uint256 _salesStartTime
     ) external initializer {
         require(bytes(_eventTitle).length > 0, "Empty title");
         require(_organizer != address(0), "Invalid organizer");
         require(_eventStartTime > block.timestamp, "Past event");
         require(_eventEndTime > _eventStartTime, "Invalid times");
         require(_factory != address(0), "Invalid factory");
+        
+        if (_salesStartTime != 0) {
+            require(_salesStartTime <= _eventStartTime, "Sales can't start after event");
+        }
         
         _transferOwnership(_organizer);
         
@@ -132,8 +141,9 @@ contract EventContract is Ownable, ReentrancyGuard, Initializable {
         venue = _venue;
         eventId = _eventId;
         factory = _factory;
+        isEventEditAllowed = _isEventEditAllowed;
         
-        salesStartTime = block.timestamp;
+        salesStartTime = _salesStartTime == 0 ? block.timestamp : _salesStartTime;
         salesEndTime = _eventStartTime;
         maxTicketsPerWallet = 10;
     }
@@ -144,7 +154,6 @@ contract EventContract is Ownable, ReentrancyGuard, Initializable {
         nftContract = _nftContract;
     }
     
-    // State-changing functions
     function purchaseSingleTicket(address buyer, uint256 quantity) external payable onlyActiveEvent onlyDuringSales nonReentrant {
         require(msg.sender == nftContract, "Only NFT contract");
         require(buyer != address(0), "Invalid buyer address");
@@ -421,16 +430,30 @@ contract EventContract is Ownable, ReentrancyGuard, Initializable {
     }
     
     function updateEventDetails(
+        string memory _eventTitle,
         string memory _description,
+        uint256 _ticketPrice,
+        uint256 _maxTickets,
         string memory _eventURI,
-        string memory _venue,
         uint256 _eventStartTime,
-        uint256 _eventEndTime
+        uint256 _eventEndTime,
+        string memory _venue
     ) external onlyOrganizer {
+        require(isEventEditAllowed, "Event editing not allowed");
+        require(bytes(_eventTitle).length > 0, "Empty title");
         require(_eventEndTime > _eventStartTime, "Invalid times");
         require(_eventStartTime > block.timestamp, "Past start time");
         
+        // If maxTickets is being reduced, ensure it's not below current sales
+        if (_maxTickets > 0 && _maxTickets < ticketsSold) {
+            revert("Max tickets below sold count");
+        }
+        
+        eventTitle = _eventTitle;
         eventDescription = _description;
+        ticketPrice = _ticketPrice;
+        maxTickets = _maxTickets;
+        emit MaxTicketsSet(maxTickets, _maxTickets);
         eventURI = _eventURI;
         venue = _venue;
         eventStartTime = _eventStartTime;
