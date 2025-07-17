@@ -18,6 +18,7 @@ import {
   Star,
 } from 'lucide-react';
 import API_ENDPOINTS from "../config/api.config.ts";
+import { colors } from "../config/global.themes.ts";
 
 const trackPageView = async (userId: string, eventData: any = {}) => {
   try {
@@ -259,7 +260,10 @@ const LandingPage = () => {
       className="absolute top-20 right-10 animate-bounce"
       style={{ animationDelay: '0s' }}
     >
-      <div className="w-12 h-8 bg-[#e43636] rounded-lg border-3 border-white shadow-lg transform rotate-12">
+      <div 
+        className="w-12 h-8 rounded-lg border-3 border-white shadow-lg transform rotate-12"
+        style={{ backgroundColor: colors.primary }}
+      >
         <div className="w-full h-full flex items-center justify-center">
           <Ticket className="w-4 h-4 text-white" />
         </div>
@@ -272,7 +276,10 @@ const LandingPage = () => {
       className="absolute top-1/3 left-5 animate-bounce"
       style={{ animationDelay: '1s' }}
     >
-      <div className="w-10 h-6 bg-[#e43636] rounded-lg border-3 border-white shadow-lg transform -rotate-12">
+      <div 
+        className="w-10 h-6 rounded-lg border-3 border-white shadow-lg transform -rotate-12"
+        style={{ backgroundColor: colors.primary }}
+      >
         <div className="w-full h-full flex items-center justify-center">
           <Ticket className="w-3 h-3 text-white" />
         </div>
@@ -285,10 +292,16 @@ const LandingPage = () => {
       className="absolute top-1/4 right-1/4 animate-pulse"
       style={{ animationDelay: '0.5s' }}
     >
-      <div className="w-16 h-16 bg-[#e43636] rounded-full border-4 border-white shadow-lg flex items-center justify-center">
+      <div 
+        className="w-16 h-16 rounded-full border-4 border-white shadow-lg flex items-center justify-center"
+        style={{ backgroundColor: colors.primary }}
+      >
         <Music className="w-6 h-6 text-white" />
       </div>
-      <div className="absolute -top-1 -right-1 w-4 h-4 bg-white rounded-full border-2 border-[#e43636] animate-ping"></div>
+      <div 
+        className="absolute -top-1 -right-1 w-4 h-4 bg-white rounded-full border-2 animate-ping"
+        style={{ borderColor: colors.primary }}
+      ></div>
     </div>
   );
 
@@ -297,7 +310,10 @@ const LandingPage = () => {
       className="absolute bottom-1/3 left-1/4 animate-pulse"
       style={{ animationDelay: '2s' }}
     >
-      <div className="w-14 h-14 bg-[#e43636] rounded-full border-4 border-white shadow-lg flex items-center justify-center">
+      <div 
+        className="w-14 h-14 rounded-full border-4 border-white shadow-lg flex items-center justify-center"
+        style={{ backgroundColor: colors.primary }}
+      >
         <Star className="w-5 h-5 text-white" />
       </div>
     </div>
@@ -308,8 +324,11 @@ const LandingPage = () => {
       {[0, 1].map((i) => (
         <div
           key={i}
-          className="w-8 h-8 bg-[#e43636] rounded-full border-3 border-white shadow-lg animate-bounce flex items-center justify-center"
-          style={{ animationDelay: `${i * 0.3}s` }}
+          className="w-8 h-8 rounded-full border-3 border-white shadow-lg animate-bounce flex items-center justify-center"
+          style={{ 
+            animationDelay: `${i * 0.3}s`,
+            backgroundColor: colors.primary
+          }}
         >
           <Heart className="w-4 h-4 text-white" />
         </div>
@@ -322,8 +341,11 @@ const LandingPage = () => {
       {[0, 1, 2].map((i) => (
         <div
           key={i}
-          className="w-6 h-6 bg-[#e43636] rounded-full border-2 border-white shadow-lg animate-bounce flex items-center justify-center"
-          style={{ animationDelay: `${1 + i * 0.2}s` }}
+          className="w-6 h-6 rounded-full border-2 border-white shadow-lg animate-bounce flex items-center justify-center"
+          style={{ 
+            animationDelay: `${1 + i * 0.2}s`,
+            backgroundColor: colors.primary
+          }}
         >
           <Users className="w-3 h-3 text-white" />
         </div>
@@ -334,26 +356,38 @@ const LandingPage = () => {
   const FloatingElements = () => (
     <>
       <div
-        className="absolute top-32 left-1/3 w-3 h-3 bg-[#e43636] rounded-full border-2 border-white animate-ping"
-        style={{ animationDelay: '0s' }}
+        className="absolute top-32 left-1/3 w-3 h-3 rounded-full border-2 border-white animate-ping"
+        style={{ 
+          animationDelay: '0s',
+          backgroundColor: colors.primary
+        }}
       ></div>
       <div
-        className="absolute top-2/3 right-1/2 w-4 h-4 bg-[#e43636] rounded-full border-2 border-white animate-pulse"
-        style={{ animationDelay: '1.5s' }}
+        className="absolute top-2/3 right-1/2 w-4 h-4 rounded-full border-2 border-white animate-pulse"
+        style={{ 
+          animationDelay: '1.5s',
+          backgroundColor: colors.primary
+        }}
       ></div>
       <div
-        className="absolute bottom-1/4 left-1/2 w-2 h-2 bg-white rounded-full animate-bounce"
-        style={{ animationDelay: '2.5s' }}
+        className="absolute bottom-1/4 left-1/2 w-2 h-2 rounded-full animate-bounce"
+        style={{ 
+          animationDelay: '2.5s',
+          backgroundColor: colors.accent
+        }}
       ></div>
       <div
-        className="absolute top-3/4 left-10 w-3 h-3 bg-white rounded-full animate-ping"
-        style={{ animationDelay: '3s' }}
+        className="absolute top-3/4 left-10 w-3 h-3 rounded-full animate-ping"
+        style={{ 
+          animationDelay: '3s',
+          backgroundColor: colors.accent
+        }}
       ></div>
     </>
   );
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-hidden relative">
+    <div className="min-h-screen bg-zinc-900 text-white overflow-hidden relative">
       {/* Distributed Animations */}
       <TicketAnimation1 />
       <TicketAnimation2 />
@@ -364,19 +398,25 @@ const LandingPage = () => {
       <FloatingElements />
 
       {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-lg border-b border-white/10">
+      <nav className="fixed top-0 w-full z-50 bg-zinc-900/80 backdrop-blur-lg border-b border-white/10">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-2">
-            {/*<div className="w-8 h-8 bg-[#e43636] rounded-lg flex items-center justify-center border-2 border-white">*/}
+            {/*<div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center border-2 border-white">*/}
             {/*    <Calendar className="w-5 h-5 text-white" />*/}
             {/*</div>*/}
-            <span className="text-3xl font-bold text-[#e43636]">
+            <span 
+              className="text-3xl font-bold"
+              style={{ color: colors.primary }}
+            >
               eventChain
             </span>
           </div>
           <button
             onClick={handleLaunchAppClick}
-            className="bg-[#e43636] hover:bg-[#e43636]/90 px-6 py-2 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 border-2 border-white text-white"
+            className="px-6 py-2 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 border-2 border-white text-white"
+            style={{ backgroundColor: colors.primary }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.primaryHover}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = colors.primary}
           >
             Launch App
           </button>
@@ -389,12 +429,15 @@ const LandingPage = () => {
           <FloatingCard>
             <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white leading-tight">
               Events
-              <span className="block text-[#e43636]">Reimagined</span>
+              <span 
+                className="block"
+                style={{ color: colors.primary }}
+              >Reimagined</span>
             </h1>
           </FloatingCard>
 
           <FloatingCard delay={200}>
-            <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl md:text-2xl text-zinc-300 mb-8 max-w-3xl mx-auto leading-relaxed">
               The first blockchain-powered event platform where transparency
               meets innovation. Create, discover, and attend events with NFT
               tickets that unlock a new world of possibilities.
@@ -405,13 +448,28 @@ const LandingPage = () => {
             <div className="flex flex-col sm:flex-row justify-center gap-4 mb-16">
               <button
                 onClick={handleGetStartedClick}
-                className="bg-[#e43636] hover:bg-[#e43636]/90 px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 transform hover:scale-105 border-2 border-white text-white flex items-center justify-center gap-2"
+                className="px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 transform hover:scale-105 border-2 border-white text-white flex items-center justify-center gap-2"
+                style={{ backgroundColor: colors.primary }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.primaryHover}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = colors.primary}
               >
                 Get Started <ChevronRight className="w-5 h-5" />
               </button>
               <button 
                 onClick={handleWatchDemoClick}
-                className="border-2 border-[#e43636] text-[#e43636] hover:bg-[#e43636] hover:text-white px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 transform hover:scale-105"
+                className="px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 transform hover:scale-105 border-2"
+                style={{ 
+                  borderColor: colors.primary,
+                  color: colors.primary
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = colors.primary
+                  e.currentTarget.style.color = 'white'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent'
+                  e.currentTarget.style.color = colors.primary
+                }}
               >
                 Watch Demo
               </button>
@@ -421,13 +479,13 @@ const LandingPage = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-20 px-6 bg-gradient-to-b from-black to-gray-900">
+      <section className="py-20 px-6 bg-gradient-to-b from-zinc-900 to-zinc-800">
         <div className="max-w-7xl mx-auto">
           <FloatingCard delay={1200}>
             <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 text-white">
-              How <span className="text-[#e43636]">eventChain</span> Works
+              How <span style={{ color: colors.primary }}>eventChain</span> Works
             </h2>
-            <p className="text-xl text-gray-400 text-center mb-16 max-w-3xl mx-auto">
+            <p className="text-xl text-zinc-400 text-center mb-16 max-w-3xl mx-auto">
               Getting started is easier than ordering pizza! Here's how you can create or attend events in just 4 simple steps.
             </p>
           </FloatingCard>
@@ -438,13 +496,16 @@ const LandingPage = () => {
               <FloatingCard delay={1400}>
                 <div className="flex items-start space-x-6">
                   <div className="flex-shrink-0">
-                    <div className="w-16 h-16 bg-[#e43636] rounded-full border-4 border-white shadow-lg flex items-center justify-center">
+                    <div 
+                      className="w-16 h-16 rounded-full border-4 border-white shadow-lg flex items-center justify-center"
+                      style={{ backgroundColor: colors.primary }}
+                    >
                       <span className="text-2xl font-bold text-white">1</span>
                     </div>
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold text-white mb-3">Create Your Event</h3>
-                    <p className="text-gray-300 text-lg leading-relaxed">
+                    <p className="text-zinc-300 text-lg leading-relaxed">
                       Event organizers use our platform to create and list their events, just like Ticketmaster or Eventbrite.
                       The difference? Everything is stored on the blockchain, so ticket sales, event details, and attendance records
                       are completely transparent and can never be manipulated or hidden.
@@ -456,13 +517,16 @@ const LandingPage = () => {
               <FloatingCard delay={1600}>
                 <div className="flex items-start space-x-6">
                   <div className="flex-shrink-0">
-                    <div className="w-16 h-16 bg-[#e43636] rounded-full border-4 border-white shadow-lg flex items-center justify-center">
+                    <div 
+                      className="w-16 h-16 rounded-full border-4 border-white shadow-lg flex items-center justify-center"
+                      style={{ backgroundColor: colors.primary }}
+                    >
                       <span className="text-2xl font-bold text-white">2</span>
                     </div>
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold text-white mb-3">Buy Your NFT Ticket</h3>
-                    <p className="text-gray-300 text-lg leading-relaxed">
+                    <p className="text-zinc-300 text-lg leading-relaxed">
                       Instead of regular tickets, you buy special digital tickets called NFTs.
                       It's like buying a concert ticket, but this one lives in your digital wallet and proves you own it - no one can steal or copy it!
                     </p>
@@ -475,33 +539,60 @@ const LandingPage = () => {
             <div className="relative h-96 flex items-center justify-center">
               <div className="absolute inset-0">
                 {/* Blockchain Background */}
-                <div className="absolute inset-0 bg-gradient-to-br from-[#e43636]/20 to-transparent rounded-3xl border border-[#e43636]/30"></div>
+                <div 
+                  className="absolute inset-0 rounded-3xl border"
+                  style={{ 
+                    background: `linear-gradient(to bottom right, ${colors.primary}33, transparent)`,
+                    borderColor: `${colors.primary}4D`
+                  }}
+                ></div>
 
                 {/* Step 1 Animation - Event Creation */}
                 <div className="absolute top-8 left-8 animate-pulse">
-                  <div className="w-20 h-20 bg-[#e43636] rounded-2xl border-4 border-white shadow-lg flex items-center justify-center">
+                  <div 
+                    className="w-20 h-20 rounded-2xl border-4 border-white shadow-lg flex items-center justify-center"
+                    style={{ backgroundColor: colors.primary }}
+                  >
                     <Calendar className="w-8 h-8 text-white" />
                   </div>
-                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-white rounded-full border-2 border-[#e43636] animate-ping"></div>
+                  <div 
+                    className="absolute -top-2 -right-2 w-6 h-6 bg-white rounded-full border-2 animate-ping"
+                    style={{ borderColor: colors.primary }}
+                  ></div>
                 </div>
 
                 {/* Arrow */}
                 <div className="absolute top-20 left-32 animate-bounce" style={{ animationDelay: '0.5s' }}>
-                  <ChevronRight className="w-8 h-8 text-[#e43636]" />
+                  <ChevronRight className="w-8 h-8" style={{ color: colors.primary }} />
                 </div>
 
                 {/* Step 2 Animation - NFT Ticket */}
                 <div className="absolute top-8 right-8 animate-bounce" style={{ animationDelay: '1s' }}>
-                  <div className="w-20 h-14 bg-gradient-to-r from-[#e43636] to-red-500 rounded-lg border-4 border-white shadow-lg flex items-center justify-center transform rotate-6">
+                  <div 
+                    className="w-20 h-14 rounded-lg border-4 border-white shadow-lg flex items-center justify-center transform rotate-6"
+                    style={{ 
+                      background: `linear-gradient(to right, ${colors.primary}, ${colors.primaryHover})`
+                    }}
+                  >
                     <Ticket className="w-8 h-8 text-white" />
                   </div>
-                  <div className="absolute -bottom-1 -left-1 w-4 h-4 bg-yellow-400 rounded-full animate-pulse"></div>
+                  <div 
+                    className="absolute -bottom-1 -left-1 w-4 h-4 rounded-full animate-pulse"
+                    style={{ backgroundColor: colors.accent }}
+                  ></div>
                 </div>
 
                 {/* Floating Elements */}
-                <div className="absolute bottom-12 left-12 w-12 h-12 bg-[#e43636]/30 rounded-full border-2 border-[#e43636] animate-pulse" style={{ animationDelay: '2s' }}>
+                <div 
+                  className="absolute bottom-12 left-12 w-12 h-12 rounded-full border-2 animate-pulse" 
+                  style={{ 
+                    animationDelay: '2s',
+                    backgroundColor: `${colors.primary}30`,
+                    borderColor: colors.primary
+                  }}
+                >
                   <div className="w-full h-full flex items-center justify-center">
-                    <Shield className="w-6 h-6 text-[#e43636]" />
+                    <Shield className="w-6 h-6" style={{ color: colors.primary }} />
                   </div>
                 </div>
               </div>
@@ -513,7 +604,13 @@ const LandingPage = () => {
             <div className="relative h-96 flex items-center justify-center order-2 lg:order-1">
               <div className="absolute inset-0">
                 {/* Background */}
-                <div className="absolute inset-0 bg-gradient-to-bl from-[#e43636]/20 to-transparent rounded-3xl border border-[#e43636]/30"></div>
+                <div 
+                  className="absolute inset-0 rounded-3xl border"
+                  style={{ 
+                    background: `linear-gradient(to bottom left, ${colors.primary}33, transparent)`,
+                    borderColor: `${colors.primary}4D`
+                  }}
+                ></div>
 
                 {/* Step 3 Animation - Phone with QR */}
                 <div className="absolute top-8 left-8">
@@ -533,22 +630,31 @@ const LandingPage = () => {
 
                 {/* Arrow */}
                 <div className="absolute top-32 left-28 animate-bounce" style={{ animationDelay: '0.5s' }}>
-                  <ChevronRight className="w-8 h-8 text-[#e43636]" />
+                  <ChevronRight className="w-8 h-8" style={{ color: colors.primary }} />
                 </div>
 
                 {/* Step 4 Animation - Scanner */}
                 <div className="absolute top-8 right-8 animate-pulse" style={{ animationDelay: '1s' }}>
                   <div className="w-20 h-16 bg-gray-800 rounded-lg border-4 border-white shadow-lg relative">
-                    <div className="absolute top-2 left-2 right-2 h-1 bg-[#e43636] animate-pulse"></div>
+                    <div 
+                      className="absolute top-2 left-2 right-2 h-1 animate-pulse"
+                      style={{ backgroundColor: colors.primary }}
+                    ></div>
                     <div className="w-full h-full flex items-center justify-center">
-                      <div className="w-8 h-8 border-2 border-[#e43636] rounded animate-spin"></div>
+                      <div 
+                        className="w-8 h-8 border-2 rounded animate-spin"
+                        style={{ borderColor: colors.primary }}
+                      ></div>
                     </div>
                   </div>
                 </div>
 
                 {/* Success Checkmark */}
                 <div className="absolute bottom-8 right-12 animate-bounce" style={{ animationDelay: '2s' }}>
-                  <div className="w-12 h-12 bg-green-500 rounded-full border-4 border-white shadow-lg flex items-center justify-center">
+                  <div 
+                    className="w-12 h-12 rounded-full border-4 border-white shadow-lg flex items-center justify-center"
+                    style={{ backgroundColor: colors.accent }}
+                  >
                     <div className="w-6 h-6 border-b-2 border-r-2 border-white transform rotate-45 translate-x-0.5 -translate-y-0.5"></div>
                   </div>
                 </div>
@@ -560,7 +666,10 @@ const LandingPage = () => {
               <FloatingCard delay={1800}>
                 <div className="flex items-start space-x-6">
                   <div className="flex-shrink-0">
-                    <div className="w-16 h-16 bg-[#e43636] rounded-full border-4 border-white shadow-lg flex items-center justify-center">
+                    <div 
+                      className="w-16 h-16 rounded-full border-4 border-white shadow-lg flex items-center justify-center"
+                      style={{ backgroundColor: colors.primary }}
+                    >
                       <span className="text-2xl font-bold text-white">3</span>
                     </div>
                   </div>
@@ -577,7 +686,10 @@ const LandingPage = () => {
               <FloatingCard delay={2000}>
                 <div className="flex items-start space-x-6">
                   <div className="flex-shrink-0">
-                    <div className="w-16 h-16 bg-[#e43636] rounded-full border-4 border-white shadow-lg flex items-center justify-center">
+                    <div 
+                      className="w-16 h-16 rounded-full border-4 border-white shadow-lg flex items-center justify-center"
+                      style={{ backgroundColor: colors.primary }}
+                    >
                       <span className="text-2xl font-bold text-white">4</span>
                     </div>
                   </div>
@@ -595,7 +707,13 @@ const LandingPage = () => {
 
           {/* Bottom CTA */}
           <FloatingCard delay={2200}>
-            <div className="text-center mt-16 p-8 bg-[#e43636]/10 rounded-3xl border border-[#e43636]/30">
+            <div 
+              className="text-center mt-16 p-8 rounded-3xl border"
+              style={{ 
+                backgroundColor: `${colors.primary}1A`,
+                borderColor: `${colors.primary}4D`
+              }}
+            >
               <h3 className="text-2xl font-bold text-white mb-4">
                 That's It! Simple as 1-2-3-4 🎉
               </h3>
@@ -604,7 +722,12 @@ const LandingPage = () => {
               </p>
               <button
                   onClick={handleTryItNowClick}
-                  className="bg-[#e43636] hover:bg-[#e43636]/90 px-8 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 border-2 border-white text-white"
+                  className="px-8 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 border-2 border-white text-white"
+                  style={{ 
+                    backgroundColor: colors.primary,
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.primaryHover}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = colors.primary}
               >
                 Try It Now - It's Free!
               </button>
@@ -614,30 +737,48 @@ const LandingPage = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-20 px-6 bg-[#e43636]/10 border-y border-[#e43636]/20">
+      <section 
+        className="py-20 px-6 border-y"
+        style={{ 
+          backgroundColor: `${colors.primary}1A`,
+          borderColor: `${colors.primary}33`
+        }}
+      >
         <div className="max-w-7xl mx-auto">
           <FloatingCard delay={1400}>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
               <div>
-                <div className="text-4xl md:text-5xl font-bold text-[#e43636] mb-2">
+                <div 
+                  className="text-4xl md:text-5xl font-bold mb-2"
+                  style={{ color: colors.primary }}
+                >
                   100%
                 </div>
                 <div className="text-white">Transparent</div>
               </div>
               <div>
-                <div className="text-4xl md:text-5xl font-bold text-[#e43636] mb-2">
+                <div 
+                  className="text-4xl md:text-5xl font-bold mb-2"
+                  style={{ color: colors.primary }}
+                >
                   0%
                 </div>
                 <div className="text-white">Hidden Fees</div>
               </div>
               <div>
-                <div className="text-4xl md:text-5xl font-bold text-[#e43636] mb-2">
+                <div 
+                  className="text-4xl md:text-5xl font-bold mb-2"
+                  style={{ color: colors.primary }}
+                >
                   ∞
                 </div>
                 <div className="text-white">Scalability</div>
               </div>
               <div>
-                <div className="text-4xl md:text-5xl font-bold text-[#e43636] mb-2">
+                <div 
+                  className="text-4xl md:text-5xl font-bold mb-2"
+                  style={{ color: colors.primary }}
+                >
                   24/7
                 </div>
                 <div className="text-white">Global Access</div>
@@ -652,7 +793,7 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto">
           <FloatingCard delay={600}>
             <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 text-white">
-              Why Choose <span className="text-[#e43636]">eventChain</span>?
+              Why Choose <span style={{ color: colors.primary }}>eventChain</span>?
             </h2>
             <p className="text-xl text-gray-400 text-center mb-16 max-w-3xl mx-auto">
               Powered by blockchain technology, we're revolutionizing how events
@@ -664,18 +805,42 @@ const LandingPage = () => {
             {features.map((feature, index) => (
               <FloatingCard key={index} delay={800 + index * 100}>
                 <div
-                  className={`p-8 rounded-2xl backdrop-blur-sm border transition-all duration-500 transform hover:scale-105 ${
-                    currentFeature === index
-                      ? 'bg-[#e43636]/20 border-[#e43636] shadow-lg shadow-[#e43636]/20'
-                      : 'bg-white/5 border-white/20 hover:border-[#e43636]/50'
-                  }`}
+                  className="p-8 rounded-2xl backdrop-blur-sm border transition-all duration-500 transform hover:scale-105"
+                  style={{
+                    backgroundColor: currentFeature === index 
+                      ? `${colors.primary}33` 
+                      : 'rgba(255, 255, 255, 0.05)',
+                    borderColor: currentFeature === index 
+                      ? colors.primary 
+                      : 'rgba(255, 255, 255, 0.2)',
+                    boxShadow: currentFeature === index 
+                      ? `0 25px 50px -12px ${colors.primary}33` 
+                      : 'none'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (currentFeature !== index) {
+                      e.currentTarget.style.borderColor = `${colors.primary}80`
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (currentFeature !== index) {
+                      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)'
+                    }
+                  }}
                 >
                   <div
-                    className={`inline-flex p-3 rounded-xl mb-4 transition-colors duration-500 border-2 ${
-                      currentFeature === index
-                        ? 'bg-[#e43636] text-white border-white'
-                        : 'bg-white/10 text-gray-300 border-white/20'
-                    }`}
+                    className="inline-flex p-3 rounded-xl mb-4 transition-colors duration-500 border-2"
+                    style={{
+                      backgroundColor: currentFeature === index 
+                        ? colors.primary 
+                        : 'rgba(255, 255, 255, 0.1)',
+                      color: currentFeature === index 
+                        ? 'white' 
+                        : 'rgb(209, 213, 219)',
+                      borderColor: currentFeature === index 
+                        ? 'white' 
+                        : 'rgba(255, 255, 255, 0.2)'
+                    }}
                   >
                     {feature.icon}
                   </div>
@@ -693,30 +858,48 @@ const LandingPage = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-20 px-6 bg-[#e43636]/10 border-y border-[#e43636]/20">
+      <section 
+        className="py-20 px-6 border-y"
+        style={{ 
+          backgroundColor: `${colors.primary}1A`,
+          borderColor: `${colors.primary}33`
+        }}
+      >
         <div className="max-w-7xl mx-auto">
           <FloatingCard delay={1400}>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
               <div>
-                <div className="text-4xl md:text-5xl font-bold text-[#e43636] mb-2">
+                <div 
+                  className="text-4xl md:text-5xl font-bold mb-2"
+                  style={{ color: colors.primary }}
+                >
                   100%
                 </div>
                 <div className="text-white">Transparent</div>
               </div>
               <div>
-                <div className="text-4xl md:text-5xl font-bold text-[#e43636] mb-2">
+                <div 
+                  className="text-4xl md:text-5xl font-bold mb-2"
+                  style={{ color: colors.primary }}
+                >
                   0%
                 </div>
                 <div className="text-white">Hidden Fees</div>
               </div>
               <div>
-                <div className="text-4xl md:text-5xl font-bold text-[#e43636] mb-2">
+                <div 
+                  className="text-4xl md:text-5xl font-bold mb-2"
+                  style={{ color: colors.primary }}
+                >
                   ∞
                 </div>
                 <div className="text-white">Scalability</div>
               </div>
               <div>
-                <div className="text-4xl md:text-5xl font-bold text-[#e43636] mb-2">
+                <div 
+                  className="text-4xl md:text-5xl font-bold mb-2"
+                  style={{ color: colors.primary }}
+                >
                   24/7
                 </div>
                 <div className="text-white">Global Access</div>
@@ -732,7 +915,7 @@ const LandingPage = () => {
           <FloatingCard delay={1600}>
             <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
               Ready to Join the{' '}
-              <span className="text-[#e43636]">Revolution</span>?
+              <span style={{ color: colors.primary }}>Revolution</span>?
             </h2>
             <p className="text-xl text-gray-300 mb-8">
               Be part of the future of events. Create, discover, and experience
@@ -740,7 +923,10 @@ const LandingPage = () => {
             </p>
             <button
               onClick={handleFinalLaunchClick}
-              className="bg-[#e43636] hover:bg-[#e43636]/90 px-12 py-4 rounded-full font-semibold text-xl transition-all duration-300 transform hover:scale-110 border-2 border-white text-white"
+              className="px-12 py-4 rounded-full font-semibold text-xl transition-all duration-300 transform hover:scale-110 border-2 border-white text-white"
+              style={{ backgroundColor: colors.primary }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.primaryHover}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = colors.primary}
             >
               Launch eventChain
             </button>

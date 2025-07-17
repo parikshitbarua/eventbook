@@ -10,6 +10,7 @@ import EventTicketNFTABI from '../contracts/EventTicketNFT.sol/EventTicketNFT.js
 import { fetchFirstImageFromIPFS } from '../utils/ipfs-helper.util';
 import { EventDetailsResponseData } from '../types/event.types.ts';
 import { useTheme } from '../hooks/theme.hook.ts';
+import { colors } from '../config/global.themes';
 import { FACTORY_ADDRESS, NETWORK_URL, SECONDARY_MARKET_LINK } from "../config/app.config.ts";
 
 interface EventMetadata {
@@ -261,10 +262,11 @@ const EventDetailsPage = () => {
       >
         <div className="text-center">
           <svg
-            className="animate-spin h-12 w-12 text-red-600 mx-auto mb-4"
+            className="animate-spin h-12 w-12 mx-auto mb-4"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
+            style={{ color: colors.primary }}
           >
             <circle
               className="opacity-25"
@@ -329,7 +331,10 @@ const EventDetailsPage = () => {
           </p>
           <button
             onClick={() => navigate('/')}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            className="px-4 py-2 text-white rounded-lg transition-colors"
+            style={{ backgroundColor: colors.primary }}
+            onMouseEnter={(e) => (e.target as HTMLButtonElement).style.backgroundColor = colors.primaryHover}
+            onMouseLeave={(e) => (e.target as HTMLButtonElement).style.backgroundColor = colors.primary}
           >
             Back to Events
           </button>
@@ -360,7 +365,10 @@ const EventDetailsPage = () => {
           <div className="container mx-auto px-6 pb-12">
             <div className="text-white">
               <div className="flex items-center mb-4">
-                <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold mr-4">
+                <span 
+                  className="text-white px-3 py-1 rounded-full text-sm font-semibold mr-4"
+                  style={{ backgroundColor: colors.primary }}
+                >
                   Live Event
                 </span>
                 <span className="text-sm opacity-75">
@@ -437,7 +445,11 @@ const EventDetailsPage = () => {
                   {eventMetadata.tags.map((tag, index) => (
                     <span
                       key={index}
-                      className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium"
+                      className="px-3 py-1 rounded-full text-sm font-medium"
+                      style={{ 
+                        backgroundColor: `${colors.primary}20`, 
+                        color: colors.primary 
+                      }}
                     >
                       #{tag}
                     </span>
@@ -461,7 +473,10 @@ const EventDetailsPage = () => {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-red-600 mb-2">
+                  <div 
+                    className="text-3xl font-bold mb-2"
+                    style={{ color: colors.primary }}
+                  >
                     {eventStats.totalCapacity.toLocaleString()}
                   </div>
                   <p
@@ -528,14 +543,16 @@ const EventDetailsPage = () => {
                   {eventMetadata?.ageRestriction && (
                     <div className="flex items-start">
                       <div
-                        className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center mr-3 mt-0.5 transition-colors ${
-                          isDark ? 'bg-red-900/50' : 'bg-red-100'
-                        }`}
+                        className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center mr-3 mt-0.5 transition-colors`}
+                        style={{ 
+                          backgroundColor: isDark ? `${colors.primary}30` : `${colors.primary}20` 
+                        }}
                       >
                         <svg
-                          className="w-3 h-3 text-red-600"
+                          className="w-3 h-3"
                           fill="currentColor"
                           viewBox="0 0 20 20"
+                          style={{ color: colors.primary }}
                         >
                           <path
                             fillRule="evenodd"
@@ -566,14 +583,16 @@ const EventDetailsPage = () => {
                   {eventMetadata?.dresscode && (
                     <div className="flex items-start">
                       <div
-                        className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center mr-3 mt-0.5 transition-colors ${
-                          isDark ? 'bg-red-900/50' : 'bg-red-100'
-                        }`}
+                        className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center mr-3 mt-0.5 transition-colors`}
+                        style={{ 
+                          backgroundColor: isDark ? `${colors.primary}30` : `${colors.primary}20` 
+                        }}
                       >
                         <svg
-                          className="w-3 h-3 text-red-600"
+                          className="w-3 h-3"
                           fill="currentColor"
                           viewBox="0 0 20 20"
+                          style={{ color: colors.primary }}
                         >
                           <path
                             fillRule="evenodd"
@@ -604,14 +623,16 @@ const EventDetailsPage = () => {
                   {eventMetadata?.amenities && (
                     <div className="flex items-start">
                       <div
-                        className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center mr-3 mt-0.5 transition-colors ${
-                          isDark ? 'bg-red-900/50' : 'bg-red-100'
-                        }`}
+                        className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center mr-3 mt-0.5 transition-colors`}
+                        style={{ 
+                          backgroundColor: isDark ? `${colors.primary}30` : `${colors.primary}20` 
+                        }}
                       >
                         <svg
-                          className="w-3 h-3 text-red-600"
+                          className="w-3 h-3"
                           fill="currentColor"
                           viewBox="0 0 20 20"
+                          style={{ color: colors.primary }}
                         >
                           <path
                             fillRule="evenodd"
@@ -659,7 +680,10 @@ const EventDetailsPage = () => {
               }`}
             >
               <div className="text-center mb-6">
-                <div className="text-3xl font-bold text-red-600 mb-2">
+                <div 
+                  className="text-3xl font-bold mb-2"
+                  style={{ color: colors.primary }}
+                >
                   {event.ticketPrice ? Number(event.ticketPrice) / 1e18 : 0} ETH
                 </div>
                 <p
@@ -679,8 +703,19 @@ const EventDetailsPage = () => {
                     ? isDark
                       ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-red-600 text-white hover:bg-red-700'
+                    : 'text-white'
                 }`}
+                style={eventStats.availableTickets === 0 ? {} : { backgroundColor: colors.primary }}
+                onMouseEnter={(e) => {
+                  if (eventStats.availableTickets > 0) {
+                    (e.target as HTMLButtonElement).style.backgroundColor = colors.primaryHover;
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (eventStats.availableTickets > 0) {
+                    (e.target as HTMLButtonElement).style.backgroundColor = colors.primary;
+                  }
+                }}
               >
                 {eventStats.availableTickets === 0 ? 'Sold Out' : 'Buy Tickets'}
               </button>
@@ -715,9 +750,10 @@ const EventDetailsPage = () => {
               <div className="space-y-4">
                 <div className="flex items-start">
                   <svg
-                    className="w-5 h-5 text-red-600 mr-3 mt-0.5 flex-shrink-0"
+                    className="w-5 h-5 mr-3 mt-0.5 flex-shrink-0"
                     fill="currentColor"
                     viewBox="0 0 20 20"
+                    style={{ color: colors.primary }}
                   >
                     <path
                       fillRule="evenodd"
@@ -746,9 +782,10 @@ const EventDetailsPage = () => {
 
                 <div className="flex items-start">
                   <svg
-                    className="w-5 h-5 text-red-600 mr-3 mt-0.5 flex-shrink-0"
+                    className="w-5 h-5 mr-3 mt-0.5 flex-shrink-0"
                     fill="currentColor"
                     viewBox="0 0 20 20"
+                    style={{ color: colors.primary }}
                   >
                     <path
                       fillRule="evenodd"
@@ -785,9 +822,10 @@ const EventDetailsPage = () => {
 
                 <div className="flex items-start">
                   <svg
-                    className="w-5 h-5 text-red-600 mr-3 mt-0.5 flex-shrink-0"
+                    className="w-5 h-5 mr-3 mt-0.5 flex-shrink-0"
                     fill="currentColor"
                     viewBox="0 0 20 20"
+                    style={{ color: colors.primary }}
                   >
                     <path
                       fillRule="evenodd"
@@ -817,9 +855,10 @@ const EventDetailsPage = () => {
 
                 <div className="flex items-start">
                   <svg
-                    className="w-5 h-5 text-red-600 mr-3 mt-0.5 flex-shrink-0"
+                    className="w-5 h-5 mr-3 mt-0.5 flex-shrink-0"
                     fill="currentColor"
                     viewBox="0 0 20 20"
+                    style={{ color: colors.primary }}
                   >
                     <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -997,10 +1036,11 @@ const EventDetailsPage = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       className={`flex items-center transition-colors ${
-                        isDark
-                          ? 'text-gray-300 hover:text-red-400'
-                          : 'text-gray-600 hover:text-red-600'
+                        isDark ? 'text-gray-300' : 'text-gray-600'
                       }`}
+                      style={{ color: colors.accent }}
+                      onMouseEnter={(e) => (e.target as HTMLAnchorElement).style.color = colors.accentHover}
+                      onMouseLeave={(e) => (e.target as HTMLAnchorElement).style.color = colors.accent}
                     >
                       <svg
                         className="w-5 h-5 mr-3"
@@ -1022,10 +1062,11 @@ const EventDetailsPage = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       className={`flex items-center transition-colors ${
-                        isDark
-                          ? 'text-gray-300 hover:text-red-400'
-                          : 'text-gray-600 hover:text-red-600'
+                        isDark ? 'text-gray-300' : 'text-gray-600'
                       }`}
+                      style={{ color: colors.accent }}
+                      onMouseEnter={(e) => (e.target as HTMLAnchorElement).style.color = colors.accentHover}
+                      onMouseLeave={(e) => (e.target as HTMLAnchorElement).style.color = colors.accent}
                     >
                       <svg
                         className="w-5 h-5 mr-3"
@@ -1043,10 +1084,11 @@ const EventDetailsPage = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       className={`flex items-center transition-colors ${
-                        isDark
-                          ? 'text-gray-300 hover:text-red-400'
-                          : 'text-gray-600 hover:text-red-600'
+                        isDark ? 'text-gray-300' : 'text-gray-600'
                       }`}
+                      style={{ color: colors.accent }}
+                      onMouseEnter={(e) => (e.target as HTMLAnchorElement).style.color = colors.accentHover}
+                      onMouseLeave={(e) => (e.target as HTMLAnchorElement).style.color = colors.accent}
                     >
                       <svg
                         className="w-5 h-5 mr-3"

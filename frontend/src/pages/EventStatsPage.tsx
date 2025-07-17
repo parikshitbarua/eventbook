@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { JsonRpcProvider, Contract, formatEther } from 'ethers';
 import { useTheme } from '../hooks/theme.hook.ts';
+import { colors } from '../config/global.themes';
 import { FACTORY_ADDRESS, NETWORK_URL } from '../config/app.config.ts';
 import EventFactoryABI from '../contracts/EventFactory.sol/EventFactory.json';
 import EventContractABI from '../contracts/EventContract.sol/EventContract.json';
@@ -231,10 +232,11 @@ const EventStatsPage = () => {
       >
         <div className="text-center">
           <svg
-            className="animate-spin h-12 w-12 text-red-600 mx-auto mb-4"
+            className="animate-spin h-12 w-12 mx-auto mb-4"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
+            style={{ color: colors.primary }}
           >
             <circle
               className="opacity-25"
@@ -299,7 +301,10 @@ const EventStatsPage = () => {
           </p>
           <button
             onClick={() => navigate(`/event/${eventId}`)}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            className="px-4 py-2 text-white rounded-lg transition-colors"
+            style={{ backgroundColor: colors.primary }}
+            onMouseEnter={(e) => (e.target as HTMLButtonElement).style.backgroundColor = colors.primaryHover}
+            onMouseLeave={(e) => (e.target as HTMLButtonElement).style.backgroundColor = colors.primary}
           >
             Back to Event
           </button>
@@ -367,7 +372,10 @@ const EventStatsPage = () => {
             }`}
           >
             <div className="text-center">
-              <div className="text-3xl font-bold text-blue-600 mb-2">
+              <div 
+                className="text-3xl font-bold mb-2"
+                style={{ color: colors.primary }}
+              >
                 {eventStats.totalSold.toLocaleString()}
               </div>
               <p
@@ -386,7 +394,10 @@ const EventStatsPage = () => {
             }`}
           >
             <div className="text-center">
-              <div className="text-3xl font-bold text-green-600 mb-2">
+              <div 
+                className="text-3xl font-bold mb-2"
+                style={{ color: colors.accent }}
+              >
                 {formatEthValue(eventStats.totalRevenue)}
               </div>
               <p
@@ -405,7 +416,10 @@ const EventStatsPage = () => {
             }`}
           >
             <div className="text-center">
-              <div className="text-3xl font-bold text-red-600 mb-2">
+              <div 
+                className="text-3xl font-bold mb-2"
+                style={{ color: colors.info }}
+              >
                 {eventStats.availableTickets.toLocaleString()}
               </div>
               <p
@@ -424,7 +438,10 @@ const EventStatsPage = () => {
             }`}
           >
             <div className="text-center">
-              <div className="text-3xl font-bold text-purple-600 mb-2">
+              <div 
+                className="text-3xl font-bold mb-2"
+                style={{ color: colors.primary }}
+              >
                 {((eventStats.totalSold / eventStats.totalCapacity) * 100).toFixed(1)}%
               </div>
               <p

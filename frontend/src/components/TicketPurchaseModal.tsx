@@ -16,6 +16,7 @@ import {
 import { TicketCategory } from '../types/ticket.types.ts';
 import { APP_DOMAIN } from '../config/app.config.ts';
 import { useTheme } from '../hooks/theme.hook.ts';
+import { colors } from '../config/global.themes';
 import LoadingModal from './LoadingModal';
 import { useLoadingModal } from '../hooks/useLoadingModal.hook';
 import { v4 as uuidv4 } from 'uuid';
@@ -690,7 +691,17 @@ const TicketPurchaseModal = ({
                 isDark
                   ? 'border-gray-600 text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed'
                   : 'border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-              } ${quantity <= 0 ? 'opacity-50 cursor-not-allowed' : 'hover:border-red-500'}`}
+              } ${quantity <= 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+              onMouseEnter={(e) => {
+                if (quantity > 0) {
+                  (e.target as HTMLButtonElement).style.borderColor = colors.primary;
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (quantity > 0) {
+                  (e.target as HTMLButtonElement).style.borderColor = '';
+                }
+              }}
             >
               -
             </button>
@@ -722,11 +733,12 @@ const TicketPurchaseModal = ({
                     setQuantity(0);
                   }
                 }}
-                className={`w-20 sm:w-24 px-3 py-3 text-center text-lg font-semibold border-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 ${
+                className={`w-20 sm:w-24 px-3 py-3 text-center text-lg font-semibold border-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200 ${
                   isDark
                     ? 'bg-gray-800 border-gray-600 text-gray-100 placeholder-gray-400'
                     : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
                 }`}
+                style={{ '--tw-ring-color': colors.primary } as React.CSSProperties}
               />
             </div>
             
@@ -740,9 +752,19 @@ const TicketPurchaseModal = ({
               disabled={maxTicketsPerWallet > 0 && currentUserTickets + quantity >= maxTicketsPerWallet}
               className={`w-12 h-12 rounded-full border-2 flex items-center justify-center text-xl font-bold transition-all duration-200 ${
                 isDark
-                  ? 'border-gray-600 text-gray-300 hover:bg-gray-700 hover:border-red-500 disabled:opacity-50 disabled:cursor-not-allowed'
-                  : 'border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-red-500 disabled:opacity-50 disabled:cursor-not-allowed'
+                  ? 'border-gray-600 text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed'
+                  : 'border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
               }`}
+              onMouseEnter={(e) => {
+                if (!(maxTicketsPerWallet > 0 && currentUserTickets + quantity >= maxTicketsPerWallet)) {
+                  (e.target as HTMLButtonElement).style.borderColor = colors.primary;
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!(maxTicketsPerWallet > 0 && currentUserTickets + quantity >= maxTicketsPerWallet)) {
+                  (e.target as HTMLButtonElement).style.borderColor = '';
+                }
+              }}
             >
               +
             </button>
@@ -765,7 +787,10 @@ const TicketPurchaseModal = ({
           >
             Total Price:
           </span>
-          <span className="text-xl sm:text-2xl font-bold text-red-600">
+          <span 
+            className="text-xl sm:text-2xl font-bold"
+            style={{ color: colors.primary }}
+          >
             {getTotalPrice().toFixed(6)} ETH
           </span>
         </div>
@@ -856,7 +881,17 @@ const TicketPurchaseModal = ({
                           isDark
                             ? 'border-gray-600 text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed'
                             : 'border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-                        } ${available === 0 || (selection?.quantity || 0) <= 0 ? 'opacity-50 cursor-not-allowed' : 'hover:border-red-500'}`}
+                        } ${available === 0 || (selection?.quantity || 0) <= 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        onMouseEnter={(e) => {
+                          if (!(available === 0 || (selection?.quantity || 0) <= 0)) {
+                            (e.target as HTMLButtonElement).style.borderColor = colors.primary;
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!(available === 0 || (selection?.quantity || 0) <= 0)) {
+                            (e.target as HTMLButtonElement).style.borderColor = '';
+                          }
+                        }}
                       >
                         -
                       </button>
@@ -889,11 +924,12 @@ const TicketPurchaseModal = ({
                             }
                           }}
                           disabled={available === 0}
-                          className={`w-12 sm:w-16 px-2 py-2 text-center text-sm sm:text-base font-semibold border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors ${
+                          className={`w-12 sm:w-16 px-2 py-2 text-center text-sm sm:text-base font-semibold border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
                             isDark
                               ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400 disabled:bg-gray-800 disabled:text-gray-500'
                               : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 disabled:bg-gray-100 disabled:text-gray-500'
                           }`}
+                          style={{ '--tw-ring-color': colors.primary } as React.CSSProperties}
                         />
                       </div>
                       
@@ -910,7 +946,17 @@ const TicketPurchaseModal = ({
                           isDark
                             ? 'border-gray-600 text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed'
                             : 'border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-                        } ${available === 0 || (selection?.quantity || 0) >= available ? 'opacity-50 cursor-not-allowed' : 'hover:border-red-500'}`}
+                        } ${available === 0 || (selection?.quantity || 0) >= available ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        onMouseEnter={(e) => {
+                          if (!(available === 0 || (selection?.quantity || 0) >= available)) {
+                            (e.target as HTMLButtonElement).style.borderColor = colors.primary;
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!(available === 0 || (selection?.quantity || 0) >= available)) {
+                            (e.target as HTMLButtonElement).style.borderColor = '';
+                          }
+                        }}
                       >
                         +
                       </button>
@@ -991,7 +1037,10 @@ const TicketPurchaseModal = ({
               >
                 Total Price:
               </span>
-              <span className="text-lg sm:text-xl font-bold text-red-600 ml-4">
+              <span 
+                className="text-lg sm:text-xl font-bold ml-4"
+                style={{ color: colors.primary }}
+              >
                 {getTotalPrice().toFixed(6)} ETH
               </span>
             </div>
@@ -1005,10 +1054,11 @@ const TicketPurchaseModal = ({
     <div className="mt-2">
       <div className="flex items-center justify-center py-12">
         <svg
-          className="animate-spin h-8 w-8 text-red-600"
+          className="animate-spin h-8 w-8"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
+          style={{ color: colors.primary }}
         >
           <circle
             className="opacity-25"
@@ -1079,7 +1129,10 @@ const TicketPurchaseModal = ({
         {description.length > 150 && (
           <button
             onClick={() => (window.location.href = `/event/${event.eventId}`)}
-            className="text-red-600 hover:text-red-700 text-sm font-medium underline transition-colors"
+            className="text-sm font-medium underline transition-colors"
+            style={{ color: colors.accent }}
+            onMouseEnter={(e) => (e.target as HTMLButtonElement).style.color = colors.accentHover}
+            onMouseLeave={(e) => (e.target as HTMLButtonElement).style.color = colors.accent}
           >
             View More Details
           </button>
@@ -1248,7 +1301,13 @@ const TicketPurchaseModal = ({
                     </button>
                     <button
                       type="button"
-                      className="inline-flex justify-center rounded-lg border border-transparent bg-red-600 px-4 py-3 sm:py-2 text-sm sm:text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 order-1 sm:order-2"
+                      className="inline-flex justify-center rounded-lg border border-transparent px-4 py-3 sm:py-2 text-sm sm:text-sm font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 order-1 sm:order-2"
+                      style={{ 
+                        backgroundColor: colors.primary,
+                        '--tw-ring-color': colors.primary 
+                      } as React.CSSProperties}
+                      onMouseEnter={(e) => (e.target as HTMLButtonElement).style.backgroundColor = colors.primaryHover}
+                      onMouseLeave={(e) => (e.target as HTMLButtonElement).style.backgroundColor = colors.primary}
                       onClick={handlePurchase}
                       disabled={!canPurchase()}
                     >

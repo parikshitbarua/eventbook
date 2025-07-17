@@ -6,6 +6,7 @@ import { useTheme } from '../hooks/theme.hook.ts';
 import { appKit } from '../config/wallet.config.tsx';
 import { v4 as uuidv4 } from 'uuid';
 import API_ENDPOINTS from '../config/api.config.ts';
+import { colors } from '../config/global.themes';
 
 const Header = () => {
   const navigate = useNavigate();
@@ -189,7 +190,7 @@ const Header = () => {
     <div
       className={`${
         isDark
-          ? 'bg-black/80 border-white/10'
+          ? 'bg-zinc-900/95 border-zinc-700/50'
           : 'bg-gradient-to-r from-slate-50 to-slate-100 border-slate-200/50'
       } shadow-sm border-b backdrop-blur-sm z-[100] sticky top-0 transition-colors duration-300`}
     >
@@ -197,16 +198,26 @@ const Header = () => {
         <div className="group">
           <Link to="/home">
             <p
-              className="text-xl sm:text-2xl lg:text-3xl font-extrabold bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent
-            transition-all duration-300 group-hover:from-red-600 group-hover:to-red-700
-            transform group-hover:scale-105 inline-block"
+              className="text-xl sm:text-2xl lg:text-3xl font-extrabold bg-clip-text text-transparent
+            transition-all duration-300 transform group-hover:scale-105 inline-block"
+              style={{
+                backgroundImage: `linear-gradient(to right, ${colors.primary}, ${colors.primaryHover})`,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundImage = `linear-gradient(to right, ${colors.primaryHover}, #3A1F6B)`;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundImage = `linear-gradient(to right, ${colors.primary}, ${colors.primaryHover})`;
+              }}
             >
               eventChain
             </p>
           </Link>
           <div
-            className="h-0.5 w-0 bg-gradient-to-r from-red-500 to-red-600 
-            transition-all duration-300 group-hover:w-full mt-0.5"
+            className="h-0.5 w-0 transition-all duration-300 group-hover:w-full mt-0.5"
+            style={{
+              backgroundImage: `linear-gradient(to right, ${colors.primary}, ${colors.primaryHover})`,
+            }}
           ></div>
         </div>
 
@@ -223,11 +234,20 @@ const Header = () => {
           {/* Create Event Button - positioned between wallet and profile */}
           <button
             onClick={handleCreateClick}
-            className={`flex items-center gap-1 px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2 lg:py-2.5 text-xs sm:text-sm lg:text-base font-medium transition-all duration-200 rounded-xl ${
-              isDark
-                ? 'bg-red-600 hover:bg-red-700 text-white border border-red-500 hover:border-red-600'
-                : 'bg-red-600 hover:bg-red-700 text-white border border-red-500 hover:border-red-600'
-            } transform hover:scale-105 shadow-sm hover:shadow-md`}
+            className={`flex items-center gap-1 px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2 lg:py-2.5 text-xs sm:text-sm lg:text-base font-medium transition-all duration-200 rounded-xl text-white transform hover:scale-105 shadow-sm hover:shadow-md`}
+            style={{
+              backgroundColor: colors.primary,
+              borderColor: colors.primary,
+              border: '1px solid',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = colors.primaryHover;
+              e.currentTarget.style.borderColor = colors.primaryHover;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = colors.primary;
+              e.currentTarget.style.borderColor = colors.primary;
+            }}
           >
             <PlusIcon className="h-3 w-3 sm:h-4 sm:w-4 lg:h-5 lg:w-5" />
             <span className="hidden sm:inline">Create</span>
@@ -237,12 +257,12 @@ const Header = () => {
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className={`p-1 sm:p-1.5 lg:p-2 ${
-                isDark ? 'hover:bg-white/10' : 'hover:bg-slate-100'
+                isDark ? 'hover:bg-zinc-700' : 'hover:bg-slate-100'
               } rounded-full transition-colors duration-200`}
             >
               <UserCircleIcon
                 className={`h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 ${
-                  isDark ? 'text-white/70' : 'text-slate-600'
+                  isDark ? 'text-white/70' : 'text-zinc-700'
                 }`}
               />
             </button>
@@ -251,7 +271,7 @@ const Header = () => {
               <div
                 className={`absolute right-0 mt-2 w-40 sm:w-44 lg:w-48 ${
                   isDark
-                    ? 'bg-gray-900 border-gray-700 shadow-lg shadow-black/50'
+                    ? 'bg-zinc-800 border-zinc-700 shadow-lg shadow-black/50'
                     : 'bg-white border-slate-200 shadow-lg'
                 } rounded-lg py-1 z-[101] border transition-colors duration-300`}
               >
@@ -260,8 +280,8 @@ const Header = () => {
                   onClick={handleConnectWallet}
                   className={`w-full flex items-center px-3 sm:px-4 py-2 text-sm ${
                     isDark
-                      ? 'text-white hover:bg-gray-800'
-                      : 'text-slate-700 hover:bg-slate-50'
+                      ? 'text-white hover:bg-zinc-700'
+                      : 'text-zinc-700 hover:bg-slate-50'
                   } transition-colors duration-200`}
                 >
                   <WalletIcon className="h-4 w-4 mr-2" />
@@ -269,7 +289,7 @@ const Header = () => {
                 </button>
                 <hr
                   className={`my-1 ${
-                    isDark ? 'border-gray-700' : 'border-slate-200'
+                    isDark ? 'border-zinc-700' : 'border-slate-200'
                   }`}
                 />
 
@@ -277,8 +297,8 @@ const Header = () => {
                   to="profile/my-events"
                   className={`block px-3 sm:px-4 py-2 text-sm ${
                     isDark
-                      ? 'text-white hover:bg-gray-800'
-                      : 'text-slate-700 hover:bg-slate-50'
+                      ? 'text-white hover:bg-zinc-700'
+                      : 'text-zinc-700 hover:bg-slate-50'
                   } transition-colors duration-200`}
                   onClick={() => setIsDropdownOpen(false)}
                 >
@@ -288,8 +308,8 @@ const Header = () => {
                   to="profile/my-tickets"
                   className={`block px-3 sm:px-4 py-2 text-sm ${
                     isDark
-                      ? 'text-white hover:bg-gray-800'
-                      : 'text-slate-700 hover:bg-slate-50'
+                      ? 'text-white hover:bg-zinc-700'
+                      : 'text-zinc-700 hover:bg-slate-50'
                   } transition-colors duration-200`}
                   onClick={() => setIsDropdownOpen(false)}
                 >
@@ -297,7 +317,7 @@ const Header = () => {
                 </Link>
                 <hr
                   className={`my-1 ${
-                    isDark ? 'border-gray-700' : 'border-slate-200'
+                    isDark ? 'border-zinc-700' : 'border-slate-200'
                   }`}
                 />
                 <button
@@ -307,8 +327,8 @@ const Header = () => {
                   }}
                   className={`w-full flex items-center px-3 sm:px-4 py-2 text-sm ${
                     isDark
-                      ? 'text-white hover:bg-gray-800'
-                      : 'text-slate-700 hover:bg-slate-50'
+                      ? 'text-white hover:bg-zinc-700'
+                      : 'text-zinc-700 hover:bg-slate-50'
                   } transition-colors duration-200`}
                 >
                   {isDark ? (

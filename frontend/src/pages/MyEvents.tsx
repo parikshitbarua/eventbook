@@ -10,6 +10,7 @@ import { useTheme } from '../hooks/theme.hook.ts';
 import EventContractABI from "../contracts/EventContract.sol/EventContract.json";
 import { TicketCategory } from "../types/ticket.types.ts";
 import QRScannerModal from '../components/QRScannerModal';
+import { colors } from '../config/global.themes';
 
 const MyEvents: React.FC = () => {
   const { isDark } = useTheme();
@@ -162,7 +163,8 @@ const MyEvents: React.FC = () => {
       >
         <div className="text-center">
           <svg
-            className="animate-spin h-12 w-12 text-red-600 mx-auto mb-4"
+            className="animate-spin h-12 w-12 mx-auto mb-4"
+            style={{ color: colors.primary }}
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -252,8 +254,9 @@ const MyEvents: React.FC = () => {
                 <div className={`p-6 ${
                   isDark ? 'bg-gray-800' : 'bg-gray-50'
                 } rounded-xl transition-colors duration-300`}>
-                  <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4" 
+                       style={{ backgroundColor: `${colors.primary}20` }}>
+                    <svg className="w-6 h-6" style={{ color: colors.primary }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                   </div>
@@ -272,8 +275,9 @@ const MyEvents: React.FC = () => {
                 <div className={`p-6 ${
                   isDark ? 'bg-gray-800' : 'bg-gray-50'
                 } rounded-xl transition-colors duration-300`}>
-                  <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4" 
+                       style={{ backgroundColor: `${colors.primary}20` }}>
+                    <svg className="w-6 h-6" style={{ color: colors.primary }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 00-2-2m0 0V5a2 2 0 012-2h2a2 2 0 00-2-2m0 0V9a2 2 0 012-2h2a2 2 0 00-2-2" />
                     </svg>
                   </div>
@@ -292,8 +296,9 @@ const MyEvents: React.FC = () => {
                 <div className={`p-6 ${
                   isDark ? 'bg-gray-800' : 'bg-gray-50'
                 } rounded-xl transition-colors duration-300`}>
-                  <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4" 
+                       style={{ backgroundColor: `${colors.primary}20` }}>
+                    <svg className="w-6 h-6" style={{ color: colors.primary }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                     </svg>
                   </div>
@@ -324,7 +329,10 @@ const MyEvents: React.FC = () => {
                   href="https://metamask.io" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-red-600 hover:text-red-700 underline"
+                  className="underline transition-colors duration-200"
+                  style={{ color: colors.accent }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = colors.accentHover}
+                  onMouseLeave={(e) => e.currentTarget.style.color = colors.accent}
                 >
                   MetaMask
                 </a>{' '}
@@ -389,7 +397,12 @@ const MyEvents: React.FC = () => {
               </p>
               <button
                 onClick={() => navigate('/new-event')}
-                className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+                className="px-6 py-3 text-white rounded-lg font-medium transition-all duration-200"
+                style={{
+                  backgroundColor: colors.primary,
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.primaryHover}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = colors.primary}
               >
                 Create Your First Event
               </button>
@@ -407,7 +420,7 @@ const MyEvents: React.FC = () => {
       } py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300`}
     >
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
+        {/* <div className="flex justify-between items-center mb-8">
           <h1
             className={`text-3xl font-bold ${
               isDark ? 'text-white' : 'text-gray-900'
@@ -417,9 +430,21 @@ const MyEvents: React.FC = () => {
           </h1>
           <button
             onClick={() => navigate('/new-event')}
-            className="px-4 sm:px-6 py-2 sm:py-3 bg-red-600 hover:bg-red-700 text-white border-red-600 
+            className="px-4 sm:px-6 py-2 sm:py-3 text-white
             font-medium rounded-xl shadow-sm text-sm sm:text-base
             transition-all duration-200 border flex items-center justify-center gap-2"
+            style={{
+              backgroundColor: colors.primary,
+              borderColor: colors.primary,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = colors.primaryHover;
+              e.currentTarget.style.borderColor = colors.primaryHover;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = colors.primary;
+              e.currentTarget.style.borderColor = colors.primary;
+            }}
           >
             <svg 
               className="w-4 h-4" 
@@ -437,7 +462,7 @@ const MyEvents: React.FC = () => {
             <span className="hidden sm:inline">New Event</span>
             <span className="sm:hidden">New</span>
           </button>
-        </div>
+        </div> */}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {events.map((event) => (
@@ -494,7 +519,8 @@ const MyEvents: React.FC = () => {
                     } transition-colors duration-300`}
                   >
                     <svg
-                      className="w-4 h-4 mr-2 text-red-600"
+                      className="w-4 h-4 mr-2"
+                      style={{ color: colors.primary }}
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -512,7 +538,8 @@ const MyEvents: React.FC = () => {
                     } transition-colors duration-300`}
                   >
                     <svg
-                      className="w-4 h-4 mr-2 text-red-600"
+                      className="w-4 h-4 mr-2"
+                      style={{ color: colors.primary }}
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -536,7 +563,7 @@ const MyEvents: React.FC = () => {
                       isDark ? 'text-gray-400' : 'text-gray-600'
                     } transition-colors duration-300`}
                   >
-                    <span className="font-semibold text-red-600">
+                    <span className="font-semibold" style={{ color: colors.primary }}>
                       {Number(event.ticketsSold)}/{Number(event.maxTickets)}
                     </span>{' '}
                     tickets sold
@@ -558,7 +585,12 @@ const MyEvents: React.FC = () => {
                           onClick={() =>
                             navigate(`/event/${event.eventId}/manage`)
                           }
-                          className="flex-1 sm:flex-none px-3 py-1.5 text-xs font-medium bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                          className="flex-1 sm:flex-none px-3 py-1.5 text-xs font-medium text-white rounded-md transition-all duration-200"
+                          style={{
+                            backgroundColor: colors.primary,
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.primaryHover}
+                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = colors.primary}
                         >
                           Manage
                         </button>

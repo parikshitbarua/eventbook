@@ -30,6 +30,7 @@ import LoadingModal from '../components/LoadingModal';
 import { useLoadingModal } from '../hooks/useLoadingModal.hook';
 import { v4 as uuidv4 } from 'uuid';
 import API_ENDPOINTS from '../config/api.config.ts';
+import { colors } from '../config/global.themes';
 
 const NewEventPage = () => {
   const { isDark } = useTheme();
@@ -443,8 +444,8 @@ const NewEventPage = () => {
     <div
       className={`min-h-screen ${
         isDark
-          ? 'bg-gradient-to-br from-gray-900 to-black'
-          : 'bg-gradient-to-br from-gray-50 to-gray-100'
+          ? 'bg-zinc-900'
+          : 'bg-slate-50'
       } py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300`}
     >
 
@@ -453,14 +454,14 @@ const NewEventPage = () => {
         <div className="text-center mb-12">
           <h1
             className={`text-4xl font-extrabold ${
-              isDark ? 'text-white' : 'text-gray-900'
+              isDark ? 'text-white' : 'text-zinc-800'
             } sm:text-5xl transition-colors duration-300`}
           >
             Create New Event
           </h1>
           <p
             className={`mt-4 text-xl ${
-              isDark ? 'text-gray-300' : 'text-gray-600'
+              isDark ? 'text-zinc-300' : 'text-zinc-600'
             } transition-colors duration-300`}
           >
             Fill in the details to create your blockchain-powered event
@@ -471,17 +472,17 @@ const NewEventPage = () => {
         {!isConnected ? (
           <div className={`${
             isDark
-              ? 'bg-gray-900 shadow-2xl shadow-black/20'
+              ? 'bg-zinc-800 shadow-2xl shadow-black/20'
               : 'bg-white shadow-2xl'
           } rounded-3xl overflow-hidden transition-colors duration-300`}>
             <div className="px-8 py-16 sm:px-12 sm:py-20 text-center">
               {/* Wallet Icon */}
               <div className={`mx-auto w-24 h-24 ${
-                isDark ? 'bg-gray-800' : 'bg-gray-100'
+                isDark ? 'bg-zinc-700' : 'bg-slate-100'
               } rounded-full flex items-center justify-center mb-8 transition-colors duration-300`}>
                 <svg
                   className={`w-12 h-12 ${
-                    isDark ? 'text-gray-400' : 'text-gray-500'
+                    isDark ? 'text-zinc-400' : 'text-zinc-500'
                   }`}
                   fill="none"
                   stroke="currentColor"
@@ -499,7 +500,7 @@ const NewEventPage = () => {
               {/* Title */}
               <h2
                 className={`text-3xl font-bold ${
-                  isDark ? 'text-white' : 'text-gray-900'
+                  isDark ? 'text-white' : 'text-zinc-800'
                 } mb-4 transition-colors duration-300`}
               >
                 Wallet Connection Required
@@ -508,7 +509,7 @@ const NewEventPage = () => {
               {/* Description */}
               <p
                 className={`text-lg ${
-                  isDark ? 'text-gray-300' : 'text-gray-600'
+                  isDark ? 'text-zinc-300' : 'text-zinc-600'
                 } mb-8 max-w-2xl mx-auto transition-colors duration-300`}
               >
                 To create an event on the blockchain, you need to connect your wallet first. 
@@ -518,60 +519,60 @@ const NewEventPage = () => {
               {/* Features List */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto">
                 <div className={`p-6 ${
-                  isDark ? 'bg-gray-800' : 'bg-gray-50'
+                  isDark ? 'bg-zinc-700' : 'bg-slate-50'
                 } rounded-xl transition-colors duration-300`}>
-                  <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
                   </div>
                   <h3 className={`font-semibold ${
-                    isDark ? 'text-white' : 'text-gray-900'
+                    isDark ? 'text-white' : 'text-zinc-800'
                   } mb-2 transition-colors duration-300`}>
                     Secure & Decentralized
                   </h3>
                   <p className={`text-sm ${
-                    isDark ? 'text-gray-400' : 'text-gray-600'
+                    isDark ? 'text-zinc-400' : 'text-zinc-600'
                   } transition-colors duration-300`}>
                     Your event data is stored on the blockchain, ensuring transparency and immutability.
                   </p>
                 </div>
 
                 <div className={`p-6 ${
-                  isDark ? 'bg-gray-800' : 'bg-gray-50'
+                  isDark ? 'bg-zinc-700' : 'bg-slate-50'
                 } rounded-xl transition-colors duration-300`}>
-                  <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a1 1 0 001 1h1a1 1 0 001-1V7a2 2 0 00-2-2H5zM5 21a2 2 0 002-2v-3a1 1 0 00-1-1H5a1 1 0 00-1 1v3a2 2 0 002 2h0z" />
                     </svg>
                   </div>
                   <h3 className={`font-semibold ${
-                    isDark ? 'text-white' : 'text-gray-900'
+                    isDark ? 'text-white' : 'text-zinc-800'
                   } mb-2 transition-colors duration-300`}>
                     NFT Tickets
                   </h3>
                   <p className={`text-sm ${
-                    isDark ? 'text-gray-400' : 'text-gray-600'
+                    isDark ? 'text-zinc-400' : 'text-zinc-600'
                   } transition-colors duration-300`}>
                     Create unique NFT tickets that can be traded on secondary markets.
                   </p>
                 </div>
 
                 <div className={`p-6 ${
-                  isDark ? 'bg-gray-800' : 'bg-gray-50'
+                  isDark ? 'bg-zinc-700' : 'bg-slate-50'
                 } rounded-xl transition-colors duration-300`}>
-                  <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                   </div>
                   <h3 className={`font-semibold ${
-                    isDark ? 'text-white' : 'text-gray-900'
+                    isDark ? 'text-white' : 'text-zinc-800'
                   } mb-2 transition-colors duration-300`}>
                     Instant Deployment
                   </h3>
                   <p className={`text-sm ${
-                    isDark ? 'text-gray-400' : 'text-gray-600'
+                    isDark ? 'text-zinc-400' : 'text-zinc-600'
                   } transition-colors duration-300`}>
                     Deploy your event smart contract in minutes, not days.
                   </p>
@@ -585,14 +586,19 @@ const NewEventPage = () => {
 
               {/* Help Text */}
               <p className={`text-sm ${
-                isDark ? 'text-gray-400' : 'text-gray-500'
+                isDark ? 'text-gray-400' : 'text-gray-700'
               } mt-6 transition-colors duration-300`}>
                 Don't have a wallet? We recommend{' '}
                 <a 
                   href="https://metamask.io" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-red-600 hover:text-red-700 underline"
+                  className="underline transition-colors duration-200"
+                  style={{ 
+                    color: colors.accent 
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = colors.accentHover}
+                  onMouseLeave={(e) => e.currentTarget.style.color = colors.accent}
                 >
                   MetaMask
                 </a>{' '}
@@ -644,8 +650,11 @@ const NewEventPage = () => {
                         className={`w-full px-4 py-3 border ${
                           isDark
                             ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
-                            : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-                        } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
+                            : 'border-gray-300 bg-white text-gray-900 placeholder-gray-700'
+                        } rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200`}
+                        style={{ 
+                          '--tw-ring-color': colors.primary,
+                        } as React.CSSProperties}
                         placeholder="Summer Music Festival 2024"
                         required
                       />
@@ -668,8 +677,11 @@ const NewEventPage = () => {
                         className={`w-full px-4 py-3 border ${
                           isDark
                             ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
-                            : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-                        } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
+                            : 'border-gray-300 bg-white text-gray-900 placeholder-gray-700'
+                        } rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200`}
+                        style={{ 
+                          '--tw-ring-color': colors.primary,
+                        } as React.CSSProperties}
                         placeholder="Describe your event in detail..."
                         required
                       />
@@ -682,7 +694,11 @@ const NewEventPage = () => {
                         id="singleCategory"
                         checked={hasSingleCategory}
                         onChange={(e) => setHasSingleCategory(e.target.checked)}
-                        className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                        className="h-4 w-4 border-gray-300 rounded focus:ring-2"
+                        style={{ 
+                          color: colors.primary,
+                          '--tw-ring-color': colors.primary,
+                        } as React.CSSProperties}
                       />
                       <label
                         htmlFor="singleCategory"
@@ -714,8 +730,11 @@ const NewEventPage = () => {
                             className={`w-full px-4 py-3 border ${
                               isDark
                                 ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
-                                : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-                            } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
+                                : 'border-gray-300 bg-white text-gray-900 placeholder-gray-700'
+                            } rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200`}
+                            style={{ 
+                              '--tw-ring-color': colors.primary,
+                            } as React.CSSProperties}
                             placeholder="0.1"
                             required={hasSingleCategory}
                           />
@@ -737,8 +756,11 @@ const NewEventPage = () => {
                             className={`w-full px-4 py-3 border ${
                               isDark
                                 ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
-                                : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-                            } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
+                                : 'border-gray-300 bg-white text-gray-900 placeholder-gray-700'
+                            } rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200`}
+                            style={{ 
+                              '--tw-ring-color': colors.primary,
+                            } as React.CSSProperties}
                             placeholder="1000"
                             required={hasSingleCategory}
                           />
@@ -779,7 +801,10 @@ const NewEventPage = () => {
                             isDark
                               ? 'border-gray-600 bg-gray-700 text-white'
                               : 'border-gray-300 bg-white text-gray-900'
-                          } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
+                          } rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200`}
+                          style={{ 
+                            '--tw-ring-color': colors.primary,
+                          } as React.CSSProperties}
                           required
                         />
                       </div>
@@ -800,7 +825,10 @@ const NewEventPage = () => {
                             isDark
                               ? 'border-gray-600 bg-gray-700 text-white'
                               : 'border-gray-300 bg-white text-gray-900'
-                          } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
+                          } rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200`}
+                          style={{ 
+                            '--tw-ring-color': colors.primary,
+                          } as React.CSSProperties}
                           required
                         />
                       </div>
@@ -838,8 +866,11 @@ const NewEventPage = () => {
                         className={`w-full px-4 py-3 border ${
                           isDark
                             ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
-                            : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-                        } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
+                            : 'border-gray-300 bg-white text-gray-900 placeholder-gray-700'
+                        } rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200`}
+                        style={{ 
+                          '--tw-ring-color': colors.primary,
+                        } as React.CSSProperties}
                         placeholder="Madison Square Garden"
                         required
                       />
@@ -863,7 +894,10 @@ const NewEventPage = () => {
                             isDark
                               ? 'border-gray-600 bg-gray-700 text-white'
                               : 'border-gray-300 bg-white text-gray-900'
-                          } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
+                          } rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200`}
+                          style={{ 
+                            '--tw-ring-color': colors.primary,
+                          } as React.CSSProperties}
                           required
                         >
                           <option value="">Select Country</option>
@@ -890,7 +924,10 @@ const NewEventPage = () => {
                             isDark
                               ? 'border-gray-600 bg-gray-700 text-white'
                               : 'border-gray-300 bg-white text-gray-900'
-                          } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
+                          } rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200`}
+                          style={{ 
+                            '--tw-ring-color': colors.primary,
+                          } as React.CSSProperties}
                           required
                           disabled={!formData.country}
                         >
@@ -918,7 +955,10 @@ const NewEventPage = () => {
                             isDark
                               ? 'border-gray-600 bg-gray-700 text-white'
                               : 'border-gray-300 bg-white text-gray-900'
-                          } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
+                          } rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200`}
+                          style={{ 
+                            '--tw-ring-color': colors.primary,
+                          } as React.CSSProperties}
                           required
                           disabled={!formData.state}
                         >
@@ -954,11 +994,28 @@ const NewEventPage = () => {
                       {...getRootProps()}
                       className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-200 ${
                         isDragActive
-                          ? 'border-red-500 bg-red-50'
+                          ? 'bg-opacity-10'
                           : isDark
-                            ? 'border-gray-600 hover:border-red-400 hover:bg-gray-700'
-                            : 'border-gray-300 hover:border-red-400 hover:bg-gray-50'
+                            ? 'border-gray-600 hover:bg-gray-700'
+                            : 'border-gray-300 hover:bg-gray-50'
                       }`}
+                      style={{
+                        borderColor: isDragActive ? colors.primary : undefined,
+                        backgroundColor: isDragActive 
+                          ? `${colors.primary}20` 
+                          : undefined,
+                        '--hover-border-color': colors.primary,
+                      } as React.CSSProperties}
+                      onMouseEnter={(e) => {
+                        if (!isDragActive) {
+                          e.currentTarget.style.borderColor = `${colors.primary}66`;
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isDragActive) {
+                          e.currentTarget.style.borderColor = isDark ? '#4B5563' : '#D1D5DB';
+                        }
+                      }}
                     >
                       <input {...getInputProps()} />
                       <div className="space-y-4">
@@ -995,7 +1052,7 @@ const NewEventPage = () => {
                           </p>
                           <p
                             className={`text-sm ${
-                              isDark ? 'text-gray-400' : 'text-gray-500'
+                              isDark ? 'text-gray-400' : 'text-gray-700'
                             } transition-colors duration-300`}
                           >
                             or click to browse (Max 5MB per image)
@@ -1025,13 +1082,18 @@ const NewEventPage = () => {
                               <button
                                 type="button"
                                 onClick={() => removeImage(index)}
-                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                                className="absolute -top-2 -right-2 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-all duration-200"
+                                style={{
+                                  backgroundColor: colors.error,
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.errorHover}
+                                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = colors.error}
                               >
                                 ×
                               </button>
                               <p
                                 className={`text-xs ${
-                                  isDark ? 'text-gray-400' : 'text-gray-500'
+                                  isDark ? 'text-gray-400' : 'text-gray-700'
                                 } mt-1 truncate transition-colors duration-300`}
                               >
                                 {file.name}
@@ -1074,8 +1136,11 @@ const NewEventPage = () => {
                           className={`w-full px-4 py-3 border ${
                             isDark
                               ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
-                              : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-                          } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
+                              : 'border-gray-300 bg-white text-gray-900 placeholder-gray-700'
+                          } rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200`}
+                          style={{ 
+                            '--tw-ring-color': colors.primary,
+                          } as React.CSSProperties}
                           placeholder="Summer Music Festival 2024 Tickets"
                           required
                         />
@@ -1097,14 +1162,17 @@ const NewEventPage = () => {
                           className={`w-full px-4 py-3 border ${
                             isDark
                               ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
-                              : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-                          } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 uppercase`}
+                              : 'border-gray-300 bg-white text-gray-900 placeholder-gray-700'
+                          } rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 uppercase`}
+                          style={{ 
+                            '--tw-ring-color': colors.primary,
+                          } as React.CSSProperties}
                           placeholder="MUSIC"
                           required
                         />
                         <p
                           className={`text-xs ${
-                            isDark ? 'text-gray-400' : 'text-gray-500'
+                            isDark ? 'text-gray-400' : 'text-gray-700'
                           } mt-1 transition-colors duration-300`}
                         >
                           2-10 uppercase letters (automatically converted)
@@ -1124,7 +1192,21 @@ const NewEventPage = () => {
                 <button
                   type="submit"
                   disabled={isPending || isLoadingModalOpen}
-                  className="bg-gradient-to-r from-red-600 to-red-700 text-white py-3 px-8 rounded-xl font-semibold hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+                  className="text-white py-3 px-8 rounded-xl font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+                  style={{
+                    background: `linear-gradient(to right, ${colors.primary}, ${colors.primaryHover})`,
+                    '--tw-ring-color': colors.primary,
+                  } as React.CSSProperties}
+                  onMouseEnter={(e) => {
+                    if (!isPending && !isLoadingModalOpen) {
+                      e.currentTarget.style.background = `linear-gradient(to right, ${colors.primaryHover}, #3A1F6B)`;
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isPending && !isLoadingModalOpen) {
+                      e.currentTarget.style.background = `linear-gradient(to right, ${colors.primary}, ${colors.primaryHover})`;
+                    }
+                  }}
                 >
                   {isPending || isLoadingModalOpen ? (
                     <div className="flex items-center justify-center">

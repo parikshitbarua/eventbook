@@ -10,7 +10,7 @@ import { fetchFirstImageFromIPFS } from '../utils/ipfs-helper.util';
 import EventContractABI from '../contracts/EventContract.sol/EventContract.json';
 import { TicketCategory } from '../types/ticket.types.ts';
 import { useTheme } from '../hooks/theme.hook.ts';
-// const { purchaseTickets } = usePurchaseTickets();
+import { colors } from "../config/global.themes.ts";
 
 const FACTORY_ADDRESS =
   import.meta.env.VITE_FACTORY_ADDRESS ||
@@ -183,13 +183,13 @@ const HomePage = () => {
     const getBadgeConfig = () => {
       switch (eventType) {
         case 'live':
-          return { text: 'Live', bgColor: 'bg-red-500', textColor: 'text-white' };
+          return { text: 'Live', bgColor: colors.success, textColor: 'text-white' };
         case 'upcoming':
-          return { text: 'Upcoming', bgColor: 'bg-blue-500', textColor: 'text-white' };
+          return { text: 'Upcoming', bgColor: colors.primary, textColor: 'text-white' };
         case 'past':
-          return { text: 'Ended', bgColor: 'bg-gray-500', textColor: 'text-white' };
+          return { text: 'Ended', bgColor: '#71717a', textColor: 'text-white' };
         default:
-          return { text: 'Live', bgColor: 'bg-red-500', textColor: 'text-white' };
+          return { text: 'Live', bgColor: colors.success, textColor: 'text-white' };
       }
     };
 
@@ -197,11 +197,10 @@ const HomePage = () => {
 
     return (
       <div
-        key={event.eventId}
         className={`${
           isDark
-            ? 'bg-gray-900 border-gray-700 shadow-lg shadow-black/20 hover:shadow-black/40'
-            : 'bg-white border-gray-200 shadow-lg hover:shadow-xl'
+            ? 'bg-zinc-900 border-zinc-700 shadow-lg shadow-black/20 hover:shadow-black/40'
+            : 'bg-white border-slate-200 shadow-lg hover:shadow-xl'
         } rounded-2xl overflow-hidden border transition-all duration-500 ease-in-out hover:scale-105 cursor-pointer ${
           eventType === 'past' ? 'opacity-75' : ''
         }`}
@@ -217,7 +216,10 @@ const HomePage = () => {
             alt={event.title}
             className="h-48 w-full object-cover"
           />
-          <div className={`absolute top-4 right-4 px-2 py-1 rounded-full text-xs font-semibold ${badge.bgColor} ${badge.textColor}`}>
+          <div 
+            className={`absolute top-4 right-4 px-2 py-1 rounded-full text-xs font-semibold ${badge.textColor}`}
+            style={{ backgroundColor: badge.bgColor }}
+          >
             {badge.text}
           </div>
         </div>
@@ -225,27 +227,33 @@ const HomePage = () => {
         <div>
           <h2
             className={`text-xl font-semibold ${
-              isDark ? 'text-white' : 'text-gray-800'
+              isDark ? 'text-white' : 'text-zinc-800'
             } mb-2 transition-colors duration-300`}
           >
             {event.title}
           </h2>
           <p
             className={`text-sm ${
-              isDark ? 'text-gray-400' : 'text-gray-600'
+              isDark ? 'text-zinc-400' : 'text-zinc-600'
             } line-clamp-3 transition-colors duration-300`}
           >
             {event.description}
           </p>
         </div>
         <div className="mt-4 flex justify-between items-center">
-          <span className="text-lg font-bold text-red-600">
+          <span 
+            className="text-lg font-bold"
+            style={{ color: colors.accent }}
+          >
             {event.ticketPrice ? Number(event.ticketPrice) / 1e18 : 0}{' '}
             ETH
           </span>
           {eventType !== 'past' && (
             <button
-              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium"
+              className="text-white px-4 py-2 rounded-lg transition-colors duration-200 font-medium"
+              style={{ backgroundColor: colors.primary }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.primaryHover}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = colors.primary}
               onClick={(e) => {
                 e.stopPropagation(); // Prevent card click event
                 setSelectedEvent(event);
@@ -275,13 +283,16 @@ const HomePage = () => {
 
     return (
       <div className="mb-16">
-        <h2 className={`text-3xl font-bold text-center mb-8 ${
-          title === 'Live Events' 
-            ? 'text-green-600' 
-            : title === 'Upcoming Events'
-            ? 'text-red-600'
-            : 'text-gray-600'
-        }`}>
+        <h2 
+          className="text-3xl font-bold text-center mb-8"
+          style={{ 
+            color: title === 'Live Events' 
+              ? colors.success 
+              : title === 'Upcoming Events'
+              ? colors.primary
+              : '#71717a'
+          }}
+        >
           {title}
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
@@ -308,15 +319,15 @@ const HomePage = () => {
     <div
       className={`${
         isDark
-          ? 'bg-gray-900 border-gray-700 shadow-lg shadow-black/20'
-          : 'bg-white border-gray-200 shadow-lg'
+          ? 'bg-zinc-900 border-zinc-700 shadow-lg shadow-black/20'
+          : 'bg-white border-slate-200 shadow-lg'
       } rounded-2xl overflow-hidden border animate-pulse transition-colors duration-300`}
     >
       <div
         className={`h-48 w-full ${
           isDark
-            ? 'bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700'
-            : 'bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200'
+            ? 'bg-gradient-to-r from-zinc-700 via-zinc-600 to-zinc-700'
+            : 'bg-gradient-to-r from-slate-200 via-slate-300 to-slate-200'
         } bg-size-200 animate-gradient`}
       ></div>
       <div className="p-4 flex flex-col justify-between h-48">
@@ -324,22 +335,22 @@ const HomePage = () => {
           <div
             className={`h-6 ${
               isDark
-                ? 'bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700'
-                : 'bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200'
+                ? 'bg-gradient-to-r from-zinc-700 via-zinc-600 to-zinc-700'
+                : 'bg-gradient-to-r from-slate-200 via-slate-300 to-slate-200'
             } bg-size-200 animate-gradient rounded mb-2`}
           ></div>
           <div
             className={`h-4 ${
               isDark
-                ? 'bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700'
-                : 'bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200'
+                ? 'bg-gradient-to-r from-zinc-700 via-zinc-600 to-zinc-700'
+                : 'bg-gradient-to-r from-slate-200 via-slate-300 to-slate-200'
             } bg-size-200 animate-gradient rounded mb-1`}
           ></div>
           <div
             className={`h-4 ${
               isDark
-                ? 'bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700'
-                : 'bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200'
+                ? 'bg-gradient-to-r from-zinc-700 via-zinc-600 to-zinc-700'
+                : 'bg-gradient-to-r from-slate-200 via-slate-300 to-slate-200'
             } bg-size-200 animate-gradient rounded w-3/4`}
           ></div>
         </div>
@@ -347,15 +358,15 @@ const HomePage = () => {
           <div
             className={`h-6 ${
               isDark
-                ? 'bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700'
-                : 'bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200'
+                ? 'bg-gradient-to-r from-zinc-700 via-zinc-600 to-zinc-700'
+                : 'bg-gradient-to-r from-slate-200 via-slate-300 to-slate-200'
             } bg-size-200 animate-gradient rounded w-20`}
           ></div>
           <div
             className={`h-10 ${
               isDark
-                ? 'bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700'
-                : 'bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200'
+                ? 'bg-gradient-to-r from-zinc-700 via-zinc-600 to-zinc-700'
+                : 'bg-gradient-to-r from-slate-200 via-slate-300 to-slate-200'
             } bg-size-200 animate-gradient rounded w-24`}
           ></div>
         </div>
@@ -367,10 +378,13 @@ const HomePage = () => {
   const LoadingState = () => (
     <div
       className={`min-h-screen ${
-        isDark ? 'bg-black' : 'bg-white'
+        isDark ? 'bg-zinc-900' : 'bg-slate-50'
       } px-6 py-10 transition-colors duration-300`}
     >
-      <h1 className="text-4xl font-bold text-red-600 text-center mb-10">
+      <h1 
+        className="text-4xl font-bold text-center mb-10"
+        style={{ color: colors.primary }}
+      >
         Upcoming Events
       </h1>
       {/*<h1 className="text-4xl font-bold text-red-600 text-center mb-10">*/}
@@ -402,14 +416,15 @@ const HomePage = () => {
   return (
     <div
       className={`min-h-screen ${
-        isDark ? 'bg-black' : 'bg-white'
+        isDark ? 'bg-zinc-900' : 'bg-slate-50'
       } px-6 py-10 transition-colors duration-300`}
     >
+      
       {allEvents.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20">
           <div
             className={`${
-              isDark ? 'text-gray-500' : 'text-gray-400'
+              isDark ? 'text-zinc-500' : 'text-zinc-400'
             } mb-4 transition-colors duration-300`}
           >
             <svg className="w-20 h-20" fill="currentColor" viewBox="0 0 20 20">
@@ -422,14 +437,14 @@ const HomePage = () => {
           </div>
           <h3
             className={`text-xl font-semibold ${
-              isDark ? 'text-white' : 'text-gray-700'
+              isDark ? 'text-white' : 'text-zinc-800'
             } mb-2 transition-colors duration-300`}
           >
             No Events Found
           </h3>
           <p
             className={`${
-              isDark ? 'text-gray-400' : 'text-gray-500'
+              isDark ? 'text-zinc-400' : 'text-zinc-600'
             } text-center max-w-md transition-colors duration-300`}
           >
             There are currently no active events available. Check back later or

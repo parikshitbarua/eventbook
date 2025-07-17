@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import QRCode from 'react-qr-code';
 import { useTheme } from '../hooks/theme.hook';
+import { colors } from '../config/global.themes';
 
 interface QRData {
   tokenId: number;
@@ -290,11 +291,21 @@ const QRModal: React.FC<QRModalProps> = ({
           } flex justify-end`}>
             <button
               onClick={onClose}
-              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                type === 'success'
-                  ? 'bg-green-600 hover:bg-green-700 text-white'
-                  : 'bg-red-600 hover:bg-red-700 text-white'
+              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors text-white ${
+                type === 'error' ? '' : ''
               }`}
+              style={type === 'success' 
+                ? { backgroundColor: colors.primary } 
+                : { backgroundColor: colors.error }
+              }
+              onMouseEnter={(e) => {
+                (e.target as HTMLButtonElement).style.backgroundColor = 
+                  type === 'success' ? colors.primaryHover : colors.errorHover;
+              }}
+              onMouseLeave={(e) => {
+                (e.target as HTMLButtonElement).style.backgroundColor = 
+                  type === 'success' ? colors.primary : colors.error;
+              }}
             >
               {type === 'success' ? 'Got it!' : 'Try Again'}
             </button>

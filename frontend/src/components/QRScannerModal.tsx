@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import { useTheme } from '../hooks/theme.hook.ts';
+import { colors } from '../config/global.themes';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import EventTicketNFTABI from '../contracts/EventTicketNFT.sol/EventTicketNFT.json';
 import API_ENDPOINTS from "../config/api.config.ts";
@@ -289,10 +290,11 @@ const QRScannerModal: React.FC<QRScannerModalProps> = ({ isOpen, onClose, eventI
               {isVerifying && (
                 <div className="flex items-center justify-center py-4">
                   <svg
-                    className="animate-spin h-6 w-6 text-blue-600 mr-3"
+                    className="animate-spin h-6 w-6 mr-3"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
+                    style={{ color: colors.primary }}
                   >
                     <circle
                       className="opacity-25"

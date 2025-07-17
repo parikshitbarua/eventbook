@@ -8,6 +8,7 @@ import { useTheme } from '../hooks/theme.hook.ts';
 import { useWalletClient } from 'wagmi';
 import QRModal from '../components/QRModal';
 import { API_ENDPOINTS } from '../config/api.config';
+import { colors } from '../config/global.themes';
 
 interface TicketNFT {
   tokenId: number;
@@ -283,7 +284,8 @@ const MyTickets: React.FC = () => {
       >
         <div className="text-center">
           <svg
-            className="animate-spin h-12 w-12 text-red-600 mx-auto mb-4"
+            className="animate-spin h-12 w-12 mx-auto mb-4"
+            style={{ color: colors.primary }}
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -373,8 +375,9 @@ const MyTickets: React.FC = () => {
                 <div className={`p-6 ${
                   isDark ? 'bg-gray-800' : 'bg-gray-50'
                 } rounded-xl transition-colors duration-300`}>
-                  <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4" 
+                       style={{ backgroundColor: `${colors.primary}20` }}>
+                    <svg className="w-6 h-6" style={{ color: colors.primary }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a1 1 0 001 1h1a1 1 0 001-1V7a2 2 0 00-2-2H5zM5 21a2 2 0 002-2v-3a1 1 0 00-1-1H5a1 1 0 00-1 1v3a2 2 0 002 2h0z" />
                     </svg>
                   </div>
@@ -393,8 +396,9 @@ const MyTickets: React.FC = () => {
                 <div className={`p-6 ${
                   isDark ? 'bg-gray-800' : 'bg-gray-50'
                 } rounded-xl transition-colors duration-300`}>
-                  <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4" 
+                       style={{ backgroundColor: `${colors.primary}20` }}>
+                    <svg className="w-6 h-6" style={{ color: colors.primary }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11a2 2 0 01-2 2H8a2 2 0 01-2-2V9a2 2 0 012-2h8a2 2 0 012 2v6zM8 9l8 8m0-8l-8 8" />
                     </svg>
                   </div>
@@ -413,8 +417,9 @@ const MyTickets: React.FC = () => {
                 <div className={`p-6 ${
                   isDark ? 'bg-gray-800' : 'bg-gray-50'
                 } rounded-xl transition-colors duration-300`}>
-                  <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4" 
+                       style={{ backgroundColor: `${colors.primary}20` }}>
+                    <svg className="w-6 h-6" style={{ color: colors.primary }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                     </svg>
                   </div>
@@ -438,14 +443,17 @@ const MyTickets: React.FC = () => {
 
               {/* Help Text */}
               <p className={`text-sm ${
-                isDark ? 'text-gray-400' : 'text-gray-500'
+                isDark ? 'text-gray-400' : 'text-gray-700'
               } mt-6 transition-colors duration-300`}>
                 Don't have a wallet? We recommend{' '}
                 <a 
                   href="https://metamask.io" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-red-600 hover:text-red-700 underline"
+                  className="underline transition-colors duration-200"
+                  style={{ color: colors.accent }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = colors.accentHover}
+                  onMouseLeave={(e) => e.currentTarget.style.color = colors.accent}
                 >
                   MetaMask
                 </a>{' '}
@@ -511,7 +519,12 @@ const MyTickets: React.FC = () => {
               </p>
               <button
                 onClick={() => (window.location.href = '/')}
-                className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition duration-200"
+                className="text-white px-6 py-2 rounded-lg transition-all duration-200"
+                style={{
+                  backgroundColor: colors.primary,
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.primaryHover}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = colors.primary}
               >
                 Browse Events
               </button>
@@ -562,9 +575,18 @@ const MyTickets: React.FC = () => {
                   key={`${ticket.nftContract}-${ticket.tokenId}`}
                   className={`${
                     isDark
-                      ? 'bg-gray-900 border-gray-700 shadow-lg shadow-black/20 hover:shadow-black/40 hover:border-red-600'
-                      : 'bg-white border-gray-100 shadow-lg hover:shadow-2xl hover:border-red-200'
+                      ? 'bg-gray-900 border-gray-700 shadow-lg shadow-black/20 hover:shadow-black/40'
+                      : 'bg-white border-gray-100 shadow-lg hover:shadow-2xl'
                   } rounded-xl border overflow-hidden hover:-translate-y-1 transition-all duration-300 group`}
+                  style={{
+                    '--hover-border-color': colors.primary,
+                  } as React.CSSProperties}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = colors.primary;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = isDark ? '#374151' : '#f3f4f6';
+                  }}
                 >
                   <div className="aspect-square relative overflow-hidden">
                     {ticket.image ? (
@@ -580,7 +602,10 @@ const MyTickets: React.FC = () => {
                       />
                     ) : null}
                     <div
-                      className={`${ticket.image ? 'hidden' : ''} w-full h-full bg-gradient-to-br from-red-400 via-red-500 to-red-600 flex items-center justify-center`}
+                      className={`${ticket.image ? 'hidden' : ''} w-full h-full flex items-center justify-center`}
+                      style={{
+                        background: `linear-gradient(to bottom right, ${colors.primary}CC, ${colors.primaryHover}, ${colors.primary}DD)`,
+                      }}
                     >
                       <svg
                         className="w-16 h-16 text-white opacity-60"
@@ -610,7 +635,9 @@ const MyTickets: React.FC = () => {
                     )}
 
                     {/* Decorative corner accent */}
-                    <div className="absolute top-0 left-0 w-12 h-12 bg-gradient-to-br from-red-500/20 to-transparent"></div>
+                    <div className="absolute top-0 left-0 w-12 h-12" style={{
+                      background: `linear-gradient(to bottom right, ${colors.primary}33, transparent)`,
+                    }}></div>
                   </div>
 
                   <div

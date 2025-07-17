@@ -12,6 +12,7 @@ import {
 } from '../utils/ipfs-helper.util.ts';
 import EventContractABI from '../contracts/EventContract.sol/EventContract.json';
 import { useTheme } from '../hooks/theme.hook.ts';
+import { colors } from '../config/global.themes';
 import LoadingModal from '../components/LoadingModal';
 import { useLoadingModal } from '../hooks/useLoadingModal.hook';
 
@@ -335,7 +336,8 @@ const AddTicketsPage = () => {
                     isDark
                       ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
                       : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-                  } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
+                  } rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200`}
+                  style={{ '--tw-ring-color': colors.primary } as React.CSSProperties}
                   placeholder="e.g., VIP, General Admission, Early Bird"
                   required
                 />
@@ -362,7 +364,8 @@ const AddTicketsPage = () => {
                     isDark
                       ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
                       : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-                  } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
+                  } rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200`}
+                  style={{ '--tw-ring-color': colors.primary } as React.CSSProperties}
                   placeholder="Describe what this ticket category includes..."
                   required
                 />
@@ -392,7 +395,8 @@ const AddTicketsPage = () => {
                       isDark
                         ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
                         : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-                    } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
+                    } rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200`}
+                    style={{ '--tw-ring-color': colors.primary } as React.CSSProperties}
                     placeholder="0.1"
                     required
                   />
@@ -419,7 +423,8 @@ const AddTicketsPage = () => {
                       isDark
                         ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
                         : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-                    } rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200`}
+                    } rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200`}
+                    style={{ '--tw-ring-color': colors.primary } as React.CSSProperties}
                     placeholder="100"
                     required
                   />
@@ -451,11 +456,15 @@ const AddTicketsPage = () => {
                   {...getRootProps()}
                   className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
                     isDragActive
-                      ? 'border-red-500 bg-red-50'
+                      ? `hover:bg-gray-50`
                       : isDark
-                        ? 'border-gray-600 hover:border-red-400 hover:bg-gray-700'
-                        : 'border-gray-300 hover:border-red-400 hover:bg-gray-50'
+                        ? 'border-gray-600 hover:bg-gray-700'
+                        : 'border-gray-300 hover:bg-gray-50'
                   }`}
+                  style={{
+                    borderColor: isDragActive ? colors.primary : undefined,
+                    backgroundColor: isDragActive ? `${colors.primary}10` : undefined,
+                  }}
                 >
                   <input {...getInputProps()} />
                   {formData.image ? (
@@ -545,7 +554,10 @@ const AddTicketsPage = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+                  className="px-6 py-2 text-white rounded-lg transition-colors font-medium"
+                  style={{ backgroundColor: colors.primary }}
+                  onMouseEnter={(e) => (e.target as HTMLButtonElement).style.backgroundColor = colors.primaryHover}
+                  onMouseLeave={(e) => (e.target as HTMLButtonElement).style.backgroundColor = colors.primary}
                 >
                   {category.id ? 'Update' : 'Add'} Category
                 </button>
@@ -643,8 +655,19 @@ const AddTicketsPage = () => {
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 categories.length >= 5
                   ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-red-600 text-white hover:bg-red-700'
+                  : 'text-white'
               }`}
+              style={categories.length >= 5 ? {} : { backgroundColor: colors.primary }}
+              onMouseEnter={(e) => {
+                if (categories.length < 5) {
+                  (e.target as HTMLButtonElement).style.backgroundColor = colors.primaryHover;
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (categories.length < 5) {
+                  (e.target as HTMLButtonElement).style.backgroundColor = colors.primary;
+                }
+              }}
             >
               Add Category {categories.length > 0 && `(${categories.length}/5)`}
             </button>
@@ -716,10 +739,13 @@ const AddTicketsPage = () => {
                         {category.description}
                       </p>
                       <div className="flex flex-wrap gap-4 text-sm">
-                        <span className="text-green-600 font-medium">
+                        <span 
+                          className="font-medium"
+                          style={{ color: colors.accent }}
+                        >
                           {category.price} ETH
                         </span>
-                        <span className="text-blue-600">
+                        <span style={{ color: colors.info }}>
                           Max: {category.maxSupply} tickets
                         </span>
                       </div>
@@ -756,7 +782,10 @@ const AddTicketsPage = () => {
                       </button>
                       <button
                         onClick={() => removeCategory(category.id)}
-                        className="p-2 text-red-400 hover:text-red-600 transition-colors"
+                        className="p-2 transition-colors"
+                        style={{ color: colors.error }}
+                        onMouseEnter={(e) => (e.target as HTMLButtonElement).style.color = colors.errorHover}
+                        onMouseLeave={(e) => (e.target as HTMLButtonElement).style.color = colors.error}
                       >
                         <svg
                           className="w-5 h-5"
@@ -856,9 +885,23 @@ const AddTicketsPage = () => {
             onClick={handleTicketCategoriesAdded}
             className={`px-8 py-3 rounded-xl transition-colors font-medium ${
               isLoadingModalOpen
-                ? 'bg-red-400 text-gray-200 cursor-not-allowed'
-                : 'bg-red-600 text-white hover:bg-red-700'
+                ? 'text-gray-200 cursor-not-allowed'
+                : 'text-white'
             }`}
+            style={isLoadingModalOpen 
+              ? { backgroundColor: `${colors.primary}60` } 
+              : { backgroundColor: colors.primary }
+            }
+            onMouseEnter={(e) => {
+              if (!isLoadingModalOpen) {
+                (e.target as HTMLButtonElement).style.backgroundColor = colors.primaryHover;
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isLoadingModalOpen) {
+                (e.target as HTMLButtonElement).style.backgroundColor = colors.primary;
+              }
+            }}
           >
             {isLoadingModalOpen ? (
               <div className="flex items-center justify-center">
