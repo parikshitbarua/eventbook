@@ -267,7 +267,18 @@ const AddTicketsPage = () => {
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
       if (acceptedFiles.length > 0) {
-        setFormData((prev) => ({ ...prev, image: acceptedFiles[0] }));
+        const file = acceptedFiles[0];
+        const cleanName = decodeURIComponent(file.name);
+        
+        // Only create a new File object if the name actually changed
+        const cleanedFile = cleanName !== file.name 
+          ? new File([file], cleanName, {
+              type: file.type,
+              lastModified: file.lastModified,
+            })
+          : file;
+        
+        setFormData((prev) => ({ ...prev, image: cleanedFile }));
       }
     }, []);
 

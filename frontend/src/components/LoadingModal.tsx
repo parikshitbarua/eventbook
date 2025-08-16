@@ -1,6 +1,7 @@
 import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { useTheme } from '../hooks/theme.hook';
+import { colors } from '../config/global.themes';
 
 export type LoadingAction = 
   | 'ticket-purchase'
@@ -49,11 +50,12 @@ const LoadingModal = ({
         return {
           title: 'Processing Ticket Purchase',
           message: customMessage || 'Please wait while we process your ticket purchase. This may take a few moments...',
-          color: 'text-blue-600',
+          color: colors.accent,
           icon: (
             <div className={`${baseClasses} relative`}>
               <svg
-                className="animate-spin text-blue-600"
+                className="animate-spin"
+                style={{ color: colors.accent }}
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -73,7 +75,7 @@ const LoadingModal = ({
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-6 h-6" style={{ color: colors.accent }} fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
               </div>
@@ -85,11 +87,12 @@ const LoadingModal = ({
         return {
           title: 'Creating Your Event',
           message: customMessage || 'Setting up your event and deploying smart contracts. This process may take a few minutes...',
-          color: 'text-green-600',
+          color: colors.success,
           icon: (
             <div className={`${baseClasses} relative`}>
               <svg
-                className="animate-pulse text-green-600"
+                className="animate-pulse"
+                style={{ color: colors.success }}
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -103,7 +106,7 @@ const LoadingModal = ({
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-3 h-3 bg-green-600 rounded-full animate-ping"></div>
+                <div className="w-3 h-3 rounded-full animate-ping" style={{ backgroundColor: colors.success }}></div>
               </div>
             </div>
           )
@@ -113,11 +116,12 @@ const LoadingModal = ({
         return {
           title: 'Uploading Metadata',
           message: customMessage || 'Uploading your event data and images to IPFS. Please wait...',
-          color: 'text-purple-600',
+          color: colors.primary,
           icon: (
             <div className={`${baseClasses} relative`}>
               <svg
-                className="animate-bounce text-purple-600"
+                className="animate-bounce"
+                style={{ color: colors.primary }}
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -138,11 +142,12 @@ const LoadingModal = ({
         return {
           title: 'Transaction Pending',
           message: customMessage || 'Your transaction is being processed on the blockchain. Please do not close this window...',
-          color: 'text-orange-600',
+          color: colors.warning,
           icon: (
             <div className={`${baseClasses} relative`}>
               <svg
-                className="animate-spin text-orange-600"
+                className="animate-spin"
+                style={{ color: colors.warning }}
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -158,11 +163,11 @@ const LoadingModal = ({
                 <path
                   className="opacity-75"
                   fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-2 h-2 bg-orange-600 rounded-full animate-pulse"></div>
+                <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: colors.warning }}></div>
               </div>
             </div>
           )
@@ -172,12 +177,12 @@ const LoadingModal = ({
         return {
           title: 'Deploying Smart Contract',
           message: customMessage || 'Deploying your event contract to the blockchain. This may take several minutes...',
-          color: 'text-red-600',
+          color: colors.primaryHover,
           icon: (
             <div className={`${baseClasses} relative`}>
               <div className="animate-pulse">
                 <svg
-                  className="text-red-600"
+                  style={{ color: colors.primaryHover }}
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -199,12 +204,16 @@ const LoadingModal = ({
         return {
           title: 'Success! 🎉',
           message: customMessage || 'Operation completed successfully!',
-          color: 'text-green-600',
+          color: colors.success,
           icon: (
             <div className={`${baseClasses} relative`}>
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+              <div 
+                className="w-16 h-16 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: `${colors.success}20` }}
+              >
                 <svg
-                  className="w-8 h-8 text-green-600"
+                  className="w-8 h-8"
+                  style={{ color: colors.success }}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -225,12 +234,16 @@ const LoadingModal = ({
         return {
           title: 'Error Occurred',
           message: customMessage || 'Something went wrong. Please try again.',
-          color: 'text-red-600',
+          color: colors.error,
           icon: (
             <div className={`${baseClasses} relative`}>
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+              <div 
+                className="w-16 h-16 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: `${colors.error}20` }}
+              >
                 <svg
-                  className="w-8 h-8 text-red-600"
+                  className="w-8 h-8"
+                  style={{ color: colors.error }}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -251,11 +264,12 @@ const LoadingModal = ({
         return {
           title: 'Loading...',
           message: customMessage || 'Please wait while we process your request...',
-          color: 'text-gray-600',
+          color: isDark ? '#9CA3AF' : '#6B7280',
           icon: (
             <div className={`${baseClasses}`}>
               <svg
-                className="animate-spin text-gray-600"
+                className="animate-spin"
+                style={{ color: isDark ? '#9CA3AF' : '#6B7280' }}
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -285,17 +299,17 @@ const LoadingModal = ({
   const getProgressBarColor = (action: LoadingAction): string => {
     switch (action) {
       case 'ticket-purchase':
-        return 'bg-blue-600';
+        return colors.accent;
       case 'event-creation':
-        return 'bg-green-600';
+        return colors.success;
       case 'metadata-upload':
-        return 'bg-purple-600';
+        return colors.primary;
       case 'transaction-pending':
-        return 'bg-orange-600';
+        return colors.warning;
       case 'contract-deployment':
-        return 'bg-red-600';
+        return colors.primaryHover;
       default:
-        return 'bg-gray-600';
+        return isDark ? '#9CA3AF' : '#6B7280';
     }
   };
 
@@ -317,8 +331,9 @@ const LoadingModal = ({
         </div>
         <div className={`w-full rounded-full h-2 ${isDark ? 'bg-gray-700' : 'bg-gray-200'} overflow-hidden`}>
           <div
-            className={`h-full rounded-full transition-all duration-500 ease-out ${progressBarColor}`}
+            className="h-full rounded-full transition-all duration-500 ease-out"
             style={{ 
+              backgroundColor: progressBarColor,
               width: `${Math.max(0, Math.min(100, progress))}%`,
               transform: `translateX(0%)` // Force hardware acceleration
             }}
@@ -397,16 +412,25 @@ const LoadingModal = ({
                   <div className="flex justify-center mt-6">
                     <div className="flex space-x-1">
                       <div
-                        className={`w-2 h-2 ${config.color.replace('text-', 'bg-')} rounded-full animate-bounce`}
-                        style={{ animationDelay: '0ms' }}
+                        className="w-2 h-2 rounded-full animate-bounce"
+                        style={{ 
+                          backgroundColor: config.color,
+                          animationDelay: '0ms'
+                        }}
                       />
                       <div
-                        className={`w-2 h-2 ${config.color.replace('text-', 'bg-')} rounded-full animate-bounce`}
-                        style={{ animationDelay: '150ms' }}
+                        className="w-2 h-2 rounded-full animate-bounce"
+                        style={{ 
+                          backgroundColor: config.color,
+                          animationDelay: '150ms'
+                        }}
                       />
                       <div
-                        className={`w-2 h-2 ${config.color.replace('text-', 'bg-')} rounded-full animate-bounce`}
-                        style={{ animationDelay: '300ms' }}
+                        className="w-2 h-2 rounded-full animate-bounce"
+                        style={{ 
+                          backgroundColor: config.color,
+                          animationDelay: '300ms'
+                        }}
                       />
                     </div>
                   </div>
@@ -418,11 +442,16 @@ const LoadingModal = ({
                     {actionButton && (
                       <button
                         onClick={actionButton.onClick}
-                        className={`w-full px-6 py-3 rounded-lg font-medium transition-colors ${
-                          action === 'success'
-                            ? 'bg-green-600 hover:bg-green-700 text-white'
-                            : 'bg-red-600 hover:bg-red-700 text-white'
-                        }`}
+                        className="w-full px-6 py-3 rounded-lg font-medium transition-all duration-200 text-white transform hover:scale-105"
+                        style={{
+                          backgroundColor: action === 'success' ? colors.success : colors.info,
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = action === 'success' ? colors.successHover : colors.infoHover;
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = action === 'success' ? colors.success : colors.info;
+                        }}
                       >
                         {actionButton.text}
                       </button>

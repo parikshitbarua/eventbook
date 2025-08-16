@@ -28,6 +28,9 @@ contract EventContract is Ownable, ReentrancyGuard, Initializable {
     // Event edit permission - set once during initialization
     bool public isEventEditAllowed;
     
+    // Ticket category edit permission - set when adding first category
+    bool public isEventTicketEditable;
+    
     // Associated NFT contract
     address public nftContract;
     
@@ -95,6 +98,12 @@ contract EventContract is Ownable, ReentrancyGuard, Initializable {
         _;
     }
     
+    modifier onlyBeforeSales() {
+        require(block.timestamp < salesStartTime, "Sales already started");
+        require(block.timestamp < eventStartTime, "Event already started");
+        _;
+    }
+    
     constructor() Ownable(msg.sender) {
         // Constructor is disabled for clones
         _disableInitializers();
@@ -113,7 +122,8 @@ contract EventContract is Ownable, ReentrancyGuard, Initializable {
         uint256 _eventId,
         address _factory,
         bool _isEventEditAllowed,
-        uint256 _salesStartTime
+        uint256 _salesStartTime,
+        uint256 _salesEndTime
     ) external initializer {
         require(bytes(_eventTitle).length > 0, "Empty title");
         require(_organizer != address(0), "Invalid organizer");
@@ -123,6 +133,11 @@ contract EventContract is Ownable, ReentrancyGuard, Initializable {
         
         if (_salesStartTime != 0) {
             require(_salesStartTime <= _eventStartTime, "Sales can't start after event");
+        }
+        
+        if (_salesEndTime != 0) {
+            require(_salesEndTime <= _eventStartTime, "Sales can't end after event");
+            require(_salesEndTime > (_salesStartTime == 0 ? block.timestamp : _salesStartTime), "Sales end before start");
         }
         
         _transferOwnership(_organizer);
@@ -144,7 +159,7 @@ contract EventContract is Ownable, ReentrancyGuard, Initializable {
         isEventEditAllowed = _isEventEditAllowed;
         
         salesStartTime = _salesStartTime == 0 ? block.timestamp : _salesStartTime;
-        salesEndTime = _eventStartTime;
+        salesEndTime = _salesEndTime == 0 ? _eventStartTime : _salesEndTime;
         maxTicketsPerWallet = 10;
     }
     
@@ -368,14 +383,14 @@ contract EventContract is Ownable, ReentrancyGuard, Initializable {
             bstr[--k] = bytes1(uint8(48 + j % 10));
             j /= 10;
         }
-        return string(bstr);
+                return string(bstr);
     }
     
-    function addTicketCategories(
+    function _createTicketCategories(
         CategoryInput[] memory _categories
-    ) external onlyOrganizer returns (uint256[] memory) {
+    ) internal returns (uint256[] memory) {
         require(_categories.length > 0, "No categories provided");
-        require(_categories.length <= 20, "Too many categories"); // Gas limit protection
+        require(_categories.length <= 20, "Too many categories");
         
         uint256[] memory categoryIds = new uint256[](_categories.length);
         
@@ -402,31 +417,51 @@ contract EventContract is Ownable, ReentrancyGuard, Initializable {
         emit CategoriesAdded(categoryIds, _categories.length);
         return categoryIds;
     }
-
-    // Legacy function for backward compatibility (single category)
+ 
     function addTicketCategory(
         string memory _name,
         uint256 _price,
         uint256 _maxSupply,
         string memory _categoryURI
-    ) external onlyOrganizer returns (uint256) {
-        require(_price > 0, "Invalid price");
-        require(bytes(_name).length > 0, "Empty name");
-        require(bytes(_categoryURI).length > 0, "Empty URI");
+    ) external onlyOrganizer onlyBeforeSales returns (uint256) {
+        require(isEventTicketEditable, "Ticket categories not editable");
         
-        uint256 categoryId = ++categoryCount;
-        
-        ticketCategories[categoryId] = TicketCategory({
+        CategoryInput[] memory categories = new CategoryInput[](1);
+        categories[0] = CategoryInput({
             name: _name,
             price: _price,
             maxSupply: _maxSupply,
-            sold: 0,
-            isActive: true,
             categoryURI: _categoryURI
         });
         
-        emit CategoryAdded(categoryId, _name, _price, _categoryURI);
-        return categoryId;
+        uint256[] memory categoryIds = _createTicketCategories(categories);
+        return categoryIds[0];
+    }
+
+    function addTicketCategories(
+        CategoryInput[] memory _categories,
+        bool _isEventTicketEditable
+    ) external onlyOrganizer onlyBeforeSales returns (uint256[] memory) {
+        require(categoryCount == 0, "Categories already exist");
+        
+        isEventTicketEditable = _isEventTicketEditable;
+        
+        return _createTicketCategories(_categories);
+    }
+    
+    function editTicketCategories(
+        CategoryInput[] memory _categories
+    ) external onlyOrganizer onlyBeforeSales returns (uint256[] memory) {
+        require(isEventTicketEditable, "Ticket categories not editable");
+        
+        for (uint256 i = 1; i <= categoryCount; i++) {
+            delete ticketCategories[i];
+        }
+        
+        categoryCount = 0;
+        isEventTicketEditable = false;
+        
+        return _createTicketCategories(_categories);
     }
     
     function updateEventDetails(
@@ -444,7 +479,6 @@ contract EventContract is Ownable, ReentrancyGuard, Initializable {
         require(_eventEndTime > _eventStartTime, "Invalid times");
         require(_eventStartTime > block.timestamp, "Past start time");
         
-        // If maxTickets is being reduced, ensure it's not below current sales
         if (_maxTickets > 0 && _maxTickets < ticketsSold) {
             revert("Max tickets below sold count");
         }
@@ -458,6 +492,7 @@ contract EventContract is Ownable, ReentrancyGuard, Initializable {
         venue = _venue;
         eventStartTime = _eventStartTime;
         eventEndTime = _eventEndTime;
+//        isEventEditAllowed = false;
         
         emit EventUpdated();
     }

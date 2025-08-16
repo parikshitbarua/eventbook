@@ -1,6 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 import Layout from './components/Layout.tsx';
 import NewEventPage from './pages/NewEventPage.tsx';
+import EditEventPage from './pages/EditEventPage.tsx';
 import HomePage from './pages/HomePage.tsx';
 import AddTicketsPage from './pages/AddTicketsPage.tsx';
 import EventDetailsPage from './pages/EventDetailsPage.tsx';
@@ -8,6 +9,7 @@ import EventStatsPage from './pages/EventStatsPage.tsx';
 import MyEvents from './pages/MyEvents.tsx';
 import MyTickets from './pages/MyTickets.tsx';
 import LandingPage from './pages/LandingPage.tsx';
+import OrganizerProtectedRoute from './components/OrganizerProtectedRoute.tsx';
 
 const router = createBrowserRouter([
   {
@@ -25,6 +27,14 @@ const router = createBrowserRouter([
       {
         path: '/new-event',
         element: <NewEventPage />,
+      },
+      {
+        path: '/edit-event/:id',
+        element: (
+          <OrganizerProtectedRoute>
+            <EditEventPage />
+          </OrganizerProtectedRoute>
+        ),
       },
       {
         path: '/add-tickets',

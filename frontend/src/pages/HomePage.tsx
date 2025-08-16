@@ -62,18 +62,85 @@ const HomePage = () => {
           FACTORY_ADDRESS,
           EventFactoryABI.abi,
           provider,
-        ) as unknown as EventFactoryContract;
+        );
 
         const eventData: EventData[] = [];
         // Get only active event IDs
+        console.log("calling get active events");
         const activeEventIds = await contract.getActiveEvents();
+        console.log("active events", activeEventIds);
 
         await Promise.all(
           activeEventIds.map(async (eventId: bigint) => {
             let firstImageUrl: string | null = null;
             try {
-              // Use getEventDetails instead of events mapping
-              const eventDetails = await contract.getEventDetails(eventId);
+              // First get the event contract address from factory
+              // events() returns a tuple: [eventContract, nftContract, organizer, title, createdAt, isActive, ticketsSold, totalRevenue]
+              const [
+                eventContractAddress,
+                nftContractAddress,
+                organizerAddress,
+                eventTitle,
+                eventCreatedAt,
+                eventIsActive,
+                eventTicketsSold,
+                eventTotalRevenue
+              ] = await contract.events(eventId);
+
+              console.log(`🏭 HomePage - Factory response for Event ${eventId}:`, {
+                eventContractAddress,
+                nftContractAddress,
+                organizerAddress,
+                eventTitle,
+                eventCreatedAt,
+                eventIsActive,
+                eventTicketsSold,
+                eventTotalRevenue
+              });
+
+              // Create event contract instance
+              const eventContractInstance = new Contract(
+                eventContractAddress,
+                EventContractABI.abi,
+                provider,
+              );
+
+              // Get event details directly from the event contract
+              const [
+                title,
+                description,
+                eventOrganizer,
+                price,
+                maxTicketsCount,
+                ticketsSoldCount,
+                active,
+                uri,
+                creationTime,
+                startTime,
+                endTime,
+                eventVenue
+              ] = await eventContractInstance.getEventDetails();
+
+              // Reconstruct eventDetails object to match the expected format
+              const eventDetails = {
+                eventInfo: {
+                  title,
+                  organizer: eventOrganizer,
+                  isActive: active,
+                  ticketsSold: BigInt(ticketsSoldCount),
+                  eventContract: eventContractAddress,
+                  nftContract: nftContractAddress,
+                  createdAt: BigInt(creationTime),
+                  totalRevenue: BigInt(eventTotalRevenue),
+                },
+                description,
+                ticketPrice: BigInt(price),
+                maxTickets: BigInt(maxTicketsCount),
+                eventURI: uri,
+                eventStartTime: BigInt(startTime),
+                eventEndTime: BigInt(endTime),
+                venue: eventVenue,
+              };
 
               if (eventDetails.eventURI) {
                 // Fetch the JSON metadata from the eventURI
@@ -156,8 +223,14 @@ const HomePage = () => {
                 totalRevenue: eventDetails.eventInfo.totalRevenue,
                 eventImages: firstImageUrl ? firstImageUrl : '',
               });
+
+              console.log(`✅ HomePage - Successfully processed Event ${eventId}`);
             } catch (err) {
-              console.error(`Failed to fetch event ${eventId}:`, err);
+              console.error(`❌ HomePage - Failed to fetch event ${eventId}:`, err);
+              // Log which step failed for better debugging
+              if (err instanceof Error) {
+                console.error(`Error details: ${err.message}`);
+              }
             }
           }),
         );

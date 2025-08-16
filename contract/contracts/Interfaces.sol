@@ -154,7 +154,10 @@ interface IEventFactory {
         uint256 _eventEndTime,
         string memory _venue,
         string memory _nftName,
-        string memory _nftSymbol
+        string memory _nftSymbol,
+        bool _isEventEditAllowed,
+        uint256 _salesStartTime,
+        uint256 _salesEndTime
     ) external returns (uint256 eventId, address eventContract, address nftContract);
     
     function deactivateEvent(uint256 eventId) external;

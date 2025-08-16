@@ -13,7 +13,7 @@ import type {
   ContractRunner,
   ContractMethod,
   Listener,
-} from 'ethers';
+} from "ethers";
 import type {
   TypedContractEvent,
   TypedDeferredTopicFilter,
@@ -21,7 +21,7 @@ import type {
   TypedLogDescription,
   TypedListener,
   TypedContractMethod,
-} from '../common';
+} from "../common";
 
 export declare namespace EventTicketNFT {
   export type TicketStruct = {
@@ -37,7 +37,7 @@ export declare namespace EventTicketNFT {
     originalBuyer: string,
     mintedAt: bigint,
     categoryId: bigint,
-    isUsed: boolean,
+    isUsed: boolean
   ] & {
     tokenId: bigint;
     originalBuyer: string;
@@ -50,273 +50,273 @@ export declare namespace EventTicketNFT {
 export interface EventTicketNFTInterface extends Interface {
   getFunction(
     nameOrSignature:
-      | 'ROYALTY_FEE'
-      | 'approve'
-      | 'balanceOf'
-      | 'batchMintTickets'
-      | 'eventContract'
-      | 'getApproved'
-      | 'getTicket'
-      | 'getTicketsOfOwner'
-      | 'initialize'
-      | 'isApprovedForAll'
-      | 'isTicketUsed'
-      | 'mintTicket'
-      | 'name'
-      | 'owner'
-      | 'ownerOf'
-      | 'purchaseCategoryTickets'
-      | 'purchaseSingleTicket'
-      | 'renounceOwnership'
-      | 'royaltyInfo'
-      | 'safeTransferFrom(address,address,uint256)'
-      | 'safeTransferFrom(address,address,uint256,bytes)'
-      | 'setApprovalForAll'
-      | 'supportsInterface'
-      | 'symbol'
-      | 'tickets'
-      | 'tokenByIndex'
-      | 'tokenOfOwnerByIndex'
-      | 'tokenURI'
-      | 'totalSupply'
-      | 'transferFrom'
-      | 'transferOwnership'
-      | 'useTicket'
-      | 'usedTickets',
+      | "ROYALTY_FEE"
+      | "approve"
+      | "balanceOf"
+      | "batchMintTickets"
+      | "eventContract"
+      | "getApproved"
+      | "getTicket"
+      | "getTicketsOfOwner"
+      | "initialize"
+      | "isApprovedForAll"
+      | "isTicketUsed"
+      | "mintTicket"
+      | "name"
+      | "owner"
+      | "ownerOf"
+      | "purchaseCategoryTickets"
+      | "purchaseSingleTicket"
+      | "renounceOwnership"
+      | "royaltyInfo"
+      | "safeTransferFrom(address,address,uint256)"
+      | "safeTransferFrom(address,address,uint256,bytes)"
+      | "setApprovalForAll"
+      | "supportsInterface"
+      | "symbol"
+      | "tickets"
+      | "tokenByIndex"
+      | "tokenOfOwnerByIndex"
+      | "tokenURI"
+      | "totalSupply"
+      | "transferFrom"
+      | "transferOwnership"
+      | "useTicket"
+      | "usedTickets"
   ): FunctionFragment;
 
   getEvent(
     nameOrSignatureOrTopic:
-      | 'Approval'
-      | 'ApprovalForAll'
-      | 'BatchMetadataUpdate'
-      | 'Initialized'
-      | 'MetadataUpdate'
-      | 'OwnershipTransferred'
-      | 'TicketMinted'
-      | 'TicketUsed'
-      | 'Transfer',
+      | "Approval"
+      | "ApprovalForAll"
+      | "BatchMetadataUpdate"
+      | "Initialized"
+      | "MetadataUpdate"
+      | "OwnershipTransferred"
+      | "TicketMinted"
+      | "TicketUsed"
+      | "Transfer"
   ): EventFragment;
 
   encodeFunctionData(
-    functionFragment: 'ROYALTY_FEE',
-    values?: undefined,
+    functionFragment: "ROYALTY_FEE",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'approve',
-    values: [AddressLike, BigNumberish],
+    functionFragment: "approve",
+    values: [AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'balanceOf',
-    values: [AddressLike],
+    functionFragment: "balanceOf",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: 'batchMintTickets',
-    values: [AddressLike, string[], BigNumberish[], BigNumberish[]],
+    functionFragment: "batchMintTickets",
+    values: [AddressLike, string[], BigNumberish[], BigNumberish[]]
   ): string;
   encodeFunctionData(
-    functionFragment: 'eventContract',
-    values?: undefined,
+    functionFragment: "eventContract",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'getApproved',
-    values: [BigNumberish],
+    functionFragment: "getApproved",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'getTicket',
-    values: [BigNumberish],
+    functionFragment: "getTicket",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'getTicketsOfOwner',
-    values: [AddressLike],
+    functionFragment: "getTicketsOfOwner",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: 'initialize',
-    values: [string, string, AddressLike, AddressLike],
+    functionFragment: "initialize",
+    values: [string, string, AddressLike, AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: 'isApprovedForAll',
-    values: [AddressLike, AddressLike],
+    functionFragment: "isApprovedForAll",
+    values: [AddressLike, AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: 'isTicketUsed',
-    values: [BigNumberish],
+    functionFragment: "isTicketUsed",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'mintTicket',
-    values: [AddressLike, string, BigNumberish],
+    functionFragment: "mintTicket",
+    values: [AddressLike, string, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: 'name', values?: undefined): string;
-  encodeFunctionData(functionFragment: 'owner', values?: undefined): string;
+  encodeFunctionData(functionFragment: "name", values?: undefined): string;
+  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: 'ownerOf',
-    values: [BigNumberish],
-  ): string;
-  encodeFunctionData(
-    functionFragment: 'purchaseCategoryTickets',
-    values: [BigNumberish[], BigNumberish[], string[]],
+    functionFragment: "ownerOf",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'purchaseSingleTicket',
-    values: [string, BigNumberish],
+    functionFragment: "purchaseCategoryTickets",
+    values: [BigNumberish[], BigNumberish[], string[]]
   ): string;
   encodeFunctionData(
-    functionFragment: 'renounceOwnership',
-    values?: undefined,
+    functionFragment: "purchaseSingleTicket",
+    values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'royaltyInfo',
-    values: [BigNumberish, BigNumberish],
+    functionFragment: "renounceOwnership",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'safeTransferFrom(address,address,uint256)',
-    values: [AddressLike, AddressLike, BigNumberish],
+    functionFragment: "royaltyInfo",
+    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'safeTransferFrom(address,address,uint256,bytes)',
-    values: [AddressLike, AddressLike, BigNumberish, BytesLike],
+    functionFragment: "safeTransferFrom(address,address,uint256)",
+    values: [AddressLike, AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'setApprovalForAll',
-    values: [AddressLike, boolean],
+    functionFragment: "safeTransferFrom(address,address,uint256,bytes)",
+    values: [AddressLike, AddressLike, BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: 'supportsInterface',
-    values: [BytesLike],
-  ): string;
-  encodeFunctionData(functionFragment: 'symbol', values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: 'tickets',
-    values: [BigNumberish],
+    functionFragment: "setApprovalForAll",
+    values: [AddressLike, boolean]
   ): string;
   encodeFunctionData(
-    functionFragment: 'tokenByIndex',
-    values: [BigNumberish],
+    functionFragment: "supportsInterface",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "tickets",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'tokenOfOwnerByIndex',
-    values: [AddressLike, BigNumberish],
+    functionFragment: "tokenByIndex",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'tokenURI',
-    values: [BigNumberish],
+    functionFragment: "tokenOfOwnerByIndex",
+    values: [AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'totalSupply',
-    values?: undefined,
+    functionFragment: "tokenURI",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'transferFrom',
-    values: [AddressLike, AddressLike, BigNumberish],
+    functionFragment: "totalSupply",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'transferOwnership',
-    values: [AddressLike],
+    functionFragment: "transferFrom",
+    values: [AddressLike, AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'useTicket',
-    values: [BigNumberish],
+    functionFragment: "transferOwnership",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: 'usedTickets',
-    values: [BigNumberish],
+    functionFragment: "useTicket",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "usedTickets",
+    values: [BigNumberish]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: 'ROYALTY_FEE',
-    data: BytesLike,
+    functionFragment: "ROYALTY_FEE",
+    data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: 'approve', data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: 'balanceOf', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: 'batchMintTickets',
-    data: BytesLike,
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: 'eventContract',
-    data: BytesLike,
+    functionFragment: "batchMintTickets",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'getApproved',
-    data: BytesLike,
-  ): Result;
-  decodeFunctionResult(functionFragment: 'getTicket', data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: 'getTicketsOfOwner',
-    data: BytesLike,
-  ): Result;
-  decodeFunctionResult(functionFragment: 'initialize', data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: 'isApprovedForAll',
-    data: BytesLike,
+    functionFragment: "eventContract",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'isTicketUsed',
-    data: BytesLike,
+    functionFragment: "getApproved",
+    data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: 'mintTicket', data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: 'name', data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: 'owner', data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: 'ownerOf', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "getTicket", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: 'purchaseCategoryTickets',
-    data: BytesLike,
+    functionFragment: "getTicketsOfOwner",
+    data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: 'purchaseSingleTicket',
-    data: BytesLike,
+    functionFragment: "isApprovedForAll",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'renounceOwnership',
-    data: BytesLike,
+    functionFragment: "isTicketUsed",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "mintTicket", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "purchaseCategoryTickets",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'royaltyInfo',
-    data: BytesLike,
+    functionFragment: "purchaseSingleTicket",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'safeTransferFrom(address,address,uint256)',
-    data: BytesLike,
+    functionFragment: "renounceOwnership",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'safeTransferFrom(address,address,uint256,bytes)',
-    data: BytesLike,
+    functionFragment: "royaltyInfo",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'setApprovalForAll',
-    data: BytesLike,
+    functionFragment: "safeTransferFrom(address,address,uint256)",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'supportsInterface',
-    data: BytesLike,
-  ): Result;
-  decodeFunctionResult(functionFragment: 'symbol', data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: 'tickets', data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: 'tokenByIndex',
-    data: BytesLike,
+    functionFragment: "safeTransferFrom(address,address,uint256,bytes)",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'tokenOfOwnerByIndex',
-    data: BytesLike,
-  ): Result;
-  decodeFunctionResult(functionFragment: 'tokenURI', data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: 'totalSupply',
-    data: BytesLike,
+    functionFragment: "setApprovalForAll",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'transferFrom',
-    data: BytesLike,
+    functionFragment: "supportsInterface",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "tickets", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "tokenByIndex",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'transferOwnership',
-    data: BytesLike,
+    functionFragment: "tokenOfOwnerByIndex",
+    data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: 'useTicket', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "tokenURI", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: 'usedTickets',
-    data: BytesLike,
+    functionFragment: "totalSupply",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "transferFrom",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "transferOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "useTicket", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "usedTickets",
+    data: BytesLike
   ): Result;
 }
 
@@ -324,7 +324,7 @@ export namespace ApprovalEvent {
   export type InputTuple = [
     owner: AddressLike,
     approved: AddressLike,
-    tokenId: BigNumberish,
+    tokenId: BigNumberish
   ];
   export type OutputTuple = [owner: string, approved: string, tokenId: bigint];
   export interface OutputObject {
@@ -342,12 +342,12 @@ export namespace ApprovalForAllEvent {
   export type InputTuple = [
     owner: AddressLike,
     operator: AddressLike,
-    approved: boolean,
+    approved: boolean
   ];
   export type OutputTuple = [
     owner: string,
     operator: string,
-    approved: boolean,
+    approved: boolean
   ];
   export interface OutputObject {
     owner: string;
@@ -363,7 +363,7 @@ export namespace ApprovalForAllEvent {
 export namespace BatchMetadataUpdateEvent {
   export type InputTuple = [
     _fromTokenId: BigNumberish,
-    _toTokenId: BigNumberish,
+    _toTokenId: BigNumberish
   ];
   export type OutputTuple = [_fromTokenId: bigint, _toTokenId: bigint];
   export interface OutputObject {
@@ -417,12 +417,12 @@ export namespace TicketMintedEvent {
   export type InputTuple = [
     tokenId: BigNumberish,
     buyer: AddressLike,
-    categoryId: BigNumberish,
+    categoryId: BigNumberish
   ];
   export type OutputTuple = [
     tokenId: bigint,
     buyer: string,
-    categoryId: bigint,
+    categoryId: bigint
   ];
   export interface OutputObject {
     tokenId: bigint;
@@ -451,7 +451,7 @@ export namespace TransferEvent {
   export type InputTuple = [
     from: AddressLike,
     to: AddressLike,
-    tokenId: BigNumberish,
+    tokenId: BigNumberish
   ];
   export type OutputTuple = [from: string, to: string, tokenId: bigint];
   export interface OutputObject {
@@ -474,75 +474,75 @@ export interface EventTicketNFT extends BaseContract {
   queryFilter<TCEvent extends TypedContractEvent>(
     event: TCEvent,
     fromBlockOrBlockhash?: string | number | undefined,
-    toBlock?: string | number | undefined,
+    toBlock?: string | number | undefined
   ): Promise<Array<TypedEventLog<TCEvent>>>;
   queryFilter<TCEvent extends TypedContractEvent>(
     filter: TypedDeferredTopicFilter<TCEvent>,
     fromBlockOrBlockhash?: string | number | undefined,
-    toBlock?: string | number | undefined,
+    toBlock?: string | number | undefined
   ): Promise<Array<TypedEventLog<TCEvent>>>;
 
   on<TCEvent extends TypedContractEvent>(
     event: TCEvent,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
   on<TCEvent extends TypedContractEvent>(
     filter: TypedDeferredTopicFilter<TCEvent>,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
 
   once<TCEvent extends TypedContractEvent>(
     event: TCEvent,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
   once<TCEvent extends TypedContractEvent>(
     filter: TypedDeferredTopicFilter<TCEvent>,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
 
   listeners<TCEvent extends TypedContractEvent>(
-    event: TCEvent,
+    event: TCEvent
   ): Promise<Array<TypedListener<TCEvent>>>;
   listeners(eventName?: string): Promise<Array<Listener>>;
   removeAllListeners<TCEvent extends TypedContractEvent>(
-    event?: TCEvent,
+    event?: TCEvent
   ): Promise<this>;
 
-  ROYALTY_FEE: TypedContractMethod<[], [bigint], 'view'>;
+  ROYALTY_FEE: TypedContractMethod<[], [bigint], "view">;
 
   approve: TypedContractMethod<
     [to: AddressLike, tokenId: BigNumberish],
     [void],
-    'nonpayable'
+    "nonpayable"
   >;
 
-  balanceOf: TypedContractMethod<[owner: AddressLike], [bigint], 'view'>;
+  balanceOf: TypedContractMethod<[owner: AddressLike], [bigint], "view">;
 
   batchMintTickets: TypedContractMethod<
     [
       to: AddressLike,
       _tokenURIs: string[],
       categoryIds: BigNumberish[],
-      quantities: BigNumberish[],
+      quantities: BigNumberish[]
     ],
     [bigint[]],
-    'nonpayable'
+    "nonpayable"
   >;
 
-  eventContract: TypedContractMethod<[], [string], 'view'>;
+  eventContract: TypedContractMethod<[], [string], "view">;
 
-  getApproved: TypedContractMethod<[tokenId: BigNumberish], [string], 'view'>;
+  getApproved: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
 
   getTicket: TypedContractMethod<
     [tokenId: BigNumberish],
     [EventTicketNFT.TicketStructOutput],
-    'view'
+    "view"
   >;
 
   getTicketsOfOwner: TypedContractMethod<
     [owner: AddressLike],
     [bigint[]],
-    'view'
+    "view"
   >;
 
   initialize: TypedContractMethod<
@@ -550,82 +550,82 @@ export interface EventTicketNFT extends BaseContract {
       _name: string,
       _symbol: string,
       _eventContract: AddressLike,
-      _owner: AddressLike,
+      _owner: AddressLike
     ],
     [void],
-    'nonpayable'
+    "nonpayable"
   >;
 
   isApprovedForAll: TypedContractMethod<
     [owner: AddressLike, operator: AddressLike],
     [boolean],
-    'view'
+    "view"
   >;
 
-  isTicketUsed: TypedContractMethod<[tokenId: BigNumberish], [boolean], 'view'>;
+  isTicketUsed: TypedContractMethod<[tokenId: BigNumberish], [boolean], "view">;
 
   mintTicket: TypedContractMethod<
     [to: AddressLike, _tokenURI: string, categoryId: BigNumberish],
     [bigint],
-    'nonpayable'
+    "nonpayable"
   >;
 
-  name: TypedContractMethod<[], [string], 'view'>;
+  name: TypedContractMethod<[], [string], "view">;
 
-  owner: TypedContractMethod<[], [string], 'view'>;
+  owner: TypedContractMethod<[], [string], "view">;
 
-  ownerOf: TypedContractMethod<[tokenId: BigNumberish], [string], 'view'>;
+  ownerOf: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
 
   purchaseCategoryTickets: TypedContractMethod<
     [quantities: BigNumberish[], categoryIds: BigNumberish[], uris: string[]],
     [bigint[]],
-    'payable'
+    "payable"
   >;
 
   purchaseSingleTicket: TypedContractMethod<
     [uri: string, quantity: BigNumberish],
     [bigint[]],
-    'payable'
+    "payable"
   >;
 
-  renounceOwnership: TypedContractMethod<[], [void], 'nonpayable'>;
+  renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
 
   royaltyInfo: TypedContractMethod<
     [_tokenId: BigNumberish, _salePrice: BigNumberish],
     [[string, bigint]],
-    'view'
+    "view"
   >;
 
-  'safeTransferFrom(address,address,uint256)': TypedContractMethod<
+  "safeTransferFrom(address,address,uint256)": TypedContractMethod<
     [from: AddressLike, to: AddressLike, tokenId: BigNumberish],
     [void],
-    'nonpayable'
+    "nonpayable"
   >;
 
-  'safeTransferFrom(address,address,uint256,bytes)': TypedContractMethod<
+  "safeTransferFrom(address,address,uint256,bytes)": TypedContractMethod<
     [
       from: AddressLike,
       to: AddressLike,
       tokenId: BigNumberish,
-      data: BytesLike,
+      data: BytesLike
     ],
     [void],
-    'nonpayable'
+    "nonpayable"
   >;
 
   setApprovalForAll: TypedContractMethod<
     [operator: AddressLike, approved: boolean],
     [void],
-    'nonpayable'
+    "nonpayable"
   >;
 
   supportsInterface: TypedContractMethod<
     [interfaceId: BytesLike],
     [boolean],
-    'view'
+    "view"
   >;
 
-  symbol: TypedContractMethod<[], [string], 'view'>;
+  symbol: TypedContractMethod<[], [string], "view">;
 
   tickets: TypedContractMethod<
     [arg0: BigNumberish],
@@ -636,179 +636,181 @@ export interface EventTicketNFT extends BaseContract {
         mintedAt: bigint;
         categoryId: bigint;
         isUsed: boolean;
-      },
+      }
     ],
-    'view'
+    "view"
   >;
 
-  tokenByIndex: TypedContractMethod<[index: BigNumberish], [bigint], 'view'>;
+  tokenByIndex: TypedContractMethod<[index: BigNumberish], [bigint], "view">;
 
   tokenOfOwnerByIndex: TypedContractMethod<
     [owner: AddressLike, index: BigNumberish],
     [bigint],
-    'view'
+    "view"
   >;
 
-  tokenURI: TypedContractMethod<[tokenId: BigNumberish], [string], 'view'>;
+  tokenURI: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
 
-  totalSupply: TypedContractMethod<[], [bigint], 'view'>;
+  totalSupply: TypedContractMethod<[], [bigint], "view">;
 
   transferFrom: TypedContractMethod<
     [from: AddressLike, to: AddressLike, tokenId: BigNumberish],
     [void],
-    'nonpayable'
+    "nonpayable"
   >;
 
   transferOwnership: TypedContractMethod<
     [newOwner: AddressLike],
     [void],
-    'nonpayable'
+    "nonpayable"
   >;
 
-  useTicket: TypedContractMethod<[tokenId: BigNumberish], [void], 'nonpayable'>;
+  useTicket: TypedContractMethod<[tokenId: BigNumberish], [void], "nonpayable">;
 
-  usedTickets: TypedContractMethod<[arg0: BigNumberish], [boolean], 'view'>;
+  usedTickets: TypedContractMethod<[arg0: BigNumberish], [boolean], "view">;
 
   getFunction<T extends ContractMethod = ContractMethod>(
-    key: string | FunctionFragment,
+    key: string | FunctionFragment
   ): T;
 
   getFunction(
-    nameOrSignature: 'ROYALTY_FEE',
-  ): TypedContractMethod<[], [bigint], 'view'>;
+    nameOrSignature: "ROYALTY_FEE"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: 'approve',
+    nameOrSignature: "approve"
   ): TypedContractMethod<
     [to: AddressLike, tokenId: BigNumberish],
     [void],
-    'nonpayable'
+    "nonpayable"
   >;
   getFunction(
-    nameOrSignature: 'balanceOf',
-  ): TypedContractMethod<[owner: AddressLike], [bigint], 'view'>;
+    nameOrSignature: "balanceOf"
+  ): TypedContractMethod<[owner: AddressLike], [bigint], "view">;
   getFunction(
-    nameOrSignature: 'batchMintTickets',
+    nameOrSignature: "batchMintTickets"
   ): TypedContractMethod<
     [
       to: AddressLike,
       _tokenURIs: string[],
       categoryIds: BigNumberish[],
-      quantities: BigNumberish[],
+      quantities: BigNumberish[]
     ],
     [bigint[]],
-    'nonpayable'
+    "nonpayable"
   >;
   getFunction(
-    nameOrSignature: 'eventContract',
-  ): TypedContractMethod<[], [string], 'view'>;
+    nameOrSignature: "eventContract"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
-    nameOrSignature: 'getApproved',
-  ): TypedContractMethod<[tokenId: BigNumberish], [string], 'view'>;
+    nameOrSignature: "getApproved"
+  ): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
   getFunction(
-    nameOrSignature: 'getTicket',
+    nameOrSignature: "getTicket"
   ): TypedContractMethod<
     [tokenId: BigNumberish],
     [EventTicketNFT.TicketStructOutput],
-    'view'
+    "view"
   >;
   getFunction(
-    nameOrSignature: 'getTicketsOfOwner',
-  ): TypedContractMethod<[owner: AddressLike], [bigint[]], 'view'>;
+    nameOrSignature: "getTicketsOfOwner"
+  ): TypedContractMethod<[owner: AddressLike], [bigint[]], "view">;
   getFunction(
-    nameOrSignature: 'initialize',
+    nameOrSignature: "initialize"
   ): TypedContractMethod<
     [
       _name: string,
       _symbol: string,
       _eventContract: AddressLike,
-      _owner: AddressLike,
+      _owner: AddressLike
     ],
     [void],
-    'nonpayable'
+    "nonpayable"
   >;
   getFunction(
-    nameOrSignature: 'isApprovedForAll',
+    nameOrSignature: "isApprovedForAll"
   ): TypedContractMethod<
     [owner: AddressLike, operator: AddressLike],
     [boolean],
-    'view'
+    "view"
   >;
   getFunction(
-    nameOrSignature: 'isTicketUsed',
-  ): TypedContractMethod<[tokenId: BigNumberish], [boolean], 'view'>;
+    nameOrSignature: "isTicketUsed"
+  ): TypedContractMethod<[tokenId: BigNumberish], [boolean], "view">;
   getFunction(
-    nameOrSignature: 'mintTicket',
+    nameOrSignature: "mintTicket"
   ): TypedContractMethod<
     [to: AddressLike, _tokenURI: string, categoryId: BigNumberish],
     [bigint],
-    'nonpayable'
+    "nonpayable"
   >;
   getFunction(
-    nameOrSignature: 'name',
-  ): TypedContractMethod<[], [string], 'view'>;
+    nameOrSignature: "name"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
-    nameOrSignature: 'owner',
-  ): TypedContractMethod<[], [string], 'view'>;
+    nameOrSignature: "owner"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
-    nameOrSignature: 'ownerOf',
-  ): TypedContractMethod<[tokenId: BigNumberish], [string], 'view'>;
+    nameOrSignature: "ownerOf"
+  ): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
   getFunction(
-    nameOrSignature: 'purchaseCategoryTickets',
+    nameOrSignature: "purchaseCategoryTickets"
   ): TypedContractMethod<
     [quantities: BigNumberish[], categoryIds: BigNumberish[], uris: string[]],
     [bigint[]],
-    'payable'
+    "payable"
   >;
   getFunction(
-    nameOrSignature: 'purchaseSingleTicket',
+    nameOrSignature: "purchaseSingleTicket"
   ): TypedContractMethod<
     [uri: string, quantity: BigNumberish],
     [bigint[]],
-    'payable'
+    "payable"
   >;
   getFunction(
-    nameOrSignature: 'renounceOwnership',
-  ): TypedContractMethod<[], [void], 'nonpayable'>;
+    nameOrSignature: "renounceOwnership"
+  ): TypedContractMethod<[], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: 'royaltyInfo',
+    nameOrSignature: "royaltyInfo"
   ): TypedContractMethod<
     [_tokenId: BigNumberish, _salePrice: BigNumberish],
     [[string, bigint]],
-    'view'
+    "view"
   >;
   getFunction(
-    nameOrSignature: 'safeTransferFrom(address,address,uint256)',
+    nameOrSignature: "safeTransferFrom(address,address,uint256)"
   ): TypedContractMethod<
     [from: AddressLike, to: AddressLike, tokenId: BigNumberish],
     [void],
-    'nonpayable'
+    "nonpayable"
   >;
   getFunction(
-    nameOrSignature: 'safeTransferFrom(address,address,uint256,bytes)',
+    nameOrSignature: "safeTransferFrom(address,address,uint256,bytes)"
   ): TypedContractMethod<
     [
       from: AddressLike,
       to: AddressLike,
       tokenId: BigNumberish,
-      data: BytesLike,
+      data: BytesLike
     ],
     [void],
-    'nonpayable'
+    "nonpayable"
   >;
   getFunction(
-    nameOrSignature: 'setApprovalForAll',
+    nameOrSignature: "setApprovalForAll"
   ): TypedContractMethod<
     [operator: AddressLike, approved: boolean],
     [void],
-    'nonpayable'
+    "nonpayable"
   >;
   getFunction(
-    nameOrSignature: 'supportsInterface',
-  ): TypedContractMethod<[interfaceId: BytesLike], [boolean], 'view'>;
+    nameOrSignature: "supportsInterface"
+  ): TypedContractMethod<[interfaceId: BytesLike], [boolean], "view">;
   getFunction(
-    nameOrSignature: 'symbol',
-  ): TypedContractMethod<[], [string], 'view'>;
-  getFunction(nameOrSignature: 'tickets'): TypedContractMethod<
+    nameOrSignature: "symbol"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "tickets"
+  ): TypedContractMethod<
     [arg0: BigNumberish],
     [
       [bigint, string, bigint, bigint, boolean] & {
@@ -817,101 +819,101 @@ export interface EventTicketNFT extends BaseContract {
         mintedAt: bigint;
         categoryId: bigint;
         isUsed: boolean;
-      },
+      }
     ],
-    'view'
+    "view"
   >;
   getFunction(
-    nameOrSignature: 'tokenByIndex',
-  ): TypedContractMethod<[index: BigNumberish], [bigint], 'view'>;
+    nameOrSignature: "tokenByIndex"
+  ): TypedContractMethod<[index: BigNumberish], [bigint], "view">;
   getFunction(
-    nameOrSignature: 'tokenOfOwnerByIndex',
+    nameOrSignature: "tokenOfOwnerByIndex"
   ): TypedContractMethod<
     [owner: AddressLike, index: BigNumberish],
     [bigint],
-    'view'
+    "view"
   >;
   getFunction(
-    nameOrSignature: 'tokenURI',
-  ): TypedContractMethod<[tokenId: BigNumberish], [string], 'view'>;
+    nameOrSignature: "tokenURI"
+  ): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
   getFunction(
-    nameOrSignature: 'totalSupply',
-  ): TypedContractMethod<[], [bigint], 'view'>;
+    nameOrSignature: "totalSupply"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: 'transferFrom',
+    nameOrSignature: "transferFrom"
   ): TypedContractMethod<
     [from: AddressLike, to: AddressLike, tokenId: BigNumberish],
     [void],
-    'nonpayable'
+    "nonpayable"
   >;
   getFunction(
-    nameOrSignature: 'transferOwnership',
-  ): TypedContractMethod<[newOwner: AddressLike], [void], 'nonpayable'>;
+    nameOrSignature: "transferOwnership"
+  ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: 'useTicket',
-  ): TypedContractMethod<[tokenId: BigNumberish], [void], 'nonpayable'>;
+    nameOrSignature: "useTicket"
+  ): TypedContractMethod<[tokenId: BigNumberish], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: 'usedTickets',
-  ): TypedContractMethod<[arg0: BigNumberish], [boolean], 'view'>;
+    nameOrSignature: "usedTickets"
+  ): TypedContractMethod<[arg0: BigNumberish], [boolean], "view">;
 
   getEvent(
-    key: 'Approval',
+    key: "Approval"
   ): TypedContractEvent<
     ApprovalEvent.InputTuple,
     ApprovalEvent.OutputTuple,
     ApprovalEvent.OutputObject
   >;
   getEvent(
-    key: 'ApprovalForAll',
+    key: "ApprovalForAll"
   ): TypedContractEvent<
     ApprovalForAllEvent.InputTuple,
     ApprovalForAllEvent.OutputTuple,
     ApprovalForAllEvent.OutputObject
   >;
   getEvent(
-    key: 'BatchMetadataUpdate',
+    key: "BatchMetadataUpdate"
   ): TypedContractEvent<
     BatchMetadataUpdateEvent.InputTuple,
     BatchMetadataUpdateEvent.OutputTuple,
     BatchMetadataUpdateEvent.OutputObject
   >;
   getEvent(
-    key: 'Initialized',
+    key: "Initialized"
   ): TypedContractEvent<
     InitializedEvent.InputTuple,
     InitializedEvent.OutputTuple,
     InitializedEvent.OutputObject
   >;
   getEvent(
-    key: 'MetadataUpdate',
+    key: "MetadataUpdate"
   ): TypedContractEvent<
     MetadataUpdateEvent.InputTuple,
     MetadataUpdateEvent.OutputTuple,
     MetadataUpdateEvent.OutputObject
   >;
   getEvent(
-    key: 'OwnershipTransferred',
+    key: "OwnershipTransferred"
   ): TypedContractEvent<
     OwnershipTransferredEvent.InputTuple,
     OwnershipTransferredEvent.OutputTuple,
     OwnershipTransferredEvent.OutputObject
   >;
   getEvent(
-    key: 'TicketMinted',
+    key: "TicketMinted"
   ): TypedContractEvent<
     TicketMintedEvent.InputTuple,
     TicketMintedEvent.OutputTuple,
     TicketMintedEvent.OutputObject
   >;
   getEvent(
-    key: 'TicketUsed',
+    key: "TicketUsed"
   ): TypedContractEvent<
     TicketUsedEvent.InputTuple,
     TicketUsedEvent.OutputTuple,
     TicketUsedEvent.OutputObject
   >;
   getEvent(
-    key: 'Transfer',
+    key: "Transfer"
   ): TypedContractEvent<
     TransferEvent.InputTuple,
     TransferEvent.OutputTuple,
@@ -919,7 +921,7 @@ export interface EventTicketNFT extends BaseContract {
   >;
 
   filters: {
-    'Approval(address,address,uint256)': TypedContractEvent<
+    "Approval(address,address,uint256)": TypedContractEvent<
       ApprovalEvent.InputTuple,
       ApprovalEvent.OutputTuple,
       ApprovalEvent.OutputObject
@@ -930,7 +932,7 @@ export interface EventTicketNFT extends BaseContract {
       ApprovalEvent.OutputObject
     >;
 
-    'ApprovalForAll(address,address,bool)': TypedContractEvent<
+    "ApprovalForAll(address,address,bool)": TypedContractEvent<
       ApprovalForAllEvent.InputTuple,
       ApprovalForAllEvent.OutputTuple,
       ApprovalForAllEvent.OutputObject
@@ -941,7 +943,7 @@ export interface EventTicketNFT extends BaseContract {
       ApprovalForAllEvent.OutputObject
     >;
 
-    'BatchMetadataUpdate(uint256,uint256)': TypedContractEvent<
+    "BatchMetadataUpdate(uint256,uint256)": TypedContractEvent<
       BatchMetadataUpdateEvent.InputTuple,
       BatchMetadataUpdateEvent.OutputTuple,
       BatchMetadataUpdateEvent.OutputObject
@@ -952,7 +954,7 @@ export interface EventTicketNFT extends BaseContract {
       BatchMetadataUpdateEvent.OutputObject
     >;
 
-    'Initialized(uint64)': TypedContractEvent<
+    "Initialized(uint64)": TypedContractEvent<
       InitializedEvent.InputTuple,
       InitializedEvent.OutputTuple,
       InitializedEvent.OutputObject
@@ -963,7 +965,7 @@ export interface EventTicketNFT extends BaseContract {
       InitializedEvent.OutputObject
     >;
 
-    'MetadataUpdate(uint256)': TypedContractEvent<
+    "MetadataUpdate(uint256)": TypedContractEvent<
       MetadataUpdateEvent.InputTuple,
       MetadataUpdateEvent.OutputTuple,
       MetadataUpdateEvent.OutputObject
@@ -974,7 +976,7 @@ export interface EventTicketNFT extends BaseContract {
       MetadataUpdateEvent.OutputObject
     >;
 
-    'OwnershipTransferred(address,address)': TypedContractEvent<
+    "OwnershipTransferred(address,address)": TypedContractEvent<
       OwnershipTransferredEvent.InputTuple,
       OwnershipTransferredEvent.OutputTuple,
       OwnershipTransferredEvent.OutputObject
@@ -985,7 +987,7 @@ export interface EventTicketNFT extends BaseContract {
       OwnershipTransferredEvent.OutputObject
     >;
 
-    'TicketMinted(uint256,address,uint256)': TypedContractEvent<
+    "TicketMinted(uint256,address,uint256)": TypedContractEvent<
       TicketMintedEvent.InputTuple,
       TicketMintedEvent.OutputTuple,
       TicketMintedEvent.OutputObject
@@ -996,7 +998,7 @@ export interface EventTicketNFT extends BaseContract {
       TicketMintedEvent.OutputObject
     >;
 
-    'TicketUsed(uint256)': TypedContractEvent<
+    "TicketUsed(uint256)": TypedContractEvent<
       TicketUsedEvent.InputTuple,
       TicketUsedEvent.OutputTuple,
       TicketUsedEvent.OutputObject
@@ -1007,7 +1009,7 @@ export interface EventTicketNFT extends BaseContract {
       TicketUsedEvent.OutputObject
     >;
 
-    'Transfer(address,address,uint256)': TypedContractEvent<
+    "Transfer(address,address,uint256)": TypedContractEvent<
       TransferEvent.InputTuple,
       TransferEvent.OutputTuple,
       TransferEvent.OutputObject

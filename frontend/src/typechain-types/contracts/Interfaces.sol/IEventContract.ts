@@ -12,156 +12,156 @@ import type {
   ContractRunner,
   ContractMethod,
   Listener,
-} from 'ethers';
+} from "ethers";
 import type {
   TypedContractEvent,
   TypedDeferredTopicFilter,
   TypedEventLog,
   TypedListener,
   TypedContractMethod,
-} from '../../common';
+} from "../../common";
 
 export interface IEventContractInterface extends Interface {
   getFunction(
     nameOrSignature:
-      | 'createdAt'
-      | 'deactivateEvent'
-      | 'eventDescription'
-      | 'eventEndTime'
-      | 'eventStartTime'
-      | 'eventTitle'
-      | 'eventURI'
-      | 'getEventDetails'
-      | 'isActive'
-      | 'maxTickets'
-      | 'organizer'
-      | 'purchaseCategoryTickets'
-      | 'purchaseSingleTicket'
-      | 'purchaseTickets'
-      | 'salesEndTime'
-      | 'salesStartTime'
-      | 'ticketPrice'
-      | 'ticketsSold'
-      | 'venue',
+      | "createdAt"
+      | "deactivateEvent"
+      | "eventDescription"
+      | "eventEndTime"
+      | "eventStartTime"
+      | "eventTitle"
+      | "eventURI"
+      | "getEventDetails"
+      | "isActive"
+      | "maxTickets"
+      | "organizer"
+      | "purchaseCategoryTickets"
+      | "purchaseSingleTicket"
+      | "purchaseTickets"
+      | "salesEndTime"
+      | "salesStartTime"
+      | "ticketPrice"
+      | "ticketsSold"
+      | "venue"
   ): FunctionFragment;
 
-  encodeFunctionData(functionFragment: 'createdAt', values?: undefined): string;
+  encodeFunctionData(functionFragment: "createdAt", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: 'deactivateEvent',
-    values?: undefined,
+    functionFragment: "deactivateEvent",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'eventDescription',
-    values?: undefined,
+    functionFragment: "eventDescription",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'eventEndTime',
-    values?: undefined,
+    functionFragment: "eventEndTime",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'eventStartTime',
-    values?: undefined,
+    functionFragment: "eventStartTime",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'eventTitle',
-    values?: undefined,
+    functionFragment: "eventTitle",
+    values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: 'eventURI', values?: undefined): string;
+  encodeFunctionData(functionFragment: "eventURI", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: 'getEventDetails',
-    values?: undefined,
+    functionFragment: "getEventDetails",
+    values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: 'isActive', values?: undefined): string;
+  encodeFunctionData(functionFragment: "isActive", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: 'maxTickets',
-    values?: undefined,
+    functionFragment: "maxTickets",
+    values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: 'organizer', values?: undefined): string;
+  encodeFunctionData(functionFragment: "organizer", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: 'purchaseCategoryTickets',
-    values: [AddressLike, BigNumberish[], BigNumberish[]],
-  ): string;
-  encodeFunctionData(
-    functionFragment: 'purchaseSingleTicket',
-    values: [AddressLike, BigNumberish],
+    functionFragment: "purchaseCategoryTickets",
+    values: [AddressLike, BigNumberish[], BigNumberish[]]
   ): string;
   encodeFunctionData(
-    functionFragment: 'purchaseTickets',
-    values: [AddressLike, BigNumberish[], BigNumberish[]],
+    functionFragment: "purchaseSingleTicket",
+    values: [AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'salesEndTime',
-    values?: undefined,
+    functionFragment: "purchaseTickets",
+    values: [AddressLike, BigNumberish[], BigNumberish[]]
   ): string;
   encodeFunctionData(
-    functionFragment: 'salesStartTime',
-    values?: undefined,
+    functionFragment: "salesEndTime",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'ticketPrice',
-    values?: undefined,
+    functionFragment: "salesStartTime",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'ticketsSold',
-    values?: undefined,
+    functionFragment: "ticketPrice",
+    values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: 'venue', values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "ticketsSold",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "venue", values?: undefined): string;
 
-  decodeFunctionResult(functionFragment: 'createdAt', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "createdAt", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: 'deactivateEvent',
-    data: BytesLike,
+    functionFragment: "deactivateEvent",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'eventDescription',
-    data: BytesLike,
+    functionFragment: "eventDescription",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'eventEndTime',
-    data: BytesLike,
+    functionFragment: "eventEndTime",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'eventStartTime',
-    data: BytesLike,
+    functionFragment: "eventStartTime",
+    data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: 'eventTitle', data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: 'eventURI', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "eventTitle", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "eventURI", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: 'getEventDetails',
-    data: BytesLike,
+    functionFragment: "getEventDetails",
+    data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: 'isActive', data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: 'maxTickets', data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: 'organizer', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "isActive", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "maxTickets", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "organizer", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: 'purchaseCategoryTickets',
-    data: BytesLike,
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: 'purchaseSingleTicket',
-    data: BytesLike,
+    functionFragment: "purchaseCategoryTickets",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'purchaseTickets',
-    data: BytesLike,
+    functionFragment: "purchaseSingleTicket",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'salesEndTime',
-    data: BytesLike,
+    functionFragment: "purchaseTickets",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'salesStartTime',
-    data: BytesLike,
+    functionFragment: "salesEndTime",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'ticketPrice',
-    data: BytesLike,
+    functionFragment: "salesStartTime",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'ticketsSold',
-    data: BytesLike,
+    functionFragment: "ticketPrice",
+    data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: 'venue', data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "ticketsSold",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "venue", data: BytesLike): Result;
 }
 
 export interface IEventContract extends BaseContract {
@@ -173,53 +173,53 @@ export interface IEventContract extends BaseContract {
   queryFilter<TCEvent extends TypedContractEvent>(
     event: TCEvent,
     fromBlockOrBlockhash?: string | number | undefined,
-    toBlock?: string | number | undefined,
+    toBlock?: string | number | undefined
   ): Promise<Array<TypedEventLog<TCEvent>>>;
   queryFilter<TCEvent extends TypedContractEvent>(
     filter: TypedDeferredTopicFilter<TCEvent>,
     fromBlockOrBlockhash?: string | number | undefined,
-    toBlock?: string | number | undefined,
+    toBlock?: string | number | undefined
   ): Promise<Array<TypedEventLog<TCEvent>>>;
 
   on<TCEvent extends TypedContractEvent>(
     event: TCEvent,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
   on<TCEvent extends TypedContractEvent>(
     filter: TypedDeferredTopicFilter<TCEvent>,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
 
   once<TCEvent extends TypedContractEvent>(
     event: TCEvent,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
   once<TCEvent extends TypedContractEvent>(
     filter: TypedDeferredTopicFilter<TCEvent>,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
 
   listeners<TCEvent extends TypedContractEvent>(
-    event: TCEvent,
+    event: TCEvent
   ): Promise<Array<TypedListener<TCEvent>>>;
   listeners(eventName?: string): Promise<Array<Listener>>;
   removeAllListeners<TCEvent extends TypedContractEvent>(
-    event?: TCEvent,
+    event?: TCEvent
   ): Promise<this>;
 
-  createdAt: TypedContractMethod<[], [bigint], 'view'>;
+  createdAt: TypedContractMethod<[], [bigint], "view">;
 
-  deactivateEvent: TypedContractMethod<[], [void], 'nonpayable'>;
+  deactivateEvent: TypedContractMethod<[], [void], "nonpayable">;
 
-  eventDescription: TypedContractMethod<[], [string], 'view'>;
+  eventDescription: TypedContractMethod<[], [string], "view">;
 
-  eventEndTime: TypedContractMethod<[], [bigint], 'view'>;
+  eventEndTime: TypedContractMethod<[], [bigint], "view">;
 
-  eventStartTime: TypedContractMethod<[], [bigint], 'view'>;
+  eventStartTime: TypedContractMethod<[], [bigint], "view">;
 
-  eventTitle: TypedContractMethod<[], [string], 'view'>;
+  eventTitle: TypedContractMethod<[], [string], "view">;
 
-  eventURI: TypedContractMethod<[], [string], 'view'>;
+  eventURI: TypedContractMethod<[], [string], "view">;
 
   getEventDetails: TypedContractMethod<
     [],
@@ -236,7 +236,7 @@ export interface IEventContract extends BaseContract {
         bigint,
         bigint,
         bigint,
-        string,
+        string
       ] & {
         title: string;
         description: string;
@@ -250,79 +250,81 @@ export interface IEventContract extends BaseContract {
         startTime: bigint;
         endTime: bigint;
         eventVenue: string;
-      },
+      }
     ],
-    'view'
+    "view"
   >;
 
-  isActive: TypedContractMethod<[], [boolean], 'view'>;
+  isActive: TypedContractMethod<[], [boolean], "view">;
 
-  maxTickets: TypedContractMethod<[], [bigint], 'view'>;
+  maxTickets: TypedContractMethod<[], [bigint], "view">;
 
-  organizer: TypedContractMethod<[], [string], 'view'>;
+  organizer: TypedContractMethod<[], [string], "view">;
 
   purchaseCategoryTickets: TypedContractMethod<
     [
       buyer: AddressLike,
       quantities: BigNumberish[],
-      categoryIds: BigNumberish[],
+      categoryIds: BigNumberish[]
     ],
     [void],
-    'payable'
+    "payable"
   >;
 
   purchaseSingleTicket: TypedContractMethod<
     [buyer: AddressLike, quantity: BigNumberish],
     [void],
-    'payable'
+    "payable"
   >;
 
   purchaseTickets: TypedContractMethod<
     [
       buyer: AddressLike,
       quantities: BigNumberish[],
-      categoryIds: BigNumberish[],
+      categoryIds: BigNumberish[]
     ],
     [void],
-    'payable'
+    "payable"
   >;
 
-  salesEndTime: TypedContractMethod<[], [bigint], 'view'>;
+  salesEndTime: TypedContractMethod<[], [bigint], "view">;
 
-  salesStartTime: TypedContractMethod<[], [bigint], 'view'>;
+  salesStartTime: TypedContractMethod<[], [bigint], "view">;
 
-  ticketPrice: TypedContractMethod<[], [bigint], 'view'>;
+  ticketPrice: TypedContractMethod<[], [bigint], "view">;
 
-  ticketsSold: TypedContractMethod<[], [bigint], 'view'>;
+  ticketsSold: TypedContractMethod<[], [bigint], "view">;
 
-  venue: TypedContractMethod<[], [string], 'view'>;
+  venue: TypedContractMethod<[], [string], "view">;
 
   getFunction<T extends ContractMethod = ContractMethod>(
-    key: string | FunctionFragment,
+    key: string | FunctionFragment
   ): T;
 
   getFunction(
-    nameOrSignature: 'createdAt',
-  ): TypedContractMethod<[], [bigint], 'view'>;
+    nameOrSignature: "createdAt"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: 'deactivateEvent',
-  ): TypedContractMethod<[], [void], 'nonpayable'>;
+    nameOrSignature: "deactivateEvent"
+  ): TypedContractMethod<[], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: 'eventDescription',
-  ): TypedContractMethod<[], [string], 'view'>;
+    nameOrSignature: "eventDescription"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
-    nameOrSignature: 'eventEndTime',
-  ): TypedContractMethod<[], [bigint], 'view'>;
+    nameOrSignature: "eventEndTime"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: 'eventStartTime',
-  ): TypedContractMethod<[], [bigint], 'view'>;
+    nameOrSignature: "eventStartTime"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: 'eventTitle',
-  ): TypedContractMethod<[], [string], 'view'>;
+    nameOrSignature: "eventTitle"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
-    nameOrSignature: 'eventURI',
-  ): TypedContractMethod<[], [string], 'view'>;
-  getFunction(nameOrSignature: 'getEventDetails'): TypedContractMethod<
+    nameOrSignature: "eventURI"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "getEventDetails"
+  ): TypedContractMethod<
     [],
     [
       [
@@ -337,7 +339,7 @@ export interface IEventContract extends BaseContract {
         bigint,
         bigint,
         bigint,
-        string,
+        string
       ] & {
         title: string;
         description: string;
@@ -351,63 +353,63 @@ export interface IEventContract extends BaseContract {
         startTime: bigint;
         endTime: bigint;
         eventVenue: string;
-      },
+      }
     ],
-    'view'
+    "view"
   >;
   getFunction(
-    nameOrSignature: 'isActive',
-  ): TypedContractMethod<[], [boolean], 'view'>;
+    nameOrSignature: "isActive"
+  ): TypedContractMethod<[], [boolean], "view">;
   getFunction(
-    nameOrSignature: 'maxTickets',
-  ): TypedContractMethod<[], [bigint], 'view'>;
+    nameOrSignature: "maxTickets"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: 'organizer',
-  ): TypedContractMethod<[], [string], 'view'>;
+    nameOrSignature: "organizer"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
-    nameOrSignature: 'purchaseCategoryTickets',
+    nameOrSignature: "purchaseCategoryTickets"
   ): TypedContractMethod<
     [
       buyer: AddressLike,
       quantities: BigNumberish[],
-      categoryIds: BigNumberish[],
+      categoryIds: BigNumberish[]
     ],
     [void],
-    'payable'
+    "payable"
   >;
   getFunction(
-    nameOrSignature: 'purchaseSingleTicket',
+    nameOrSignature: "purchaseSingleTicket"
   ): TypedContractMethod<
     [buyer: AddressLike, quantity: BigNumberish],
     [void],
-    'payable'
+    "payable"
   >;
   getFunction(
-    nameOrSignature: 'purchaseTickets',
+    nameOrSignature: "purchaseTickets"
   ): TypedContractMethod<
     [
       buyer: AddressLike,
       quantities: BigNumberish[],
-      categoryIds: BigNumberish[],
+      categoryIds: BigNumberish[]
     ],
     [void],
-    'payable'
+    "payable"
   >;
   getFunction(
-    nameOrSignature: 'salesEndTime',
-  ): TypedContractMethod<[], [bigint], 'view'>;
+    nameOrSignature: "salesEndTime"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: 'salesStartTime',
-  ): TypedContractMethod<[], [bigint], 'view'>;
+    nameOrSignature: "salesStartTime"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: 'ticketPrice',
-  ): TypedContractMethod<[], [bigint], 'view'>;
+    nameOrSignature: "ticketPrice"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: 'ticketsSold',
-  ): TypedContractMethod<[], [bigint], 'view'>;
+    nameOrSignature: "ticketsSold"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: 'venue',
-  ): TypedContractMethod<[], [string], 'view'>;
+    nameOrSignature: "venue"
+  ): TypedContractMethod<[], [string], "view">;
 
   filters: {};
 }

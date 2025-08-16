@@ -13,7 +13,7 @@ import type {
   ContractRunner,
   ContractMethod,
   Listener,
-} from 'ethers';
+} from "ethers";
 import type {
   TypedContractEvent,
   TypedDeferredTopicFilter,
@@ -21,7 +21,7 @@ import type {
   TypedLogDescription,
   TypedListener,
   TypedContractMethod,
-} from '../../common';
+} from "../../common";
 
 export declare namespace IEventTicketNFT {
   export type TicketStruct = {
@@ -37,7 +37,7 @@ export declare namespace IEventTicketNFT {
     originalBuyer: string,
     mintedAt: bigint,
     categoryId: bigint,
-    isUsed: boolean,
+    isUsed: boolean
   ] & {
     tokenId: bigint;
     originalBuyer: string;
@@ -50,144 +50,144 @@ export declare namespace IEventTicketNFT {
 export interface IEventTicketNFTInterface extends Interface {
   getFunction(
     nameOrSignature:
-      | 'ROYALTY_FEE'
-      | 'balanceOf'
-      | 'batchMintTickets'
-      | 'eventContract'
-      | 'getTicket'
-      | 'getTicketsOfOwner'
-      | 'isTicketUsed'
-      | 'mintTicket'
-      | 'ownerOf'
-      | 'purchaseTickets'
-      | 'royaltyInfo'
-      | 'tickets'
-      | 'tokenOfOwnerByIndex'
-      | 'tokenURI'
-      | 'totalSupply'
-      | 'useTicket'
-      | 'usedTickets',
+      | "ROYALTY_FEE"
+      | "balanceOf"
+      | "batchMintTickets"
+      | "eventContract"
+      | "getTicket"
+      | "getTicketsOfOwner"
+      | "isTicketUsed"
+      | "mintTicket"
+      | "ownerOf"
+      | "purchaseTickets"
+      | "royaltyInfo"
+      | "tickets"
+      | "tokenOfOwnerByIndex"
+      | "tokenURI"
+      | "totalSupply"
+      | "useTicket"
+      | "usedTickets"
   ): FunctionFragment;
 
   getEvent(
-    nameOrSignatureOrTopic: 'TicketMinted' | 'TicketUsed',
+    nameOrSignatureOrTopic: "TicketMinted" | "TicketUsed"
   ): EventFragment;
 
   encodeFunctionData(
-    functionFragment: 'ROYALTY_FEE',
-    values?: undefined,
+    functionFragment: "ROYALTY_FEE",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'balanceOf',
-    values: [AddressLike],
+    functionFragment: "balanceOf",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: 'batchMintTickets',
-    values: [AddressLike, string[], BigNumberish[], BigNumberish[]],
+    functionFragment: "batchMintTickets",
+    values: [AddressLike, string[], BigNumberish[], BigNumberish[]]
   ): string;
   encodeFunctionData(
-    functionFragment: 'eventContract',
-    values?: undefined,
+    functionFragment: "eventContract",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'getTicket',
-    values: [BigNumberish],
+    functionFragment: "getTicket",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'getTicketsOfOwner',
-    values: [AddressLike],
+    functionFragment: "getTicketsOfOwner",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: 'isTicketUsed',
-    values: [BigNumberish],
+    functionFragment: "isTicketUsed",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'mintTicket',
-    values: [AddressLike, string, BigNumberish],
+    functionFragment: "mintTicket",
+    values: [AddressLike, string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'ownerOf',
-    values: [BigNumberish],
+    functionFragment: "ownerOf",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'purchaseTickets',
-    values: [BigNumberish[], BigNumberish[], string[]],
+    functionFragment: "purchaseTickets",
+    values: [BigNumberish[], BigNumberish[], string[]]
   ): string;
   encodeFunctionData(
-    functionFragment: 'royaltyInfo',
-    values: [BigNumberish, BigNumberish],
+    functionFragment: "royaltyInfo",
+    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'tickets',
-    values: [BigNumberish],
+    functionFragment: "tickets",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'tokenOfOwnerByIndex',
-    values: [AddressLike, BigNumberish],
+    functionFragment: "tokenOfOwnerByIndex",
+    values: [AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'tokenURI',
-    values: [BigNumberish],
+    functionFragment: "tokenURI",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'totalSupply',
-    values?: undefined,
+    functionFragment: "totalSupply",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'useTicket',
-    values: [BigNumberish],
+    functionFragment: "useTicket",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'usedTickets',
-    values: [BigNumberish],
+    functionFragment: "usedTickets",
+    values: [BigNumberish]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: 'ROYALTY_FEE',
-    data: BytesLike,
+    functionFragment: "ROYALTY_FEE",
+    data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: 'balanceOf', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: 'batchMintTickets',
-    data: BytesLike,
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: 'eventContract',
-    data: BytesLike,
-  ): Result;
-  decodeFunctionResult(functionFragment: 'getTicket', data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: 'getTicketsOfOwner',
-    data: BytesLike,
+    functionFragment: "batchMintTickets",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'isTicketUsed',
-    data: BytesLike,
+    functionFragment: "eventContract",
+    data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: 'mintTicket', data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: 'ownerOf', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "getTicket", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: 'purchaseTickets',
-    data: BytesLike,
+    functionFragment: "getTicketsOfOwner",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'royaltyInfo',
-    data: BytesLike,
+    functionFragment: "isTicketUsed",
+    data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: 'tickets', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "mintTicket", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: 'tokenOfOwnerByIndex',
-    data: BytesLike,
+    functionFragment: "purchaseTickets",
+    data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: 'tokenURI', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: 'totalSupply',
-    data: BytesLike,
+    functionFragment: "royaltyInfo",
+    data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: 'useTicket', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "tickets", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: 'usedTickets',
-    data: BytesLike,
+    functionFragment: "tokenOfOwnerByIndex",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "tokenURI", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "totalSupply",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "useTicket", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "usedTickets",
+    data: BytesLike
   ): Result;
 }
 
@@ -195,12 +195,12 @@ export namespace TicketMintedEvent {
   export type InputTuple = [
     tokenId: BigNumberish,
     buyer: AddressLike,
-    categoryId: BigNumberish,
+    categoryId: BigNumberish
   ];
   export type OutputTuple = [
     tokenId: bigint,
     buyer: string,
-    categoryId: bigint,
+    categoryId: bigint
   ];
   export interface OutputObject {
     tokenId: bigint;
@@ -234,217 +234,217 @@ export interface IEventTicketNFT extends BaseContract {
   queryFilter<TCEvent extends TypedContractEvent>(
     event: TCEvent,
     fromBlockOrBlockhash?: string | number | undefined,
-    toBlock?: string | number | undefined,
+    toBlock?: string | number | undefined
   ): Promise<Array<TypedEventLog<TCEvent>>>;
   queryFilter<TCEvent extends TypedContractEvent>(
     filter: TypedDeferredTopicFilter<TCEvent>,
     fromBlockOrBlockhash?: string | number | undefined,
-    toBlock?: string | number | undefined,
+    toBlock?: string | number | undefined
   ): Promise<Array<TypedEventLog<TCEvent>>>;
 
   on<TCEvent extends TypedContractEvent>(
     event: TCEvent,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
   on<TCEvent extends TypedContractEvent>(
     filter: TypedDeferredTopicFilter<TCEvent>,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
 
   once<TCEvent extends TypedContractEvent>(
     event: TCEvent,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
   once<TCEvent extends TypedContractEvent>(
     filter: TypedDeferredTopicFilter<TCEvent>,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
 
   listeners<TCEvent extends TypedContractEvent>(
-    event: TCEvent,
+    event: TCEvent
   ): Promise<Array<TypedListener<TCEvent>>>;
   listeners(eventName?: string): Promise<Array<Listener>>;
   removeAllListeners<TCEvent extends TypedContractEvent>(
-    event?: TCEvent,
+    event?: TCEvent
   ): Promise<this>;
 
-  ROYALTY_FEE: TypedContractMethod<[], [bigint], 'view'>;
+  ROYALTY_FEE: TypedContractMethod<[], [bigint], "view">;
 
-  balanceOf: TypedContractMethod<[owner: AddressLike], [bigint], 'view'>;
+  balanceOf: TypedContractMethod<[owner: AddressLike], [bigint], "view">;
 
   batchMintTickets: TypedContractMethod<
     [
       to: AddressLike,
       tokenURIs: string[],
       categoryIds: BigNumberish[],
-      quantities: BigNumberish[],
+      quantities: BigNumberish[]
     ],
     [bigint[]],
-    'nonpayable'
+    "nonpayable"
   >;
 
-  eventContract: TypedContractMethod<[], [string], 'view'>;
+  eventContract: TypedContractMethod<[], [string], "view">;
 
   getTicket: TypedContractMethod<
     [tokenId: BigNumberish],
     [IEventTicketNFT.TicketStructOutput],
-    'view'
+    "view"
   >;
 
   getTicketsOfOwner: TypedContractMethod<
     [owner: AddressLike],
     [bigint[]],
-    'view'
+    "view"
   >;
 
-  isTicketUsed: TypedContractMethod<[tokenId: BigNumberish], [boolean], 'view'>;
+  isTicketUsed: TypedContractMethod<[tokenId: BigNumberish], [boolean], "view">;
 
   mintTicket: TypedContractMethod<
     [to: AddressLike, tokenURI: string, categoryId: BigNumberish],
     [bigint],
-    'nonpayable'
+    "nonpayable"
   >;
 
-  ownerOf: TypedContractMethod<[tokenId: BigNumberish], [string], 'view'>;
+  ownerOf: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
 
   purchaseTickets: TypedContractMethod<
     [
       quantities: BigNumberish[],
       categoryIds: BigNumberish[],
-      tokenURIs: string[],
+      tokenURIs: string[]
     ],
     [bigint[]],
-    'payable'
+    "payable"
   >;
 
   royaltyInfo: TypedContractMethod<
     [tokenId: BigNumberish, salePrice: BigNumberish],
     [[string, bigint]],
-    'view'
+    "view"
   >;
 
   tickets: TypedContractMethod<
     [tokenId: BigNumberish],
     [IEventTicketNFT.TicketStructOutput],
-    'view'
+    "view"
   >;
 
   tokenOfOwnerByIndex: TypedContractMethod<
     [owner: AddressLike, index: BigNumberish],
     [bigint],
-    'view'
+    "view"
   >;
 
-  tokenURI: TypedContractMethod<[tokenId: BigNumberish], [string], 'view'>;
+  tokenURI: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
 
-  totalSupply: TypedContractMethod<[], [bigint], 'view'>;
+  totalSupply: TypedContractMethod<[], [bigint], "view">;
 
-  useTicket: TypedContractMethod<[tokenId: BigNumberish], [void], 'nonpayable'>;
+  useTicket: TypedContractMethod<[tokenId: BigNumberish], [void], "nonpayable">;
 
-  usedTickets: TypedContractMethod<[tokenId: BigNumberish], [boolean], 'view'>;
+  usedTickets: TypedContractMethod<[tokenId: BigNumberish], [boolean], "view">;
 
   getFunction<T extends ContractMethod = ContractMethod>(
-    key: string | FunctionFragment,
+    key: string | FunctionFragment
   ): T;
 
   getFunction(
-    nameOrSignature: 'ROYALTY_FEE',
-  ): TypedContractMethod<[], [bigint], 'view'>;
+    nameOrSignature: "ROYALTY_FEE"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: 'balanceOf',
-  ): TypedContractMethod<[owner: AddressLike], [bigint], 'view'>;
+    nameOrSignature: "balanceOf"
+  ): TypedContractMethod<[owner: AddressLike], [bigint], "view">;
   getFunction(
-    nameOrSignature: 'batchMintTickets',
+    nameOrSignature: "batchMintTickets"
   ): TypedContractMethod<
     [
       to: AddressLike,
       tokenURIs: string[],
       categoryIds: BigNumberish[],
-      quantities: BigNumberish[],
+      quantities: BigNumberish[]
     ],
     [bigint[]],
-    'nonpayable'
+    "nonpayable"
   >;
   getFunction(
-    nameOrSignature: 'eventContract',
-  ): TypedContractMethod<[], [string], 'view'>;
+    nameOrSignature: "eventContract"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
-    nameOrSignature: 'getTicket',
+    nameOrSignature: "getTicket"
   ): TypedContractMethod<
     [tokenId: BigNumberish],
     [IEventTicketNFT.TicketStructOutput],
-    'view'
+    "view"
   >;
   getFunction(
-    nameOrSignature: 'getTicketsOfOwner',
-  ): TypedContractMethod<[owner: AddressLike], [bigint[]], 'view'>;
+    nameOrSignature: "getTicketsOfOwner"
+  ): TypedContractMethod<[owner: AddressLike], [bigint[]], "view">;
   getFunction(
-    nameOrSignature: 'isTicketUsed',
-  ): TypedContractMethod<[tokenId: BigNumberish], [boolean], 'view'>;
+    nameOrSignature: "isTicketUsed"
+  ): TypedContractMethod<[tokenId: BigNumberish], [boolean], "view">;
   getFunction(
-    nameOrSignature: 'mintTicket',
+    nameOrSignature: "mintTicket"
   ): TypedContractMethod<
     [to: AddressLike, tokenURI: string, categoryId: BigNumberish],
     [bigint],
-    'nonpayable'
+    "nonpayable"
   >;
   getFunction(
-    nameOrSignature: 'ownerOf',
-  ): TypedContractMethod<[tokenId: BigNumberish], [string], 'view'>;
+    nameOrSignature: "ownerOf"
+  ): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
   getFunction(
-    nameOrSignature: 'purchaseTickets',
+    nameOrSignature: "purchaseTickets"
   ): TypedContractMethod<
     [
       quantities: BigNumberish[],
       categoryIds: BigNumberish[],
-      tokenURIs: string[],
+      tokenURIs: string[]
     ],
     [bigint[]],
-    'payable'
+    "payable"
   >;
   getFunction(
-    nameOrSignature: 'royaltyInfo',
+    nameOrSignature: "royaltyInfo"
   ): TypedContractMethod<
     [tokenId: BigNumberish, salePrice: BigNumberish],
     [[string, bigint]],
-    'view'
+    "view"
   >;
   getFunction(
-    nameOrSignature: 'tickets',
+    nameOrSignature: "tickets"
   ): TypedContractMethod<
     [tokenId: BigNumberish],
     [IEventTicketNFT.TicketStructOutput],
-    'view'
+    "view"
   >;
   getFunction(
-    nameOrSignature: 'tokenOfOwnerByIndex',
+    nameOrSignature: "tokenOfOwnerByIndex"
   ): TypedContractMethod<
     [owner: AddressLike, index: BigNumberish],
     [bigint],
-    'view'
+    "view"
   >;
   getFunction(
-    nameOrSignature: 'tokenURI',
-  ): TypedContractMethod<[tokenId: BigNumberish], [string], 'view'>;
+    nameOrSignature: "tokenURI"
+  ): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
   getFunction(
-    nameOrSignature: 'totalSupply',
-  ): TypedContractMethod<[], [bigint], 'view'>;
+    nameOrSignature: "totalSupply"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: 'useTicket',
-  ): TypedContractMethod<[tokenId: BigNumberish], [void], 'nonpayable'>;
+    nameOrSignature: "useTicket"
+  ): TypedContractMethod<[tokenId: BigNumberish], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: 'usedTickets',
-  ): TypedContractMethod<[tokenId: BigNumberish], [boolean], 'view'>;
+    nameOrSignature: "usedTickets"
+  ): TypedContractMethod<[tokenId: BigNumberish], [boolean], "view">;
 
   getEvent(
-    key: 'TicketMinted',
+    key: "TicketMinted"
   ): TypedContractEvent<
     TicketMintedEvent.InputTuple,
     TicketMintedEvent.OutputTuple,
     TicketMintedEvent.OutputObject
   >;
   getEvent(
-    key: 'TicketUsed',
+    key: "TicketUsed"
   ): TypedContractEvent<
     TicketUsedEvent.InputTuple,
     TicketUsedEvent.OutputTuple,
@@ -452,7 +452,7 @@ export interface IEventTicketNFT extends BaseContract {
   >;
 
   filters: {
-    'TicketMinted(uint256,address,uint256)': TypedContractEvent<
+    "TicketMinted(uint256,address,uint256)": TypedContractEvent<
       TicketMintedEvent.InputTuple,
       TicketMintedEvent.OutputTuple,
       TicketMintedEvent.OutputObject
@@ -463,7 +463,7 @@ export interface IEventTicketNFT extends BaseContract {
       TicketMintedEvent.OutputObject
     >;
 
-    'TicketUsed(uint256)': TypedContractEvent<
+    "TicketUsed(uint256)": TypedContractEvent<
       TicketUsedEvent.InputTuple,
       TicketUsedEvent.OutputTuple,
       TicketUsedEvent.OutputObject

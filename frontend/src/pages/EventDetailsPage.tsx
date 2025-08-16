@@ -135,16 +135,52 @@ const EventDetailsPage = () => {
         provider,
       );
 
-      const eventDetails: EventDetailsResponseData =
-        await factoryContract.getEventDetails(BigInt(eventId!));
+      // First get the event info from factory
+      // events() returns a tuple: [eventContract, nftContract, organizer, title, createdAt, isActive, ticketsSold, totalRevenue]
+      const [
+        eventContractAddress,
+        nftContractAddress,
+        organizerAddress,
+        eventTitle,
+        eventCreatedAt,
+        eventIsActive,
+        eventTicketsSold,
+        eventTotalRevenue
+      ] = await factoryContract.events(BigInt(eventId!));
+
+      console.log('🏭 Factory Contract Response:');
+      console.log('  - Event Contract:', eventContractAddress);
+      console.log('  - NFT Contract:', nftContractAddress);
+      console.log('  - Organizer:', organizerAddress);
+      console.log('  - Title:', eventTitle);
+      console.log('  - Created At:', eventCreatedAt);
+      console.log('  - Is Active:', eventIsActive);
+      console.log('  - Tickets Sold:', eventTicketsSold);
+      console.log('  - Total Revenue:', eventTotalRevenue);
+
+      if (!eventContractAddress) {
+        throw new Error('Event contract address not found for this event ID.');
+      }
+
+      const eventContractInstance = new Contract(
+        eventContractAddress,
+        EventContractABI.abi,
+        provider,
+      );
+
+      const [
+        title, description, eventOrganizer, price, 
+        maxTicketsCount, ticketsSoldCount, active, uri,
+        creationTime, startTime, endTime, eventVenue
+      ] = await eventContractInstance.getEventDetails();
 
       // Fetch first image from IPFS
       let firstImageUrl: string | null = null;
       let metadata: EventMetadata | null = null;
 
-      if (eventDetails.eventURI) {
+      if (uri) {
         try {
-          const metadataResponse = await fetch(eventDetails.eventURI);
+          const metadataResponse = await fetch(uri);
           if (metadataResponse.ok) {
             metadata = await metadataResponse.json();
 
@@ -156,51 +192,84 @@ const EventDetailsPage = () => {
           console.error('Failed to fetch metadata:', err);
         }
       }
+      console.log("firstImageUrl", firstImageUrl);
+      // Reconstruct eventDetails object to match the expected format
+      const eventDetails: EventDetailsResponseData = {
+        eventInfo: {
+          title,
+          organizer: eventOrganizer as `0x${string}`,
+          isActive: active,
+          ticketsSold: BigInt(ticketsSoldCount),
+          eventContract: eventContractAddress as `0x${string}`,
+          nftContract: nftContractAddress as `0x${string}`,
+          createdAt: BigInt(creationTime),
+          totalRevenue: BigInt(eventTotalRevenue),
+        },
+        eventId: Number(eventId),
+        description,
+        ticketPrice: BigInt(price),
+        maxTickets: BigInt(maxTicketsCount),
+        eventURI: uri,
+        eventStartTime: BigInt(startTime),
+        eventEndTime: BigInt(endTime),
+        venue: eventVenue,
+        eventContract: eventContractAddress as `0x${string}`,
+        nftContract: nftContractAddress as `0x${string}`,
+        totalRevenue: BigInt(eventTotalRevenue),
+        eventImages: '',
+      };
 
       // Fetch ticket categories to calculate proper stats
       const stats = await fetchEventStats(
-        eventDetails.eventInfo.eventContract,
+        eventContractAddress,
         eventDetails,
       );
 
       // Fetch NFT symbol
       let symbol = '';
       try {
-        const nftContract = new Contract(
-          eventDetails.eventInfo.nftContract,
-          EventTicketNFTABI.abi,
-          provider,
-        );
-        symbol = await nftContract.symbol();
+        if (nftContractAddress && nftContractAddress !== '0x0000000000000000000000000000000000000000') {
+          const nftContract = new Contract(
+            nftContractAddress,
+            EventTicketNFTABI.abi,
+            provider,
+          );
+          symbol = await nftContract.symbol();
+        } else {
+          console.warn('NFT contract address is empty or zero address');
+          symbol = `Event${eventId}`;
+        }
       } catch (err) {
         console.error('Failed to fetch NFT symbol:', err);
-        // Fallback to using contract address
-        symbol = eventDetails.eventInfo.nftContract;
+        // Fallback to using contract address or event ID
+        symbol = nftContractAddress || `Event${eventId}`;
       }
 
       const eventData: EventData = {
         eventId: Number(eventId),
-        title: eventDetails.eventInfo.title,
-        description: eventDetails.description,
-        organizer: eventDetails.eventInfo.organizer as `0x${string}`,
+        title: title,
+        description: description,
+        organizer: eventOrganizer as `0x${string}`,
         ticketPrice:
           stats.minTicketPrice && stats.minTicketPrice > 0
             ? stats.minTicketPrice
-            : eventDetails.ticketPrice,
+            : BigInt(price),
         maxTickets: BigInt(stats.totalCapacity), // Use calculated capacity
         ticketsSold: BigInt(stats.totalSold), // Use calculated sold count
         ticketsLeft: BigInt(stats.availableTickets), // Use calculated available
-        isActive: eventDetails.eventInfo.isActive,
-        eventURI: eventDetails.eventURI,
-        createdAt: eventDetails.eventInfo.createdAt,
-        eventStartTime: eventDetails.eventStartTime,
-        eventEndTime: eventDetails.eventEndTime,
-        venue: eventDetails.venue,
-        eventContract: eventDetails.eventInfo.eventContract as `0x${string}`,
-        nftContract: eventDetails.eventInfo.nftContract as `0x${string}`,
-        totalRevenue: eventDetails.eventInfo.totalRevenue,
+        isActive: active,
+        eventURI: uri,
+        createdAt: BigInt(creationTime),
+        eventStartTime: BigInt(startTime),
+        eventEndTime: BigInt(endTime),
+        venue: eventVenue,
+        eventContract: eventContractAddress as `0x${string}`,
+        nftContract: nftContractAddress as `0x${string}`,
+        totalRevenue: BigInt(eventTotalRevenue),
         eventImages: firstImageUrl || '',
       };
+
+      console.log('Event Data:', eventData);
 
       setEvent(eventData);
       setEventMetadata(metadata);
@@ -774,8 +843,8 @@ const EventDetailsPage = () => {
                         isDark ? 'text-gray-300' : 'text-gray-600'
                       }`}
                     >
-                      {formatDateTime(event.eventStartTime)} -{' '}
-                      {formatTime(event.eventEndTime)}
+                      <p>{formatDateTime(event.eventStartTime)} -</p>
+                      <p>{formatDateTime(event.eventEndTime)}</p>
                     </p>
                   </div>
                 </div>

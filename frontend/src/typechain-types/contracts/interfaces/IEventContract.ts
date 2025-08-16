@@ -13,7 +13,7 @@ import type {
   ContractRunner,
   ContractMethod,
   Listener,
-} from 'ethers';
+} from "ethers";
 import type {
   TypedContractEvent,
   TypedDeferredTopicFilter,
@@ -21,7 +21,7 @@ import type {
   TypedLogDescription,
   TypedListener,
   TypedContractMethod,
-} from '../../common';
+} from "../../common";
 
 export declare namespace IEventContract {
   export type TicketCategoryStruct = {
@@ -37,7 +37,7 @@ export declare namespace IEventContract {
     price: bigint,
     maxSupply: bigint,
     sold: bigint,
-    isActive: boolean,
+    isActive: boolean
   ] & {
     name: string;
     price: bigint;
@@ -50,239 +50,239 @@ export declare namespace IEventContract {
 export interface IEventContractInterface extends Interface {
   getFunction(
     nameOrSignature:
-      | 'addTicketCategory'
-      | 'categoryCount'
-      | 'createdAt'
-      | 'deactivateEvent'
-      | 'eventDescription'
-      | 'eventEndTime'
-      | 'eventStartTime'
-      | 'eventTitle'
-      | 'eventURI'
-      | 'getEventDetails'
-      | 'isActive'
-      | 'maxTickets'
-      | 'maxTicketsPerWallet'
-      | 'nftContract'
-      | 'organizer'
-      | 'purchaseTickets'
-      | 'salesEndTime'
-      | 'salesStartTime'
-      | 'setNFTContract'
-      | 'ticketCategories'
-      | 'ticketPrice'
-      | 'ticketsSold'
-      | 'toggleWhitelist'
-      | 'updateEventDetails'
-      | 'updateSalesPeriod'
-      | 'updateWhitelist'
-      | 'venue'
-      | 'whitelist'
-      | 'whitelistEnabled',
+      | "addTicketCategory"
+      | "categoryCount"
+      | "createdAt"
+      | "deactivateEvent"
+      | "eventDescription"
+      | "eventEndTime"
+      | "eventStartTime"
+      | "eventTitle"
+      | "eventURI"
+      | "getEventDetails"
+      | "isActive"
+      | "maxTickets"
+      | "maxTicketsPerWallet"
+      | "nftContract"
+      | "organizer"
+      | "purchaseTickets"
+      | "salesEndTime"
+      | "salesStartTime"
+      | "setNFTContract"
+      | "ticketCategories"
+      | "ticketPrice"
+      | "ticketsSold"
+      | "toggleWhitelist"
+      | "updateEventDetails"
+      | "updateSalesPeriod"
+      | "updateWhitelist"
+      | "venue"
+      | "whitelist"
+      | "whitelistEnabled"
   ): FunctionFragment;
 
   getEvent(
     nameOrSignatureOrTopic:
-      | 'CategoryAdded'
-      | 'EventDeactivated'
-      | 'EventUpdated'
-      | 'TicketPurchased'
-      | 'WhitelistUpdated',
+      | "CategoryAdded"
+      | "EventDeactivated"
+      | "EventUpdated"
+      | "TicketPurchased"
+      | "WhitelistUpdated"
   ): EventFragment;
 
   encodeFunctionData(
-    functionFragment: 'addTicketCategory',
-    values: [string, BigNumberish, BigNumberish],
+    functionFragment: "addTicketCategory",
+    values: [string, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'categoryCount',
-    values?: undefined,
+    functionFragment: "categoryCount",
+    values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: 'createdAt', values?: undefined): string;
+  encodeFunctionData(functionFragment: "createdAt", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: 'deactivateEvent',
-    values?: undefined,
-  ): string;
-  encodeFunctionData(
-    functionFragment: 'eventDescription',
-    values?: undefined,
+    functionFragment: "deactivateEvent",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'eventEndTime',
-    values?: undefined,
+    functionFragment: "eventDescription",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'eventStartTime',
-    values?: undefined,
+    functionFragment: "eventEndTime",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'eventTitle',
-    values?: undefined,
-  ): string;
-  encodeFunctionData(functionFragment: 'eventURI', values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: 'getEventDetails',
-    values?: undefined,
-  ): string;
-  encodeFunctionData(functionFragment: 'isActive', values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: 'maxTickets',
-    values?: undefined,
+    functionFragment: "eventStartTime",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'maxTicketsPerWallet',
-    values?: undefined,
+    functionFragment: "eventTitle",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "eventURI", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "getEventDetails",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "isActive", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "maxTickets",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'nftContract',
-    values?: undefined,
-  ): string;
-  encodeFunctionData(functionFragment: 'organizer', values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: 'purchaseTickets',
-    values: [AddressLike, BigNumberish[], BigNumberish[]],
+    functionFragment: "maxTicketsPerWallet",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'salesEndTime',
-    values?: undefined,
+    functionFragment: "nftContract",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "organizer", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "purchaseTickets",
+    values: [AddressLike, BigNumberish[], BigNumberish[]]
   ): string;
   encodeFunctionData(
-    functionFragment: 'salesStartTime',
-    values?: undefined,
+    functionFragment: "salesEndTime",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'setNFTContract',
-    values: [AddressLike],
+    functionFragment: "salesStartTime",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'ticketCategories',
-    values: [BigNumberish],
+    functionFragment: "setNFTContract",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: 'ticketPrice',
-    values?: undefined,
+    functionFragment: "ticketCategories",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'ticketsSold',
-    values?: undefined,
+    functionFragment: "ticketPrice",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'toggleWhitelist',
-    values: [boolean],
+    functionFragment: "ticketsSold",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'updateEventDetails',
-    values: [string, string, string, BigNumberish, BigNumberish],
+    functionFragment: "toggleWhitelist",
+    values: [boolean]
   ): string;
   encodeFunctionData(
-    functionFragment: 'updateSalesPeriod',
-    values: [BigNumberish, BigNumberish],
+    functionFragment: "updateEventDetails",
+    values: [string, string, string, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'updateWhitelist',
-    values: [AddressLike[], boolean],
-  ): string;
-  encodeFunctionData(functionFragment: 'venue', values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: 'whitelist',
-    values: [AddressLike],
+    functionFragment: "updateSalesPeriod",
+    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'whitelistEnabled',
-    values?: undefined,
+    functionFragment: "updateWhitelist",
+    values: [AddressLike[], boolean]
+  ): string;
+  encodeFunctionData(functionFragment: "venue", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "whitelist",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "whitelistEnabled",
+    values?: undefined
   ): string;
 
   decodeFunctionResult(
-    functionFragment: 'addTicketCategory',
-    data: BytesLike,
+    functionFragment: "addTicketCategory",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'categoryCount',
-    data: BytesLike,
+    functionFragment: "categoryCount",
+    data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: 'createdAt', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "createdAt", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: 'deactivateEvent',
-    data: BytesLike,
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: 'eventDescription',
-    data: BytesLike,
+    functionFragment: "deactivateEvent",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'eventEndTime',
-    data: BytesLike,
+    functionFragment: "eventDescription",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'eventStartTime',
-    data: BytesLike,
-  ): Result;
-  decodeFunctionResult(functionFragment: 'eventTitle', data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: 'eventURI', data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: 'getEventDetails',
-    data: BytesLike,
-  ): Result;
-  decodeFunctionResult(functionFragment: 'isActive', data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: 'maxTickets', data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: 'maxTicketsPerWallet',
-    data: BytesLike,
+    functionFragment: "eventEndTime",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'nftContract',
-    data: BytesLike,
+    functionFragment: "eventStartTime",
+    data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: 'organizer', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "eventTitle", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "eventURI", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: 'purchaseTickets',
-    data: BytesLike,
+    functionFragment: "getEventDetails",
+    data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "isActive", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "maxTickets", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: 'salesEndTime',
-    data: BytesLike,
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: 'salesStartTime',
-    data: BytesLike,
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: 'setNFTContract',
-    data: BytesLike,
+    functionFragment: "maxTicketsPerWallet",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'ticketCategories',
-    data: BytesLike,
+    functionFragment: "nftContract",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "organizer", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "purchaseTickets",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'ticketPrice',
-    data: BytesLike,
+    functionFragment: "salesEndTime",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'ticketsSold',
-    data: BytesLike,
+    functionFragment: "salesStartTime",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'toggleWhitelist',
-    data: BytesLike,
+    functionFragment: "setNFTContract",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'updateEventDetails',
-    data: BytesLike,
+    functionFragment: "ticketCategories",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'updateSalesPeriod',
-    data: BytesLike,
+    functionFragment: "ticketPrice",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'updateWhitelist',
-    data: BytesLike,
+    functionFragment: "ticketsSold",
+    data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: 'venue', data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: 'whitelist', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: 'whitelistEnabled',
-    data: BytesLike,
+    functionFragment: "toggleWhitelist",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "updateEventDetails",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "updateSalesPeriod",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "updateWhitelist",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "venue", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "whitelist", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "whitelistEnabled",
+    data: BytesLike
   ): Result;
 }
 
@@ -290,7 +290,7 @@ export namespace CategoryAddedEvent {
   export type InputTuple = [
     categoryId: BigNumberish,
     name: string,
-    price: BigNumberish,
+    price: BigNumberish
   ];
   export type OutputTuple = [categoryId: bigint, name: string, price: bigint];
   export interface OutputObject {
@@ -328,12 +328,12 @@ export namespace TicketPurchasedEvent {
   export type InputTuple = [
     buyer: AddressLike,
     quantity: BigNumberish,
-    totalPrice: BigNumberish,
+    totalPrice: BigNumberish
   ];
   export type OutputTuple = [
     buyer: string,
     quantity: bigint,
-    totalPrice: bigint,
+    totalPrice: bigint
   ];
   export interface OutputObject {
     buyer: string;
@@ -368,61 +368,61 @@ export interface IEventContract extends BaseContract {
   queryFilter<TCEvent extends TypedContractEvent>(
     event: TCEvent,
     fromBlockOrBlockhash?: string | number | undefined,
-    toBlock?: string | number | undefined,
+    toBlock?: string | number | undefined
   ): Promise<Array<TypedEventLog<TCEvent>>>;
   queryFilter<TCEvent extends TypedContractEvent>(
     filter: TypedDeferredTopicFilter<TCEvent>,
     fromBlockOrBlockhash?: string | number | undefined,
-    toBlock?: string | number | undefined,
+    toBlock?: string | number | undefined
   ): Promise<Array<TypedEventLog<TCEvent>>>;
 
   on<TCEvent extends TypedContractEvent>(
     event: TCEvent,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
   on<TCEvent extends TypedContractEvent>(
     filter: TypedDeferredTopicFilter<TCEvent>,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
 
   once<TCEvent extends TypedContractEvent>(
     event: TCEvent,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
   once<TCEvent extends TypedContractEvent>(
     filter: TypedDeferredTopicFilter<TCEvent>,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
 
   listeners<TCEvent extends TypedContractEvent>(
-    event: TCEvent,
+    event: TCEvent
   ): Promise<Array<TypedListener<TCEvent>>>;
   listeners(eventName?: string): Promise<Array<Listener>>;
   removeAllListeners<TCEvent extends TypedContractEvent>(
-    event?: TCEvent,
+    event?: TCEvent
   ): Promise<this>;
 
   addTicketCategory: TypedContractMethod<
     [_name: string, _price: BigNumberish, _maxSupply: BigNumberish],
     [bigint],
-    'nonpayable'
+    "nonpayable"
   >;
 
-  categoryCount: TypedContractMethod<[], [bigint], 'view'>;
+  categoryCount: TypedContractMethod<[], [bigint], "view">;
 
-  createdAt: TypedContractMethod<[], [bigint], 'view'>;
+  createdAt: TypedContractMethod<[], [bigint], "view">;
 
-  deactivateEvent: TypedContractMethod<[], [void], 'nonpayable'>;
+  deactivateEvent: TypedContractMethod<[], [void], "nonpayable">;
 
-  eventDescription: TypedContractMethod<[], [string], 'view'>;
+  eventDescription: TypedContractMethod<[], [string], "view">;
 
-  eventEndTime: TypedContractMethod<[], [bigint], 'view'>;
+  eventEndTime: TypedContractMethod<[], [bigint], "view">;
 
-  eventStartTime: TypedContractMethod<[], [bigint], 'view'>;
+  eventStartTime: TypedContractMethod<[], [bigint], "view">;
 
-  eventTitle: TypedContractMethod<[], [string], 'view'>;
+  eventTitle: TypedContractMethod<[], [string], "view">;
 
-  eventURI: TypedContractMethod<[], [string], 'view'>;
+  eventURI: TypedContractMethod<[], [string], "view">;
 
   getEventDetails: TypedContractMethod<
     [],
@@ -439,7 +439,7 @@ export interface IEventContract extends BaseContract {
         bigint,
         bigint,
         bigint,
-        string,
+        string
       ] & {
         title: string;
         description: string;
@@ -453,55 +453,55 @@ export interface IEventContract extends BaseContract {
         startTime: bigint;
         endTime: bigint;
         eventVenue: string;
-      },
+      }
     ],
-    'view'
+    "view"
   >;
 
-  isActive: TypedContractMethod<[], [boolean], 'view'>;
+  isActive: TypedContractMethod<[], [boolean], "view">;
 
-  maxTickets: TypedContractMethod<[], [bigint], 'view'>;
+  maxTickets: TypedContractMethod<[], [bigint], "view">;
 
-  maxTicketsPerWallet: TypedContractMethod<[], [bigint], 'view'>;
+  maxTicketsPerWallet: TypedContractMethod<[], [bigint], "view">;
 
-  nftContract: TypedContractMethod<[], [string], 'view'>;
+  nftContract: TypedContractMethod<[], [string], "view">;
 
-  organizer: TypedContractMethod<[], [string], 'view'>;
+  organizer: TypedContractMethod<[], [string], "view">;
 
   purchaseTickets: TypedContractMethod<
     [
       buyer: AddressLike,
       quantities: BigNumberish[],
-      categoryIds: BigNumberish[],
+      categoryIds: BigNumberish[]
     ],
     [void],
-    'payable'
+    "payable"
   >;
 
-  salesEndTime: TypedContractMethod<[], [bigint], 'view'>;
+  salesEndTime: TypedContractMethod<[], [bigint], "view">;
 
-  salesStartTime: TypedContractMethod<[], [bigint], 'view'>;
+  salesStartTime: TypedContractMethod<[], [bigint], "view">;
 
   setNFTContract: TypedContractMethod<
     [_nftContract: AddressLike],
     [void],
-    'nonpayable'
+    "nonpayable"
   >;
 
   ticketCategories: TypedContractMethod<
     [categoryId: BigNumberish],
     [IEventContract.TicketCategoryStructOutput],
-    'view'
+    "view"
   >;
 
-  ticketPrice: TypedContractMethod<[], [bigint], 'view'>;
+  ticketPrice: TypedContractMethod<[], [bigint], "view">;
 
-  ticketsSold: TypedContractMethod<[], [bigint], 'view'>;
+  ticketsSold: TypedContractMethod<[], [bigint], "view">;
 
   toggleWhitelist: TypedContractMethod<
     [_enabled: boolean],
     [void],
-    'nonpayable'
+    "nonpayable"
   >;
 
   updateEventDetails: TypedContractMethod<
@@ -510,66 +510,68 @@ export interface IEventContract extends BaseContract {
       _eventURI: string,
       _venue: string,
       _eventStartTime: BigNumberish,
-      _eventEndTime: BigNumberish,
+      _eventEndTime: BigNumberish
     ],
     [void],
-    'nonpayable'
+    "nonpayable"
   >;
 
   updateSalesPeriod: TypedContractMethod<
     [_startTime: BigNumberish, _endTime: BigNumberish],
     [void],
-    'nonpayable'
+    "nonpayable"
   >;
 
   updateWhitelist: TypedContractMethod<
     [_addresses: AddressLike[], _status: boolean],
     [void],
-    'nonpayable'
+    "nonpayable"
   >;
 
-  venue: TypedContractMethod<[], [string], 'view'>;
+  venue: TypedContractMethod<[], [string], "view">;
 
-  whitelist: TypedContractMethod<[user: AddressLike], [boolean], 'view'>;
+  whitelist: TypedContractMethod<[user: AddressLike], [boolean], "view">;
 
-  whitelistEnabled: TypedContractMethod<[], [boolean], 'view'>;
+  whitelistEnabled: TypedContractMethod<[], [boolean], "view">;
 
   getFunction<T extends ContractMethod = ContractMethod>(
-    key: string | FunctionFragment,
+    key: string | FunctionFragment
   ): T;
 
   getFunction(
-    nameOrSignature: 'addTicketCategory',
+    nameOrSignature: "addTicketCategory"
   ): TypedContractMethod<
     [_name: string, _price: BigNumberish, _maxSupply: BigNumberish],
     [bigint],
-    'nonpayable'
+    "nonpayable"
   >;
   getFunction(
-    nameOrSignature: 'categoryCount',
-  ): TypedContractMethod<[], [bigint], 'view'>;
+    nameOrSignature: "categoryCount"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: 'createdAt',
-  ): TypedContractMethod<[], [bigint], 'view'>;
+    nameOrSignature: "createdAt"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: 'deactivateEvent',
-  ): TypedContractMethod<[], [void], 'nonpayable'>;
+    nameOrSignature: "deactivateEvent"
+  ): TypedContractMethod<[], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: 'eventDescription',
-  ): TypedContractMethod<[], [string], 'view'>;
+    nameOrSignature: "eventDescription"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
-    nameOrSignature: 'eventEndTime',
-  ): TypedContractMethod<[], [bigint], 'view'>;
+    nameOrSignature: "eventEndTime"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: 'eventStartTime',
-  ): TypedContractMethod<[], [bigint], 'view'>;
+    nameOrSignature: "eventStartTime"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: 'eventTitle',
-  ): TypedContractMethod<[], [string], 'view'>;
+    nameOrSignature: "eventTitle"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
-    nameOrSignature: 'eventURI',
-  ): TypedContractMethod<[], [string], 'view'>;
-  getFunction(nameOrSignature: 'getEventDetails'): TypedContractMethod<
+    nameOrSignature: "eventURI"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "getEventDetails"
+  ): TypedContractMethod<
     [],
     [
       [
@@ -584,7 +586,7 @@ export interface IEventContract extends BaseContract {
         bigint,
         bigint,
         bigint,
-        string,
+        string
       ] & {
         title: string;
         description: string;
@@ -598,128 +600,128 @@ export interface IEventContract extends BaseContract {
         startTime: bigint;
         endTime: bigint;
         eventVenue: string;
-      },
+      }
     ],
-    'view'
+    "view"
   >;
   getFunction(
-    nameOrSignature: 'isActive',
-  ): TypedContractMethod<[], [boolean], 'view'>;
+    nameOrSignature: "isActive"
+  ): TypedContractMethod<[], [boolean], "view">;
   getFunction(
-    nameOrSignature: 'maxTickets',
-  ): TypedContractMethod<[], [bigint], 'view'>;
+    nameOrSignature: "maxTickets"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: 'maxTicketsPerWallet',
-  ): TypedContractMethod<[], [bigint], 'view'>;
+    nameOrSignature: "maxTicketsPerWallet"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: 'nftContract',
-  ): TypedContractMethod<[], [string], 'view'>;
+    nameOrSignature: "nftContract"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
-    nameOrSignature: 'organizer',
-  ): TypedContractMethod<[], [string], 'view'>;
+    nameOrSignature: "organizer"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
-    nameOrSignature: 'purchaseTickets',
+    nameOrSignature: "purchaseTickets"
   ): TypedContractMethod<
     [
       buyer: AddressLike,
       quantities: BigNumberish[],
-      categoryIds: BigNumberish[],
+      categoryIds: BigNumberish[]
     ],
     [void],
-    'payable'
+    "payable"
   >;
   getFunction(
-    nameOrSignature: 'salesEndTime',
-  ): TypedContractMethod<[], [bigint], 'view'>;
+    nameOrSignature: "salesEndTime"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: 'salesStartTime',
-  ): TypedContractMethod<[], [bigint], 'view'>;
+    nameOrSignature: "salesStartTime"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: 'setNFTContract',
-  ): TypedContractMethod<[_nftContract: AddressLike], [void], 'nonpayable'>;
+    nameOrSignature: "setNFTContract"
+  ): TypedContractMethod<[_nftContract: AddressLike], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: 'ticketCategories',
+    nameOrSignature: "ticketCategories"
   ): TypedContractMethod<
     [categoryId: BigNumberish],
     [IEventContract.TicketCategoryStructOutput],
-    'view'
+    "view"
   >;
   getFunction(
-    nameOrSignature: 'ticketPrice',
-  ): TypedContractMethod<[], [bigint], 'view'>;
+    nameOrSignature: "ticketPrice"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: 'ticketsSold',
-  ): TypedContractMethod<[], [bigint], 'view'>;
+    nameOrSignature: "ticketsSold"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: 'toggleWhitelist',
-  ): TypedContractMethod<[_enabled: boolean], [void], 'nonpayable'>;
+    nameOrSignature: "toggleWhitelist"
+  ): TypedContractMethod<[_enabled: boolean], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: 'updateEventDetails',
+    nameOrSignature: "updateEventDetails"
   ): TypedContractMethod<
     [
       _description: string,
       _eventURI: string,
       _venue: string,
       _eventStartTime: BigNumberish,
-      _eventEndTime: BigNumberish,
+      _eventEndTime: BigNumberish
     ],
     [void],
-    'nonpayable'
+    "nonpayable"
   >;
   getFunction(
-    nameOrSignature: 'updateSalesPeriod',
+    nameOrSignature: "updateSalesPeriod"
   ): TypedContractMethod<
     [_startTime: BigNumberish, _endTime: BigNumberish],
     [void],
-    'nonpayable'
+    "nonpayable"
   >;
   getFunction(
-    nameOrSignature: 'updateWhitelist',
+    nameOrSignature: "updateWhitelist"
   ): TypedContractMethod<
     [_addresses: AddressLike[], _status: boolean],
     [void],
-    'nonpayable'
+    "nonpayable"
   >;
   getFunction(
-    nameOrSignature: 'venue',
-  ): TypedContractMethod<[], [string], 'view'>;
+    nameOrSignature: "venue"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
-    nameOrSignature: 'whitelist',
-  ): TypedContractMethod<[user: AddressLike], [boolean], 'view'>;
+    nameOrSignature: "whitelist"
+  ): TypedContractMethod<[user: AddressLike], [boolean], "view">;
   getFunction(
-    nameOrSignature: 'whitelistEnabled',
-  ): TypedContractMethod<[], [boolean], 'view'>;
+    nameOrSignature: "whitelistEnabled"
+  ): TypedContractMethod<[], [boolean], "view">;
 
   getEvent(
-    key: 'CategoryAdded',
+    key: "CategoryAdded"
   ): TypedContractEvent<
     CategoryAddedEvent.InputTuple,
     CategoryAddedEvent.OutputTuple,
     CategoryAddedEvent.OutputObject
   >;
   getEvent(
-    key: 'EventDeactivated',
+    key: "EventDeactivated"
   ): TypedContractEvent<
     EventDeactivatedEvent.InputTuple,
     EventDeactivatedEvent.OutputTuple,
     EventDeactivatedEvent.OutputObject
   >;
   getEvent(
-    key: 'EventUpdated',
+    key: "EventUpdated"
   ): TypedContractEvent<
     EventUpdatedEvent.InputTuple,
     EventUpdatedEvent.OutputTuple,
     EventUpdatedEvent.OutputObject
   >;
   getEvent(
-    key: 'TicketPurchased',
+    key: "TicketPurchased"
   ): TypedContractEvent<
     TicketPurchasedEvent.InputTuple,
     TicketPurchasedEvent.OutputTuple,
     TicketPurchasedEvent.OutputObject
   >;
   getEvent(
-    key: 'WhitelistUpdated',
+    key: "WhitelistUpdated"
   ): TypedContractEvent<
     WhitelistUpdatedEvent.InputTuple,
     WhitelistUpdatedEvent.OutputTuple,
@@ -727,7 +729,7 @@ export interface IEventContract extends BaseContract {
   >;
 
   filters: {
-    'CategoryAdded(uint256,string,uint256)': TypedContractEvent<
+    "CategoryAdded(uint256,string,uint256)": TypedContractEvent<
       CategoryAddedEvent.InputTuple,
       CategoryAddedEvent.OutputTuple,
       CategoryAddedEvent.OutputObject
@@ -738,7 +740,7 @@ export interface IEventContract extends BaseContract {
       CategoryAddedEvent.OutputObject
     >;
 
-    'EventDeactivated()': TypedContractEvent<
+    "EventDeactivated()": TypedContractEvent<
       EventDeactivatedEvent.InputTuple,
       EventDeactivatedEvent.OutputTuple,
       EventDeactivatedEvent.OutputObject
@@ -749,7 +751,7 @@ export interface IEventContract extends BaseContract {
       EventDeactivatedEvent.OutputObject
     >;
 
-    'EventUpdated()': TypedContractEvent<
+    "EventUpdated()": TypedContractEvent<
       EventUpdatedEvent.InputTuple,
       EventUpdatedEvent.OutputTuple,
       EventUpdatedEvent.OutputObject
@@ -760,7 +762,7 @@ export interface IEventContract extends BaseContract {
       EventUpdatedEvent.OutputObject
     >;
 
-    'TicketPurchased(address,uint256,uint256)': TypedContractEvent<
+    "TicketPurchased(address,uint256,uint256)": TypedContractEvent<
       TicketPurchasedEvent.InputTuple,
       TicketPurchasedEvent.OutputTuple,
       TicketPurchasedEvent.OutputObject
@@ -771,7 +773,7 @@ export interface IEventContract extends BaseContract {
       TicketPurchasedEvent.OutputObject
     >;
 
-    'WhitelistUpdated(address,bool)': TypedContractEvent<
+    "WhitelistUpdated(address,bool)": TypedContractEvent<
       WhitelistUpdatedEvent.InputTuple,
       WhitelistUpdatedEvent.OutputTuple,
       WhitelistUpdatedEvent.OutputObject

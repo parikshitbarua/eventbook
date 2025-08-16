@@ -234,7 +234,7 @@ const Header = () => {
           {/* Create Event Button - positioned between wallet and profile */}
           <button
             onClick={handleCreateClick}
-            className={`flex items-center gap-1 px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2 lg:py-2.5 text-xs sm:text-sm lg:text-base font-medium transition-all duration-200 rounded-xl text-white transform hover:scale-105 shadow-sm hover:shadow-md`}
+            className={`flex items-center gap-1 px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2 lg:py-2 text-xs sm:text-sm lg:text-base font-medium transition-all duration-200 rounded-xl text-white transform hover:scale-105 shadow-sm hover:shadow-md`}
             style={{
               backgroundColor: colors.primary,
               borderColor: colors.primary,
@@ -249,21 +249,29 @@ const Header = () => {
               e.currentTarget.style.borderColor = colors.primary;
             }}
           >
-            <PlusIcon className="h-3 w-3 sm:h-4 sm:w-4 lg:h-5 lg:w-5" />
+            <PlusIcon className="h-2 w-3 sm:h-4 sm:w-4 lg:h-5 lg:w-5" />
             <span className="hidden sm:inline">Create</span>
           </button>
 
           <div className="relative ml-1 sm:ml-2" ref={dropdownRef}>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className={`p-1 sm:p-1.5 lg:p-2 ${
-                isDark ? 'hover:bg-zinc-700' : 'hover:bg-slate-100'
-              } rounded-full transition-colors duration-200`}
+              className="p-1 sm:p-1.5 lg:p-2 rounded-full transition-all duration-200 transform hover:scale-105"
+              style={{
+                color: isDark ? 'rgba(255, 255, 255, 0.7)' : '#374151',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = `${colors.primary}15`;
+                e.currentTarget.style.color = colors.primary;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = isDark ? 'rgba(255, 255, 255, 0.7)' : '#374151';
+              }}
             >
               <UserCircleIcon
-                className={`h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 ${
-                  isDark ? 'text-white/70' : 'text-zinc-700'
-                }`}
+                className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 transition-colors duration-200"
+                style={{ color: 'inherit' }}
               />
             </button>
 
@@ -278,13 +286,25 @@ const Header = () => {
                 {/* Wallet Option - Always Visible */}
                 <button
                   onClick={handleConnectWallet}
-                  className={`w-full flex items-center px-3 sm:px-4 py-2 text-sm ${
-                    isDark
-                      ? 'text-white hover:bg-zinc-700'
-                      : 'text-zinc-700 hover:bg-slate-50'
-                  } transition-colors duration-200`}
+                  className={`w-full flex items-center px-3 sm:px-4 py-2 text-sm transition-all duration-200 rounded-lg mx-1`}
+                  style={{
+                    color: isDark ? 'white' : '#374151',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = `${colors.primary}15`;
+                    e.currentTarget.style.color = colors.primary;
+                    e.currentTarget.style.transform = 'translateX(2px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = isDark ? 'white' : '#374151';
+                    e.currentTarget.style.transform = 'translateX(0px)';
+                  }}
                 >
-                  <WalletIcon className="h-4 w-4 mr-2" />
+                  <WalletIcon 
+                    className="h-4 w-4 mr-2 transition-colors duration-200" 
+                    style={{ color: 'inherit' }}
+                  />
                   Wallet
                 </button>
                 <hr
@@ -295,22 +315,40 @@ const Header = () => {
 
                 <Link
                   to="profile/my-events"
-                  className={`block px-3 sm:px-4 py-2 text-sm ${
-                    isDark
-                      ? 'text-white hover:bg-zinc-700'
-                      : 'text-zinc-700 hover:bg-slate-50'
-                  } transition-colors duration-200`}
+                  className="block px-3 sm:px-4 py-2 text-sm transition-all duration-200 rounded-lg mx-1"
+                  style={{
+                    color: isDark ? 'white' : '#374151',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = `${colors.primary}15`;
+                    e.currentTarget.style.color = colors.primary;
+                    e.currentTarget.style.transform = 'translateX(2px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = isDark ? 'white' : '#374151';
+                    e.currentTarget.style.transform = 'translateX(0px)';
+                  }}
                   onClick={() => setIsDropdownOpen(false)}
                 >
                   My Events
                 </Link>
                 <Link
                   to="profile/my-tickets"
-                  className={`block px-3 sm:px-4 py-2 text-sm ${
-                    isDark
-                      ? 'text-white hover:bg-zinc-700'
-                      : 'text-zinc-700 hover:bg-slate-50'
-                  } transition-colors duration-200`}
+                  className="block px-3 sm:px-4 py-2 text-sm transition-all duration-200 rounded-lg mx-1"
+                  style={{
+                    color: isDark ? 'white' : '#374151',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = `${colors.primary}15`;
+                    e.currentTarget.style.color = colors.primary;
+                    e.currentTarget.style.transform = 'translateX(2px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = isDark ? 'white' : '#374151';
+                    e.currentTarget.style.transform = 'translateX(0px)';
+                  }}
                   onClick={() => setIsDropdownOpen(false)}
                 >
                   My Tickets
@@ -325,20 +363,29 @@ const Header = () => {
                     toggleTheme();
                     setIsDropdownOpen(false);
                   }}
-                  className={`w-full flex items-center px-3 sm:px-4 py-2 text-sm ${
-                    isDark
-                      ? 'text-white hover:bg-zinc-700'
-                      : 'text-zinc-700 hover:bg-slate-50'
-                  } transition-colors duration-200`}
+                  className="w-full flex items-center px-3 sm:px-4 py-2 text-sm transition-all duration-200 rounded-lg mx-1"
+                  style={{
+                    color: isDark ? 'white' : '#374151',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = `${colors.primary}15`;
+                    e.currentTarget.style.color = colors.primary;
+                    e.currentTarget.style.transform = 'translateX(2px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = isDark ? 'white' : '#374151';
+                    e.currentTarget.style.transform = 'translateX(0px)';
+                  }}
                 >
                   {isDark ? (
                     <>
-                      <SunIcon className="h-4 w-4 mr-2" />
+                      <SunIcon className="h-4 w-4 mr-2 transition-colors duration-200" style={{ color: 'inherit' }} />
                       Light Theme
                     </>
                   ) : (
                     <>
-                      <MoonIcon className="h-4 w-4 mr-2" />
+                      <MoonIcon className="h-4 w-4 mr-2 transition-colors duration-200" style={{ color: 'inherit' }} />
                       Dark Theme
                     </>
                   )}

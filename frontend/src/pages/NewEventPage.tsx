@@ -74,6 +74,8 @@ const NewEventPage = () => {
     maxTickets: '',
     eventStartTime: '',
     eventEndTime: '',
+    salesStartTime: '',
+    salesEndTime: '',
     venue: '',
     country: '',
     state: '',
@@ -81,6 +83,7 @@ const NewEventPage = () => {
     nftName: '',
     nftSymbol: '',
     eventImages: [],
+    isEventEditAllowed: false,
   });
 
   // Log write errors from wagmi
@@ -186,9 +189,22 @@ const NewEventPage = () => {
   };
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
+    // Clean file names to remove URL encoding
+    const cleanedFiles = acceptedFiles.map(file => {
+      const cleanName = decodeURIComponent(file.name);
+      // Only create a new File object if the name actually changed
+      if (cleanName !== file.name) {
+        return new File([file], cleanName, {
+          type: file.type,
+          lastModified: file.lastModified,
+        });
+      }
+      return file;
+    });
+
     setFormData((prev) => ({
       ...prev,
-      eventImages: [...prev.eventImages, ...acceptedFiles],
+      eventImages: [...prev.eventImages, ...cleanedFiles],
     }));
   }, []);
 
@@ -274,8 +290,18 @@ const NewEventPage = () => {
     // Validate form data
     const validation = validateEventForm(formData, hasSingleCategory);
     if (!validation.isValid) {
-      hideLoadingModal();
-      alert(validation.error);
+      showErrorModal(
+        validation.error,
+        {
+          text: 'Try Again',
+          onClick: () => {
+            hideLoadingModal();
+          }
+        },
+        () => {
+          hideLoadingModal();
+        }
+      );
       return;
     }
 
@@ -289,12 +315,15 @@ const NewEventPage = () => {
       maxTickets,
       eventStartTime,
       eventEndTime,
+      salesStartTime,
+      salesEndTime,
       venue,
       nftName,
       nftSymbol,
       country,
       city,
       state,
+      isEventEditAllowed,
     } = formData;
 
     try {
@@ -334,10 +363,18 @@ const NewEventPage = () => {
       updateProgress(100);
       
       // Convert dates to Unix timestamps
-      const startTimestamp = Math.floor(
+      const eventStartTimestamp = Math.floor(
         new Date(eventStartTime).getTime() / 1000,
       );
-      const endTimestamp = Math.floor(new Date(eventEndTime).getTime() / 1000);
+      const eventEndTimestamp = Math.floor(new Date(eventEndTime).getTime() / 1000);
+      
+      // Convert sales dates to Unix timestamps (0 if empty)
+      const salesStartTimestamp = salesStartTime 
+        ? Math.floor(new Date(salesStartTime).getTime() / 1000)
+        : 0;
+      const salesEndTimestamp = salesEndTime 
+        ? Math.floor(new Date(salesEndTime).getTime() / 1000)
+        : 0;
 
       // Add detailed logging for maxTickets
       console.log('maxTickets value at different stages:');
@@ -358,11 +395,14 @@ const NewEventPage = () => {
           ? BigInt(maxTickets).toString()
           : '0',
         eventURI: eventURI || '',
-        startTimestamp,
-        endTimestamp,
+        eventStartTimestamp,
+        eventEndTimestamp,
+        salesStartTimestamp,
+        salesEndTimestamp,
         venue,
         nftName,
         nftSymbol,
+        isEventEditAllowed,
       });
 
       // Show contract deployment modal
@@ -380,11 +420,14 @@ const NewEventPage = () => {
           hasSingleCategory ? parseEther(ticketPrice) : BigInt(0),
           hasSingleCategory ? BigInt(maxTickets) : BigInt(0),
           eventURI || '',
-          BigInt(startTimestamp),
-          BigInt(endTimestamp),
+          BigInt(eventStartTimestamp),
+          BigInt(eventEndTimestamp),
           venue,
           nftName,
           nftSymbol,
+          isEventEditAllowed,
+          BigInt(salesStartTimestamp),
+          BigInt(salesEndTimestamp),
         ],
       });
       
@@ -404,17 +447,16 @@ const NewEventPage = () => {
               text: 'Continue to Home',
               onClick: () => {
                 hideLoadingModal();
-                navigate('/');
+                navigate('/home');
               }
             },
             () => {
               hideLoadingModal();
-              navigate('/');
+              navigate('/home');
             }
           );
         }, 2000);
       } else {
-        // For multi-category events, hide modal and navigate
         setTimeout(() => {
           hideLoadingModal();
         }, 2000);
@@ -790,7 +832,7 @@ const NewEventPage = () => {
                             isDark ? 'text-gray-300' : 'text-gray-700'
                           } mb-2 transition-colors duration-300`}
                         >
-                          Start Date & Time *
+                          Event Start Date & Time *
                         </label>
                         <input
                           type="datetime-local"
@@ -814,7 +856,7 @@ const NewEventPage = () => {
                             isDark ? 'text-gray-300' : 'text-gray-700'
                           } mb-2 transition-colors duration-300`}
                         >
-                          End Date & Time *
+                          Event End Date & Time *
                         </label>
                         <input
                           type="datetime-local"
@@ -833,142 +875,71 @@ const NewEventPage = () => {
                         />
                       </div>
                     </div>
-                  </div>
 
-                  {/* Location */}
-                  <div
-                    className={`${
-                      isDark ? 'bg-gray-800' : 'bg-gray-50'
-                    } p-6 rounded-2xl transition-colors duration-300`}
-                  >
-                    <h3
-                      className={`text-lg font-semibold ${
-                        isDark ? 'text-white' : 'text-gray-900'
-                      } mb-6 transition-colors duration-300`}
-                    >
-                      Location
-                    </h3>
-
-                    {/* Venue */}
-                    <div className="mb-4">
-                      <label
-                        className={`block text-sm font-medium ${
+                    {/* Sales Schedule */}
+                    <div className="mt-6">
+                      <h4
+                        className={`text-md font-medium ${
                           isDark ? 'text-gray-300' : 'text-gray-700'
-                        } mb-2 transition-colors duration-300`}
+                        } mb-4 transition-colors duration-300`}
                       >
-                        Venue Name *
-                      </label>
-                      <input
-                        type="text"
-                        name="venue"
-                        value={formData.venue}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 border ${
-                          isDark
-                            ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
-                            : 'border-gray-300 bg-white text-gray-900 placeholder-gray-700'
-                        } rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200`}
-                        style={{ 
-                          '--tw-ring-color': colors.primary,
-                        } as React.CSSProperties}
-                        placeholder="Madison Square Garden"
-                        required
-                      />
-                    </div>
-
-                    {/* Country, State, City */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <label
-                          className={`block text-sm font-medium ${
-                            isDark ? 'text-gray-300' : 'text-gray-700'
-                          } mb-2 transition-colors duration-300`}
-                        >
-                          Country *
-                        </label>
-                        <select
-                          name="country"
-                          value={formData.country}
-                          onChange={handleChange}
-                          className={`w-full px-4 py-3 border ${
-                            isDark
-                              ? 'border-gray-600 bg-gray-700 text-white'
-                              : 'border-gray-300 bg-white text-gray-900'
-                          } rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200`}
-                          style={{ 
-                            '--tw-ring-color': colors.primary,
-                          } as React.CSSProperties}
-                          required
-                        >
-                          <option value="">Select Country</option>
-                          {locationData.map((country) => (
-                            <option key={country.id} value={country.id}>
-                              {country.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <label
-                          className={`block text-sm font-medium ${
-                            isDark ? 'text-gray-300' : 'text-gray-700'
-                          } mb-2 transition-colors duration-300`}
-                        >
-                          State/Province *
-                        </label>
-                        <select
-                          name="state"
-                          value={formData.state}
-                          onChange={handleChange}
-                          className={`w-full px-4 py-3 border ${
-                            isDark
-                              ? 'border-gray-600 bg-gray-700 text-white'
-                              : 'border-gray-300 bg-white text-gray-900'
-                          } rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200`}
-                          style={{ 
-                            '--tw-ring-color': colors.primary,
-                          } as React.CSSProperties}
-                          required
-                          disabled={!formData.country}
-                        >
-                          <option value="">Select State</option>
-                          {availableStates.map((state) => (
-                            <option key={state.id} value={state.id}>
-                              {state.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <label
-                          className={`block text-sm font-medium ${
-                            isDark ? 'text-gray-300' : 'text-gray-700'
-                          } mb-2 transition-colors duration-300`}
-                        >
-                          City *
-                        </label>
-                        <select
-                          name="city"
-                          value={formData.city}
-                          onChange={handleChange}
-                          className={`w-full px-4 py-3 border ${
-                            isDark
-                              ? 'border-gray-600 bg-gray-700 text-white'
-                              : 'border-gray-300 bg-white text-gray-900'
-                          } rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200`}
-                          style={{ 
-                            '--tw-ring-color': colors.primary,
-                          } as React.CSSProperties}
-                          required
-                          disabled={!formData.state}
-                        >
-                          <option value="">Select City</option>
-                          {availableCities.map((city) => (
-                            <option key={city.id} value={city.id}>
-                              {city.name}
-                            </option>
-                          ))}
-                        </select>
+                        Sales Schedule (Optional)
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label
+                            className={`block text-sm font-medium ${
+                              isDark ? 'text-gray-300' : 'text-gray-700'
+                            } mb-2 transition-colors duration-300`}
+                          >
+                            Sales Start Date & Time
+                          </label>
+                          <input
+                            type="datetime-local"
+                            name="salesStartTime"
+                            value={formData.salesStartTime}
+                            onChange={handleChange}
+                            className={`w-full px-4 py-3 border ${
+                              isDark
+                                ? 'border-gray-600 bg-gray-700 text-white'
+                                : 'border-gray-300 bg-white text-gray-900'
+                            } rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200`}
+                            style={{ 
+                              '--tw-ring-color': colors.primary,
+                            } as React.CSSProperties}
+                            placeholder="Leave empty for immediate sales"
+                          />
+                          <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                            Leave empty to start sales immediately
+                          </p>
+                        </div>
+                        <div>
+                          <label
+                            className={`block text-sm font-medium ${
+                              isDark ? 'text-gray-300' : 'text-gray-700'
+                            } mb-2 transition-colors duration-300`}
+                          >
+                            Sales End Date & Time
+                          </label>
+                          <input
+                            type="datetime-local"
+                            name="salesEndTime"
+                            value={formData.salesEndTime}
+                            onChange={handleChange}
+                            className={`w-full px-4 py-3 border ${
+                              isDark
+                                ? 'border-gray-600 bg-gray-700 text-white'
+                                : 'border-gray-300 bg-white text-gray-900'
+                            } rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200`}
+                            style={{ 
+                              '--tw-ring-color': colors.primary,
+                            } as React.CSSProperties}
+                            placeholder="Leave empty to end at event start"
+                          />
+                          <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                            Leave empty to end sales at event start
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1103,6 +1074,194 @@ const NewEventPage = () => {
                         </div>
                       </div>
                     )}
+                  </div>
+
+                  {/* Location */}
+                  <div
+                    className={`${
+                      isDark ? 'bg-gray-800' : 'bg-gray-50'
+                    } p-6 rounded-2xl transition-colors duration-300`}
+                  >
+                    <h3
+                      className={`text-lg font-semibold ${
+                        isDark ? 'text-white' : 'text-gray-900'
+                      } mb-6 transition-colors duration-300`}
+                    >
+                      Location
+                    </h3>
+
+                    {/* Venue */}
+                    <div className="mb-4">
+                      <label
+                        className={`block text-sm font-medium ${
+                          isDark ? 'text-gray-300' : 'text-gray-700'
+                        } mb-2 transition-colors duration-300`}
+                      >
+                        Venue Name *
+                      </label>
+                      <input
+                        type="text"
+                        name="venue"
+                        value={formData.venue}
+                        onChange={handleChange}
+                        className={`w-full px-4 py-3 border ${
+                          isDark
+                            ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                            : 'border-gray-300 bg-white text-gray-900 placeholder-gray-700'
+                        } rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200`}
+                        style={{ 
+                          '--tw-ring-color': colors.primary,
+                        } as React.CSSProperties}
+                        placeholder="Madison Square Garden"
+                        required
+                      />
+                    </div>
+
+                    {/* Country, State, City */}
+                    <div className="grid grid-cols-1 gap-4">
+                      <div>
+                        <label
+                          className={`block text-sm font-medium ${
+                            isDark ? 'text-gray-300' : 'text-gray-700'
+                          } mb-2 transition-colors duration-300`}
+                        >
+                          Country *
+                        </label>
+                        <select
+                          name="country"
+                          value={formData.country}
+                          onChange={handleChange}
+                          className={`w-full px-4 py-3 border ${
+                            isDark
+                              ? 'border-gray-600 bg-gray-700 text-white'
+                              : 'border-gray-300 bg-white text-gray-900'
+                          } rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200`}
+                          style={{ 
+                            '--tw-ring-color': colors.primary,
+                          } as React.CSSProperties}
+                          required
+                        >
+                          <option value="">Select Country</option>
+                          {locationData.map((country) => (
+                            <option key={country.id} value={country.id}>
+                              {country.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label
+                          className={`block text-sm font-medium ${
+                            isDark ? 'text-gray-300' : 'text-gray-700'
+                          } mb-2 transition-colors duration-300`}
+                        >
+                          State/Province *
+                        </label>
+                        <select
+                          name="state"
+                          value={formData.state}
+                          onChange={handleChange}
+                          className={`w-full px-4 py-3 border ${
+                            isDark
+                              ? 'border-gray-600 bg-gray-700 text-white'
+                              : 'border-gray-300 bg-white text-gray-900'
+                          } rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200`}
+                          style={{ 
+                            '--tw-ring-color': colors.primary,
+                          } as React.CSSProperties}
+                          required
+                          disabled={!formData.country}
+                        >
+                          <option value="">Select State</option>
+                          {availableStates.map((state) => (
+                            <option key={state.id} value={state.id}>
+                              {state.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label
+                          className={`block text-sm font-medium ${
+                            isDark ? 'text-gray-300' : 'text-gray-700'
+                          } mb-2 transition-colors duration-300`}
+                        >
+                          City *
+                        </label>
+                        <select
+                          name="city"
+                          value={formData.city}
+                          onChange={handleChange}
+                          className={`w-full px-4 py-3 border ${
+                            isDark
+                              ? 'border-gray-600 bg-gray-700 text-white'
+                              : 'border-gray-300 bg-white text-gray-900'
+                          } rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200`}
+                          style={{ 
+                            '--tw-ring-color': colors.primary,
+                          } as React.CSSProperties}
+                          required
+                          disabled={!formData.state}
+                        >
+                          <option value="">Select City</option>
+                          {availableCities.map((city) => (
+                            <option key={city.id} value={city.id}>
+                              {city.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Event Settings */}
+                  <div
+                    className={`${
+                      isDark ? 'bg-gray-800' : 'bg-gray-50'
+                    } p-6 rounded-2xl transition-colors duration-300`}
+                  >
+                    <h3
+                      className={`text-lg font-semibold ${
+                        isDark ? 'text-white' : 'text-gray-900'
+                      } mb-6 transition-colors duration-300`}
+                    >
+                      Event Settings
+                    </h3>
+
+                    <div className="flex items-start">
+                      <input
+                        type="checkbox"
+                        id="isEventEditAllowed"
+                        name="isEventEditAllowed"
+                        checked={formData.isEventEditAllowed}
+                        onChange={(e) => setFormData(prev => ({ 
+                          ...prev, 
+                          isEventEditAllowed: e.target.checked 
+                        }))}
+                        className="h-4 w-4 border-gray-300 rounded focus:ring-2 mt-1"
+                        style={{ 
+                          color: colors.primary,
+                          '--tw-ring-color': colors.primary,
+                        } as React.CSSProperties}
+                      />
+                      <div className="ml-3">
+                        <label
+                          htmlFor="isEventEditAllowed"
+                          className={`block text-sm font-medium ${
+                            isDark ? 'text-gray-300' : 'text-gray-700'
+                          } transition-colors duration-300 cursor-pointer`}
+                        >
+                          Allow event details to be edited in the future
+                        </label>
+                        <div className={`mt-2 p-3 rounded-lg ${isDark ? 'bg-yellow-900/20 border border-yellow-700' : 'bg-yellow-50 border border-yellow-200'}`}>
+                          <p className={`text-sm ${isDark ? 'text-yellow-300' : 'text-yellow-800'}`}>
+                            ⚠️ <strong>Warning:</strong> Please check this box if you wish to edit event details in the future. 
+                            Leaving this unchecked will not allow you to make changes to event details after creation.<br/>
+                            If selected, events can only be edited a maximum of <strong><i>once</i></strong> after creation.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   {/* NFT Configuration */}

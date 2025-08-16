@@ -8,6 +8,7 @@ export interface EventData {
   ticketsSold?: bigint;
   ticketsLeft?: bigint;
   isActive?: boolean;
+  isEventEditAllowed?: boolean;
   eventURI?: string;
   createdAt?: bigint;
   eventStartTime: bigint;

@@ -13,7 +13,7 @@ import type {
   ContractRunner,
   ContractMethod,
   Listener,
-} from 'ethers';
+} from "ethers";
 import type {
   TypedContractEvent,
   TypedDeferredTopicFilter,
@@ -21,56 +21,56 @@ import type {
   TypedLogDescription,
   TypedListener,
   TypedContractMethod,
-} from '../common';
+} from "../common";
 
 export interface DeploymentExampleInterface extends Interface {
   getFunction(
     nameOrSignature:
-      | 'createSampleEvent'
-      | 'deployFactory'
-      | 'estimateGasSavings'
-      | 'factory'
-      | 'getFactoryInfo',
+      | "createSampleEvent"
+      | "deployFactory"
+      | "estimateGasSavings"
+      | "factory"
+      | "getFactoryInfo"
   ): FunctionFragment;
 
   getEvent(
-    nameOrSignatureOrTopic: 'EventCreated' | 'FactoryDeployed',
+    nameOrSignatureOrTopic: "EventCreated" | "FactoryDeployed"
   ): EventFragment;
 
   encodeFunctionData(
-    functionFragment: 'createSampleEvent',
-    values?: undefined,
+    functionFragment: "createSampleEvent",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'deployFactory',
-    values: [AddressLike],
+    functionFragment: "deployFactory",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: 'estimateGasSavings',
-    values?: undefined,
+    functionFragment: "estimateGasSavings",
+    values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: 'factory', values?: undefined): string;
+  encodeFunctionData(functionFragment: "factory", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: 'getFactoryInfo',
-    values?: undefined,
+    functionFragment: "getFactoryInfo",
+    values?: undefined
   ): string;
 
   decodeFunctionResult(
-    functionFragment: 'createSampleEvent',
-    data: BytesLike,
+    functionFragment: "createSampleEvent",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'deployFactory',
-    data: BytesLike,
+    functionFragment: "deployFactory",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'estimateGasSavings',
-    data: BytesLike,
+    functionFragment: "estimateGasSavings",
+    data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: 'factory', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "factory", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: 'getFactoryInfo',
-    data: BytesLike,
+    functionFragment: "getFactoryInfo",
+    data: BytesLike
   ): Result;
 }
 
@@ -78,12 +78,12 @@ export namespace EventCreatedEvent {
   export type InputTuple = [
     eventId: BigNumberish,
     eventContract: AddressLike,
-    nftContract: AddressLike,
+    nftContract: AddressLike
   ];
   export type OutputTuple = [
     eventId: bigint,
     eventContract: string,
-    nftContract: string,
+    nftContract: string
   ];
   export interface OutputObject {
     eventId: bigint;
@@ -117,38 +117,38 @@ export interface DeploymentExample extends BaseContract {
   queryFilter<TCEvent extends TypedContractEvent>(
     event: TCEvent,
     fromBlockOrBlockhash?: string | number | undefined,
-    toBlock?: string | number | undefined,
+    toBlock?: string | number | undefined
   ): Promise<Array<TypedEventLog<TCEvent>>>;
   queryFilter<TCEvent extends TypedContractEvent>(
     filter: TypedDeferredTopicFilter<TCEvent>,
     fromBlockOrBlockhash?: string | number | undefined,
-    toBlock?: string | number | undefined,
+    toBlock?: string | number | undefined
   ): Promise<Array<TypedEventLog<TCEvent>>>;
 
   on<TCEvent extends TypedContractEvent>(
     event: TCEvent,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
   on<TCEvent extends TypedContractEvent>(
     filter: TypedDeferredTopicFilter<TCEvent>,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
 
   once<TCEvent extends TypedContractEvent>(
     event: TCEvent,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
   once<TCEvent extends TypedContractEvent>(
     filter: TypedDeferredTopicFilter<TCEvent>,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
 
   listeners<TCEvent extends TypedContractEvent>(
-    event: TCEvent,
+    event: TCEvent
   ): Promise<Array<TypedListener<TCEvent>>>;
   listeners(eventName?: string): Promise<Array<Listener>>;
   removeAllListeners<TCEvent extends TypedContractEvent>(
-    event?: TCEvent,
+    event?: TCEvent
   ): Promise<this>;
 
   createSampleEvent: TypedContractMethod<
@@ -158,15 +158,15 @@ export interface DeploymentExample extends BaseContract {
         eventId: bigint;
         eventContract: string;
         nftContract: string;
-      },
+      }
     ],
-    'nonpayable'
+    "nonpayable"
   >;
 
   deployFactory: TypedContractMethod<
     [platformFeeRecipient: AddressLike],
     [void],
-    'nonpayable'
+    "nonpayable"
   >;
 
   estimateGasSavings: TypedContractMethod<
@@ -175,12 +175,12 @@ export interface DeploymentExample extends BaseContract {
       [bigint, bigint] & {
         deploymentSavings: bigint;
         eventCreationSavings: bigint;
-      },
+      }
     ],
-    'view'
+    "view"
   >;
 
-  factory: TypedContractMethod<[], [string], 'view'>;
+  factory: TypedContractMethod<[], [string], "view">;
 
   getFactoryInfo: TypedContractMethod<
     [],
@@ -191,47 +191,53 @@ export interface DeploymentExample extends BaseContract {
         nftImplementation: string;
         platformFee: bigint;
         eventCount: bigint;
-      },
+      }
     ],
-    'view'
+    "view"
   >;
 
   getFunction<T extends ContractMethod = ContractMethod>(
-    key: string | FunctionFragment,
+    key: string | FunctionFragment
   ): T;
 
-  getFunction(nameOrSignature: 'createSampleEvent'): TypedContractMethod<
+  getFunction(
+    nameOrSignature: "createSampleEvent"
+  ): TypedContractMethod<
     [],
     [
       [bigint, string, string] & {
         eventId: bigint;
         eventContract: string;
         nftContract: string;
-      },
+      }
     ],
-    'nonpayable'
+    "nonpayable"
   >;
   getFunction(
-    nameOrSignature: 'deployFactory',
+    nameOrSignature: "deployFactory"
   ): TypedContractMethod<
     [platformFeeRecipient: AddressLike],
     [void],
-    'nonpayable'
+    "nonpayable"
   >;
-  getFunction(nameOrSignature: 'estimateGasSavings'): TypedContractMethod<
+  getFunction(
+    nameOrSignature: "estimateGasSavings"
+  ): TypedContractMethod<
     [],
     [
       [bigint, bigint] & {
         deploymentSavings: bigint;
         eventCreationSavings: bigint;
-      },
+      }
     ],
-    'view'
+    "view"
   >;
   getFunction(
-    nameOrSignature: 'factory',
-  ): TypedContractMethod<[], [string], 'view'>;
-  getFunction(nameOrSignature: 'getFactoryInfo'): TypedContractMethod<
+    nameOrSignature: "factory"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "getFactoryInfo"
+  ): TypedContractMethod<
     [],
     [
       [string, string, string, bigint, bigint] & {
@@ -240,20 +246,20 @@ export interface DeploymentExample extends BaseContract {
         nftImplementation: string;
         platformFee: bigint;
         eventCount: bigint;
-      },
+      }
     ],
-    'view'
+    "view"
   >;
 
   getEvent(
-    key: 'EventCreated',
+    key: "EventCreated"
   ): TypedContractEvent<
     EventCreatedEvent.InputTuple,
     EventCreatedEvent.OutputTuple,
     EventCreatedEvent.OutputObject
   >;
   getEvent(
-    key: 'FactoryDeployed',
+    key: "FactoryDeployed"
   ): TypedContractEvent<
     FactoryDeployedEvent.InputTuple,
     FactoryDeployedEvent.OutputTuple,
@@ -261,7 +267,7 @@ export interface DeploymentExample extends BaseContract {
   >;
 
   filters: {
-    'EventCreated(uint256,address,address)': TypedContractEvent<
+    "EventCreated(uint256,address,address)": TypedContractEvent<
       EventCreatedEvent.InputTuple,
       EventCreatedEvent.OutputTuple,
       EventCreatedEvent.OutputObject
@@ -272,7 +278,7 @@ export interface DeploymentExample extends BaseContract {
       EventCreatedEvent.OutputObject
     >;
 
-    'FactoryDeployed(address)': TypedContractEvent<
+    "FactoryDeployed(address)": TypedContractEvent<
       FactoryDeployedEvent.InputTuple,
       FactoryDeployedEvent.OutputTuple,
       FactoryDeployedEvent.OutputObject

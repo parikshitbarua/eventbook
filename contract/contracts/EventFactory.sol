@@ -62,11 +62,23 @@ contract EventFactory is IEventFactory {
         uint256 _eventEndTime,
         string memory _venue,
         string memory _nftName,
-        string memory _nftSymbol
+        string memory _nftSymbol,
+        bool _isEventEditAllowed,
+        uint256 _salesStartTime,
+        uint256 _salesEndTime
     ) external override returns (uint256 eventId, address eventContract, address nftContract) {
         require(bytes(_title).length > 0, "Empty title");
         require(_eventStartTime > block.timestamp, "Past event start");
         require(_eventEndTime > _eventStartTime, "Invalid times");
+        
+        // Validate sales timing
+        if (_salesStartTime != 0) {
+            require(_salesStartTime <= _eventStartTime, "Sales can't start after event");
+        }
+        if (_salesEndTime != 0) {
+            require(_salesEndTime <= _eventStartTime, "Sales can't end after event");
+            require(_salesEndTime > (_salesStartTime == 0 ? block.timestamp : _salesStartTime), "Sales end before start");
+        }
         
         eventId = ++eventCounter;
         
@@ -78,7 +90,8 @@ contract EventFactory is IEventFactory {
         EventContract(eventContract).initialize(
             _title, _description, msg.sender, _ticketPrice, _maxTickets,
             _eventURI, _eventStartTime, _eventEndTime, _venue,
-            eventId, address(this)
+            eventId, address(this), _isEventEditAllowed,
+            _salesStartTime, _salesEndTime
         );
         
         // Initialize NFT contract

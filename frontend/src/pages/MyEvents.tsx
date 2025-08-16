@@ -33,16 +33,91 @@ const MyEvents: React.FC = () => {
         provider,
       );
 
-      const eventDetails: EventDetailsResponseData = await factoryContract.getEventDetails(eventId);
+      // First get the event contract address from factory
+      // events() returns a tuple: [eventContract, nftContract, organizer, title, createdAt, isActive, ticketsSold, totalRevenue]
+      const [
+        eventContractAddress,
+        nftContractAddress,
+        organizerAddress,
+        eventTitle,
+        eventCreatedAt,
+        eventIsActive,
+        eventTicketsSold,
+        eventTotalRevenue
+      ] = await factoryContract.events(eventId);
+
+      console.log(`🏭 MyEvents - Factory response for Event ${eventId}:`, {
+        eventContractAddress,
+        nftContractAddress,
+        organizerAddress,
+        eventTitle,
+        eventCreatedAt,
+        eventIsActive,
+        eventTicketsSold,
+        eventTotalRevenue
+      });
+
+      // Create event contract instance
+      const eventContractInstance = new Contract(
+        eventContractAddress,
+        EventContractABI.abi,
+        provider,
+      );
+
+      // Get event details directly from the event contract
+      const [
+        title,
+        description,
+        eventOrganizer,
+        price,
+        maxTicketsCount,
+        ticketsSoldCount,
+        active,
+        uri,
+        creationTime,
+        startTime,
+        endTime,
+        eventVenue
+      ] = await eventContractInstance.getEventDetails();
+
+      // Reconstruct eventDetails object to match the expected format
+      const eventDetails: EventDetailsResponseData = {
+        eventInfo: {
+          title,
+          organizer: eventOrganizer,
+          isActive: active,
+          ticketsSold: BigInt(ticketsSoldCount),
+          eventContract: eventContractAddress,
+          nftContract: nftContractAddress,
+          createdAt: BigInt(creationTime),
+          totalRevenue: BigInt(eventTotalRevenue),
+        },
+        eventId: Number(eventId),
+        description,
+        ticketPrice: BigInt(price),
+        maxTickets: BigInt(maxTicketsCount),
+        eventURI: uri,
+        eventStartTime: BigInt(startTime),
+        eventEndTime: BigInt(endTime),
+        venue: eventVenue,
+        eventContract: eventContractAddress as `0x${string}`,
+        nftContract: nftContractAddress as `0x${string}`,
+        totalRevenue: BigInt(eventTotalRevenue),
+        eventImages: '',
+      };
+
+      // Fetch isEventEditAllowed from the event contract (using existing instance)
+      const isEventEditAllowed = await eventContractInstance.isEventEditAllowed();
+      
+      // Log event details for debugging
+      console.log('🔍 MyEvents - Fetching Event Details:');
+      console.log('🎫 Event ID:', eventId);
+      console.log('📝 Event Details from Factory:', eventDetails);
+      console.log('🔧 Is Event Edit Allowed:', isEventEditAllowed);
 
       if (eventDetails.ticketPrice === 0n && eventDetails.maxTickets === 0n) {
-        const eventContract = new Contract(
-            eventDetails.eventInfo.eventContract as `0x${string}`,
-            EventContractABI.abi,
-            provider,
-        );
         const categories: TicketCategory[] =
-            await eventContract.getAllCategories();
+            await eventContractInstance.getAllCategories();
         if (categories.length > 0) {
           maxTickets = categories.reduce((total, category) => {
               total += category.maxSupply;
@@ -67,7 +142,7 @@ const MyEvents: React.FC = () => {
         }
       }
 
-      return {
+      const eventData = {
         eventId: Number(eventId),
         title: eventDetails.eventInfo.title,
         description: eventDetails.description,
@@ -78,6 +153,7 @@ const MyEvents: React.FC = () => {
         ticketsLeft: BigInt(maxTickets > 0n || eventDetails.maxTickets == null ? maxTickets - eventDetails.eventInfo.ticketsSold :
           eventDetails.maxTickets - eventDetails.eventInfo.ticketsSold),
         isActive: eventDetails.eventInfo.isActive,
+        isEventEditAllowed: isEventEditAllowed,
         eventURI: eventDetails.eventURI,
         createdAt: eventDetails.eventInfo.createdAt,
         eventStartTime: eventDetails.eventStartTime,
@@ -88,6 +164,13 @@ const MyEvents: React.FC = () => {
         totalRevenue: eventDetails.eventInfo.totalRevenue,
         eventImages: firstImageUrl || '',
       } as EventData;
+      
+      console.log('📦 Final Event Data Object:', eventData);
+      console.log('🎛️ Button Visibility Conditions:');
+      console.log('  - Edit Button Visible:', eventData.isEventEditAllowed);
+      console.log('  - Manage Button Visible:', eventData.isActive && eventData.isEventEditAllowed);
+      
+      return eventData;
     } catch (err) {
       console.error(`Failed to fetch event ${eventId}:`, err);
       return null;
@@ -580,10 +663,22 @@ const MyEvents: React.FC = () => {
                       >
                         View
                       </button>
-                      {event.isActive && (
+                      {event.isActive && event.isEventEditAllowed && (
+                        <button
+                          onClick={() => navigate(`/edit-event/${event.eventId}`)}
+                          className={`flex-1 sm:flex-none px-3 py-1.5 text-xs font-medium ${
+                            isDark
+                              ? 'bg-blue-600 text-white hover:bg-blue-700'
+                              : 'bg-blue-600 text-white hover:bg-blue-700'
+                          } rounded-md transition-colors`}
+                        >
+                          Edit
+                        </button>
+                      )}
+                      {event.isActive && event.isEventEditAllowed && (
                         <button
                           onClick={() =>
-                            navigate(`/event/${event.eventId}/manage`)
+                            navigate(`/manage-event/${event.eventId}`)
                           }
                           className="flex-1 sm:flex-none px-3 py-1.5 text-xs font-medium text-white rounded-md transition-all duration-200"
                           style={{

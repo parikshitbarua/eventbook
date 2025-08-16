@@ -118,13 +118,16 @@ export interface CreateEventParams {
   maxTickets: string;
   eventStartTime: string; // ISO date string
   eventEndTime: string; // ISO date string
+  salesStartTime: string; // ISO date string
+  salesEndTime: string; // ISO date string
   venue: string;
   country: string;
   state: string;
   city: string;
-  nftName: string;
-  nftSymbol: string;
+  nftName?: string;
+  nftSymbol?: string;
   eventImages: File[];
+  isEventEditAllowed: boolean;
 }
 
 /**
@@ -149,12 +152,12 @@ export function validateEventForm(
     maxTickets,
     eventStartTime,
     eventEndTime,
+    salesStartTime,
+    salesEndTime,
     venue,
     country,
     state,
     city,
-    nftName,
-    nftSymbol,
   } = formData;
 
   // Required field validation
@@ -165,17 +168,6 @@ export function validateEventForm(
   if (!country.trim()) return { isValid: false, error: 'Country is required' };
   if (!state.trim()) return { isValid: false, error: 'State is required' };
   if (!city.trim()) return { isValid: false, error: 'City is required' };
-  if (!nftName.trim()) return { isValid: false, error: 'NFT name is required' };
-  if (!nftSymbol.trim())
-    return { isValid: false, error: 'NFT symbol is required' };
-
-  // NFT symbol validation (should be uppercase, 3-5 characters)
-  if (!/^[A-Z]{2,10}$/.test(nftSymbol.trim())) {
-    return {
-      isValid: false,
-      error: 'NFT symbol must be 2-10 uppercase letters (e.g., MUSIC, FEST)',
-    };
-  }
 
   // Date validation
   const startDate = new Date(eventStartTime);
@@ -188,6 +180,34 @@ export function validateEventForm(
 
   if (endDate <= startDate) {
     return { isValid: false, error: 'Event end time must be after start time' };
+  }
+
+  // Sales date validation
+  if (salesStartTime) {
+    const salesStartDate = new Date(salesStartTime);
+    if (isNaN(salesStartDate.getTime()))
+      return { isValid: false, error: 'Invalid sales start date' };
+    
+    if (salesStartDate > startDate) {
+      return { isValid: false, error: 'Sales start time cannot be after event start time' };
+    }
+  }
+
+  if (salesEndTime) {
+    const salesEndDate = new Date(salesEndTime);
+    if (isNaN(salesEndDate.getTime()))
+      return { isValid: false, error: 'Invalid sales end date' };
+    
+    if (salesEndDate > startDate) {
+      return { isValid: false, error: 'Sales end time cannot be after event start time' };
+    }
+    
+    if (salesStartTime) {
+      const salesStartDate = new Date(salesStartTime);
+      if (salesEndDate <= salesStartDate) {
+        return { isValid: false, error: 'Sales end time must be after sales start time' };
+      }
+    }
   }
 
   // Numeric validation for single category events

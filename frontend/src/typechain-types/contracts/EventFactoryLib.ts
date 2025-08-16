@@ -11,26 +11,26 @@ import type {
   ContractRunner,
   ContractMethod,
   Listener,
-} from 'ethers';
+} from "ethers";
 import type {
   TypedContractEvent,
   TypedDeferredTopicFilter,
   TypedEventLog,
   TypedListener,
   TypedContractMethod,
-} from '../common';
+} from "../common";
 
 export interface EventFactoryLibInterface extends Interface {
-  getFunction(nameOrSignature: 'getEventDetailsFromContract'): FunctionFragment;
+  getFunction(nameOrSignature: "getEventDetailsFromContract"): FunctionFragment;
 
   encodeFunctionData(
-    functionFragment: 'getEventDetailsFromContract',
-    values: [AddressLike],
+    functionFragment: "getEventDetailsFromContract",
+    values: [AddressLike]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: 'getEventDetailsFromContract',
-    data: BytesLike,
+    functionFragment: "getEventDetailsFromContract",
+    data: BytesLike
   ): Result;
 }
 
@@ -43,38 +43,38 @@ export interface EventFactoryLib extends BaseContract {
   queryFilter<TCEvent extends TypedContractEvent>(
     event: TCEvent,
     fromBlockOrBlockhash?: string | number | undefined,
-    toBlock?: string | number | undefined,
+    toBlock?: string | number | undefined
   ): Promise<Array<TypedEventLog<TCEvent>>>;
   queryFilter<TCEvent extends TypedContractEvent>(
     filter: TypedDeferredTopicFilter<TCEvent>,
     fromBlockOrBlockhash?: string | number | undefined,
-    toBlock?: string | number | undefined,
+    toBlock?: string | number | undefined
   ): Promise<Array<TypedEventLog<TCEvent>>>;
 
   on<TCEvent extends TypedContractEvent>(
     event: TCEvent,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
   on<TCEvent extends TypedContractEvent>(
     filter: TypedDeferredTopicFilter<TCEvent>,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
 
   once<TCEvent extends TypedContractEvent>(
     event: TCEvent,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
   once<TCEvent extends TypedContractEvent>(
     filter: TypedDeferredTopicFilter<TCEvent>,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
 
   listeners<TCEvent extends TypedContractEvent>(
-    event: TCEvent,
+    event: TCEvent
   ): Promise<Array<TypedListener<TCEvent>>>;
   listeners(eventName?: string): Promise<Array<Listener>>;
   removeAllListeners<TCEvent extends TypedContractEvent>(
-    event?: TCEvent,
+    event?: TCEvent
   ): Promise<this>;
 
   getEventDetailsFromContract: TypedContractMethod<
@@ -88,17 +88,17 @@ export interface EventFactoryLib extends BaseContract {
         eventStartTime: bigint;
         eventEndTime: bigint;
         venue: string;
-      },
+      }
     ],
-    'view'
+    "view"
   >;
 
   getFunction<T extends ContractMethod = ContractMethod>(
-    key: string | FunctionFragment,
+    key: string | FunctionFragment
   ): T;
 
   getFunction(
-    nameOrSignature: 'getEventDetailsFromContract',
+    nameOrSignature: "getEventDetailsFromContract"
   ): TypedContractMethod<
     [eventContract: AddressLike],
     [
@@ -110,9 +110,9 @@ export interface EventFactoryLib extends BaseContract {
         eventStartTime: bigint;
         eventEndTime: bigint;
         venue: string;
-      },
+      }
     ],
-    'view'
+    "view"
   >;
 
   filters: {};

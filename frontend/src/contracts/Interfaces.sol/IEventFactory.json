@@ -130,6 +130,21 @@
           "internalType": "string",
           "name": "_nftSymbol",
           "type": "string"
+        },
+        {
+          "internalType": "bool",
+          "name": "_isEventEditAllowed",
+          "type": "bool"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_salesStartTime",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_salesEndTime",
+          "type": "uint256"
         }
       ],
       "name": "createEvent",

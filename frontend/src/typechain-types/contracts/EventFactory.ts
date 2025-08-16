@@ -13,7 +13,7 @@ import type {
   ContractRunner,
   ContractMethod,
   Listener,
-} from 'ethers';
+} from "ethers";
 import type {
   TypedContractEvent,
   TypedDeferredTopicFilter,
@@ -21,7 +21,7 @@ import type {
   TypedLogDescription,
   TypedListener,
   TypedContractMethod,
-} from '../common';
+} from "../common";
 
 export declare namespace IEventFactory {
   export type EventInfoStruct = {
@@ -43,7 +43,7 @@ export declare namespace IEventFactory {
     createdAt: bigint,
     isActive: boolean,
     ticketsSold: bigint,
-    totalRevenue: bigint,
+    totalRevenue: bigint
   ] & {
     eventContract: string;
     nftContract: string;
@@ -59,40 +59,40 @@ export declare namespace IEventFactory {
 export interface EventFactoryInterface extends Interface {
   getFunction(
     nameOrSignature:
-      | 'createEvent'
-      | 'deactivateEvent'
-      | 'emergencyWithdraw'
-      | 'eventCounter'
-      | 'eventImplementation'
-      | 'events'
-      | 'getActiveEvents'
-      | 'getAllEventIds'
-      | 'getEventDetails'
-      | 'getOrganizerEventCount'
-      | 'getOrganizerEvents'
-      | 'nftImplementation'
-      | 'organizerEventCount'
-      | 'organizerEvents'
-      | 'organizerEventsList'
-      | 'owner'
-      | 'platformFee'
-      | 'platformFeeRecipient'
-      | 'setPlatformFee'
-      | 'setPlatformFeeRecipient'
-      | 'updateEventStats'
-      | 'withdrawPlatformFees',
+      | "createEvent"
+      | "deactivateEvent"
+      | "emergencyWithdraw"
+      | "eventCounter"
+      | "eventImplementation"
+      | "events"
+      | "getActiveEvents"
+      | "getAllEventIds"
+      | "getEventDetails"
+      | "getOrganizerEventCount"
+      | "getOrganizerEvents"
+      | "nftImplementation"
+      | "organizerEventCount"
+      | "organizerEvents"
+      | "organizerEventsList"
+      | "owner"
+      | "platformFee"
+      | "platformFeeRecipient"
+      | "setPlatformFee"
+      | "setPlatformFeeRecipient"
+      | "updateEventStats"
+      | "withdrawPlatformFees"
   ): FunctionFragment;
 
   getEvent(
     nameOrSignatureOrTopic:
-      | 'EventCreated'
-      | 'EventDeactivated'
-      | 'PlatformFeeRecipientUpdated'
-      | 'PlatformFeeUpdated',
+      | "EventCreated"
+      | "EventDeactivated"
+      | "PlatformFeeRecipientUpdated"
+      | "PlatformFeeUpdated"
   ): EventFragment;
 
   encodeFunctionData(
-    functionFragment: 'createEvent',
+    functionFragment: "createEvent",
     values: [
       string,
       string,
@@ -104,171 +104,174 @@ export interface EventFactoryInterface extends Interface {
       string,
       string,
       string,
-    ],
+      boolean,
+      BigNumberish,
+      BigNumberish
+    ]
   ): string;
   encodeFunctionData(
-    functionFragment: 'deactivateEvent',
-    values: [BigNumberish],
+    functionFragment: "deactivateEvent",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'emergencyWithdraw',
-    values?: undefined,
+    functionFragment: "emergencyWithdraw",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'eventCounter',
-    values?: undefined,
+    functionFragment: "eventCounter",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'eventImplementation',
-    values?: undefined,
+    functionFragment: "eventImplementation",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'events',
-    values: [BigNumberish],
+    functionFragment: "events",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'getActiveEvents',
-    values?: undefined,
+    functionFragment: "getActiveEvents",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'getAllEventIds',
-    values?: undefined,
+    functionFragment: "getAllEventIds",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'getEventDetails',
-    values: [BigNumberish],
+    functionFragment: "getEventDetails",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'getOrganizerEventCount',
-    values: [AddressLike],
+    functionFragment: "getOrganizerEventCount",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: 'getOrganizerEvents',
-    values: [AddressLike],
+    functionFragment: "getOrganizerEvents",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: 'nftImplementation',
-    values?: undefined,
+    functionFragment: "nftImplementation",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'organizerEventCount',
-    values: [AddressLike],
+    functionFragment: "organizerEventCount",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: 'organizerEvents',
-    values: [AddressLike, BigNumberish],
+    functionFragment: "organizerEvents",
+    values: [AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'organizerEventsList',
-    values: [AddressLike, BigNumberish],
+    functionFragment: "organizerEventsList",
+    values: [AddressLike, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: 'owner', values?: undefined): string;
+  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: 'platformFee',
-    values?: undefined,
-  ): string;
-  encodeFunctionData(
-    functionFragment: 'platformFeeRecipient',
-    values?: undefined,
+    functionFragment: "platformFee",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'setPlatformFee',
-    values: [BigNumberish],
+    functionFragment: "platformFeeRecipient",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: 'setPlatformFeeRecipient',
-    values: [AddressLike],
+    functionFragment: "setPlatformFee",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: 'updateEventStats',
-    values: [BigNumberish, BigNumberish, BigNumberish],
+    functionFragment: "setPlatformFeeRecipient",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: 'withdrawPlatformFees',
-    values?: undefined,
+    functionFragment: "updateEventStats",
+    values: [BigNumberish, BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "withdrawPlatformFees",
+    values?: undefined
   ): string;
 
   decodeFunctionResult(
-    functionFragment: 'createEvent',
-    data: BytesLike,
+    functionFragment: "createEvent",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'deactivateEvent',
-    data: BytesLike,
+    functionFragment: "deactivateEvent",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'emergencyWithdraw',
-    data: BytesLike,
+    functionFragment: "emergencyWithdraw",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'eventCounter',
-    data: BytesLike,
+    functionFragment: "eventCounter",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'eventImplementation',
-    data: BytesLike,
+    functionFragment: "eventImplementation",
+    data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: 'events', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "events", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: 'getActiveEvents',
-    data: BytesLike,
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: 'getAllEventIds',
-    data: BytesLike,
+    functionFragment: "getActiveEvents",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'getEventDetails',
-    data: BytesLike,
+    functionFragment: "getAllEventIds",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'getOrganizerEventCount',
-    data: BytesLike,
+    functionFragment: "getEventDetails",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'getOrganizerEvents',
-    data: BytesLike,
+    functionFragment: "getOrganizerEventCount",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'nftImplementation',
-    data: BytesLike,
+    functionFragment: "getOrganizerEvents",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'organizerEventCount',
-    data: BytesLike,
+    functionFragment: "nftImplementation",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'organizerEvents',
-    data: BytesLike,
+    functionFragment: "organizerEventCount",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'organizerEventsList',
-    data: BytesLike,
-  ): Result;
-  decodeFunctionResult(functionFragment: 'owner', data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: 'platformFee',
-    data: BytesLike,
+    functionFragment: "organizerEvents",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'platformFeeRecipient',
-    data: BytesLike,
+    functionFragment: "organizerEventsList",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "platformFee",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'setPlatformFee',
-    data: BytesLike,
+    functionFragment: "platformFeeRecipient",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'setPlatformFeeRecipient',
-    data: BytesLike,
+    functionFragment: "setPlatformFee",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'updateEventStats',
-    data: BytesLike,
+    functionFragment: "setPlatformFeeRecipient",
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: 'withdrawPlatformFees',
-    data: BytesLike,
+    functionFragment: "updateEventStats",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "withdrawPlatformFees",
+    data: BytesLike
   ): Result;
 }
 
@@ -278,14 +281,14 @@ export namespace EventCreatedEvent {
     organizer: AddressLike,
     eventContract: AddressLike,
     nftContract: AddressLike,
-    title: string,
+    title: string
   ];
   export type OutputTuple = [
     eventId: bigint,
     organizer: string,
     eventContract: string,
     nftContract: string,
-    title: string,
+    title: string
   ];
   export interface OutputObject {
     eventId: bigint;
@@ -345,38 +348,38 @@ export interface EventFactory extends BaseContract {
   queryFilter<TCEvent extends TypedContractEvent>(
     event: TCEvent,
     fromBlockOrBlockhash?: string | number | undefined,
-    toBlock?: string | number | undefined,
+    toBlock?: string | number | undefined
   ): Promise<Array<TypedEventLog<TCEvent>>>;
   queryFilter<TCEvent extends TypedContractEvent>(
     filter: TypedDeferredTopicFilter<TCEvent>,
     fromBlockOrBlockhash?: string | number | undefined,
-    toBlock?: string | number | undefined,
+    toBlock?: string | number | undefined
   ): Promise<Array<TypedEventLog<TCEvent>>>;
 
   on<TCEvent extends TypedContractEvent>(
     event: TCEvent,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
   on<TCEvent extends TypedContractEvent>(
     filter: TypedDeferredTopicFilter<TCEvent>,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
 
   once<TCEvent extends TypedContractEvent>(
     event: TCEvent,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
   once<TCEvent extends TypedContractEvent>(
     filter: TypedDeferredTopicFilter<TCEvent>,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
 
   listeners<TCEvent extends TypedContractEvent>(
-    event: TCEvent,
+    event: TCEvent
   ): Promise<Array<TypedListener<TCEvent>>>;
   listeners(eventName?: string): Promise<Array<Listener>>;
   removeAllListeners<TCEvent extends TypedContractEvent>(
-    event?: TCEvent,
+    event?: TCEvent
   ): Promise<this>;
 
   createEvent: TypedContractMethod<
@@ -391,28 +394,31 @@ export interface EventFactory extends BaseContract {
       _venue: string,
       _nftName: string,
       _nftSymbol: string,
+      _isEventEditAllowed: boolean,
+      _salesStartTime: BigNumberish,
+      _salesEndTime: BigNumberish
     ],
     [
       [bigint, string, string] & {
         eventId: bigint;
         eventContract: string;
         nftContract: string;
-      },
+      }
     ],
-    'nonpayable'
+    "nonpayable"
   >;
 
   deactivateEvent: TypedContractMethod<
     [eventId: BigNumberish],
     [void],
-    'nonpayable'
+    "nonpayable"
   >;
 
-  emergencyWithdraw: TypedContractMethod<[], [void], 'nonpayable'>;
+  emergencyWithdraw: TypedContractMethod<[], [void], "nonpayable">;
 
-  eventCounter: TypedContractMethod<[], [bigint], 'view'>;
+  eventCounter: TypedContractMethod<[], [bigint], "view">;
 
-  eventImplementation: TypedContractMethod<[], [string], 'view'>;
+  eventImplementation: TypedContractMethod<[], [string], "view">;
 
   events: TypedContractMethod<
     [arg0: BigNumberish],
@@ -426,14 +432,14 @@ export interface EventFactory extends BaseContract {
         isActive: boolean;
         ticketsSold: bigint;
         totalRevenue: bigint;
-      },
+      }
     ],
-    'view'
+    "view"
   >;
 
-  getActiveEvents: TypedContractMethod<[], [bigint[]], 'view'>;
+  getActiveEvents: TypedContractMethod<[], [bigint[]], "view">;
 
-  getAllEventIds: TypedContractMethod<[], [bigint[]], 'view'>;
+  getAllEventIds: TypedContractMethod<[], [bigint[]], "view">;
 
   getEventDetails: TypedContractMethod<
     [eventId: BigNumberish],
@@ -446,7 +452,7 @@ export interface EventFactory extends BaseContract {
         string,
         bigint,
         bigint,
-        string,
+        string
       ] & {
         eventInfo: IEventFactory.EventInfoStructOutput;
         description: string;
@@ -456,74 +462,76 @@ export interface EventFactory extends BaseContract {
         eventStartTime: bigint;
         eventEndTime: bigint;
         venue: string;
-      },
+      }
     ],
-    'view'
+    "view"
   >;
 
   getOrganizerEventCount: TypedContractMethod<
     [organizer: AddressLike],
     [bigint],
-    'view'
+    "view"
   >;
 
   getOrganizerEvents: TypedContractMethod<
     [organizer: AddressLike],
     [bigint[]],
-    'view'
+    "view"
   >;
 
-  nftImplementation: TypedContractMethod<[], [string], 'view'>;
+  nftImplementation: TypedContractMethod<[], [string], "view">;
 
   organizerEventCount: TypedContractMethod<
     [arg0: AddressLike],
     [bigint],
-    'view'
+    "view"
   >;
 
   organizerEvents: TypedContractMethod<
     [organizer: AddressLike, index: BigNumberish],
     [bigint],
-    'view'
+    "view"
   >;
 
   organizerEventsList: TypedContractMethod<
     [arg0: AddressLike, arg1: BigNumberish],
     [bigint],
-    'view'
+    "view"
   >;
 
-  owner: TypedContractMethod<[], [string], 'view'>;
+  owner: TypedContractMethod<[], [string], "view">;
 
-  platformFee: TypedContractMethod<[], [bigint], 'view'>;
+  platformFee: TypedContractMethod<[], [bigint], "view">;
 
-  platformFeeRecipient: TypedContractMethod<[], [string], 'view'>;
+  platformFeeRecipient: TypedContractMethod<[], [string], "view">;
 
   setPlatformFee: TypedContractMethod<
     [_fee: BigNumberish],
     [void],
-    'nonpayable'
+    "nonpayable"
   >;
 
   setPlatformFeeRecipient: TypedContractMethod<
     [_recipient: AddressLike],
     [void],
-    'nonpayable'
+    "nonpayable"
   >;
 
   updateEventStats: TypedContractMethod<
     [eventId: BigNumberish, ticketsSold: BigNumberish, revenue: BigNumberish],
     [void],
-    'nonpayable'
+    "nonpayable"
   >;
 
-  withdrawPlatformFees: TypedContractMethod<[], [void], 'nonpayable'>;
+  withdrawPlatformFees: TypedContractMethod<[], [void], "nonpayable">;
 
   getFunction<T extends ContractMethod = ContractMethod>(
-    key: string | FunctionFragment,
+    key: string | FunctionFragment
   ): T;
 
-  getFunction(nameOrSignature: 'createEvent'): TypedContractMethod<
+  getFunction(
+    nameOrSignature: "createEvent"
+  ): TypedContractMethod<
     [
       _title: string,
       _description: string,
@@ -535,29 +543,34 @@ export interface EventFactory extends BaseContract {
       _venue: string,
       _nftName: string,
       _nftSymbol: string,
+      _isEventEditAllowed: boolean,
+      _salesStartTime: BigNumberish,
+      _salesEndTime: BigNumberish
     ],
     [
       [bigint, string, string] & {
         eventId: bigint;
         eventContract: string;
         nftContract: string;
-      },
+      }
     ],
-    'nonpayable'
+    "nonpayable"
   >;
   getFunction(
-    nameOrSignature: 'deactivateEvent',
-  ): TypedContractMethod<[eventId: BigNumberish], [void], 'nonpayable'>;
+    nameOrSignature: "deactivateEvent"
+  ): TypedContractMethod<[eventId: BigNumberish], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: 'emergencyWithdraw',
-  ): TypedContractMethod<[], [void], 'nonpayable'>;
+    nameOrSignature: "emergencyWithdraw"
+  ): TypedContractMethod<[], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: 'eventCounter',
-  ): TypedContractMethod<[], [bigint], 'view'>;
+    nameOrSignature: "eventCounter"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: 'eventImplementation',
-  ): TypedContractMethod<[], [string], 'view'>;
-  getFunction(nameOrSignature: 'events'): TypedContractMethod<
+    nameOrSignature: "eventImplementation"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "events"
+  ): TypedContractMethod<
     [arg0: BigNumberish],
     [
       [string, string, string, string, bigint, boolean, bigint, bigint] & {
@@ -569,17 +582,19 @@ export interface EventFactory extends BaseContract {
         isActive: boolean;
         ticketsSold: bigint;
         totalRevenue: bigint;
-      },
+      }
     ],
-    'view'
+    "view"
   >;
   getFunction(
-    nameOrSignature: 'getActiveEvents',
-  ): TypedContractMethod<[], [bigint[]], 'view'>;
+    nameOrSignature: "getActiveEvents"
+  ): TypedContractMethod<[], [bigint[]], "view">;
   getFunction(
-    nameOrSignature: 'getAllEventIds',
-  ): TypedContractMethod<[], [bigint[]], 'view'>;
-  getFunction(nameOrSignature: 'getEventDetails'): TypedContractMethod<
+    nameOrSignature: "getAllEventIds"
+  ): TypedContractMethod<[], [bigint[]], "view">;
+  getFunction(
+    nameOrSignature: "getEventDetails"
+  ): TypedContractMethod<
     [eventId: BigNumberish],
     [
       [
@@ -590,7 +605,7 @@ export interface EventFactory extends BaseContract {
         string,
         bigint,
         bigint,
-        string,
+        string
       ] & {
         eventInfo: IEventFactory.EventInfoStructOutput;
         description: string;
@@ -600,85 +615,85 @@ export interface EventFactory extends BaseContract {
         eventStartTime: bigint;
         eventEndTime: bigint;
         venue: string;
-      },
+      }
     ],
-    'view'
+    "view"
   >;
   getFunction(
-    nameOrSignature: 'getOrganizerEventCount',
-  ): TypedContractMethod<[organizer: AddressLike], [bigint], 'view'>;
+    nameOrSignature: "getOrganizerEventCount"
+  ): TypedContractMethod<[organizer: AddressLike], [bigint], "view">;
   getFunction(
-    nameOrSignature: 'getOrganizerEvents',
-  ): TypedContractMethod<[organizer: AddressLike], [bigint[]], 'view'>;
+    nameOrSignature: "getOrganizerEvents"
+  ): TypedContractMethod<[organizer: AddressLike], [bigint[]], "view">;
   getFunction(
-    nameOrSignature: 'nftImplementation',
-  ): TypedContractMethod<[], [string], 'view'>;
+    nameOrSignature: "nftImplementation"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
-    nameOrSignature: 'organizerEventCount',
-  ): TypedContractMethod<[arg0: AddressLike], [bigint], 'view'>;
+    nameOrSignature: "organizerEventCount"
+  ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
   getFunction(
-    nameOrSignature: 'organizerEvents',
+    nameOrSignature: "organizerEvents"
   ): TypedContractMethod<
     [organizer: AddressLike, index: BigNumberish],
     [bigint],
-    'view'
+    "view"
   >;
   getFunction(
-    nameOrSignature: 'organizerEventsList',
+    nameOrSignature: "organizerEventsList"
   ): TypedContractMethod<
     [arg0: AddressLike, arg1: BigNumberish],
     [bigint],
-    'view'
+    "view"
   >;
   getFunction(
-    nameOrSignature: 'owner',
-  ): TypedContractMethod<[], [string], 'view'>;
+    nameOrSignature: "owner"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
-    nameOrSignature: 'platformFee',
-  ): TypedContractMethod<[], [bigint], 'view'>;
+    nameOrSignature: "platformFee"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: 'platformFeeRecipient',
-  ): TypedContractMethod<[], [string], 'view'>;
+    nameOrSignature: "platformFeeRecipient"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
-    nameOrSignature: 'setPlatformFee',
-  ): TypedContractMethod<[_fee: BigNumberish], [void], 'nonpayable'>;
+    nameOrSignature: "setPlatformFee"
+  ): TypedContractMethod<[_fee: BigNumberish], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: 'setPlatformFeeRecipient',
-  ): TypedContractMethod<[_recipient: AddressLike], [void], 'nonpayable'>;
+    nameOrSignature: "setPlatformFeeRecipient"
+  ): TypedContractMethod<[_recipient: AddressLike], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: 'updateEventStats',
+    nameOrSignature: "updateEventStats"
   ): TypedContractMethod<
     [eventId: BigNumberish, ticketsSold: BigNumberish, revenue: BigNumberish],
     [void],
-    'nonpayable'
+    "nonpayable"
   >;
   getFunction(
-    nameOrSignature: 'withdrawPlatformFees',
-  ): TypedContractMethod<[], [void], 'nonpayable'>;
+    nameOrSignature: "withdrawPlatformFees"
+  ): TypedContractMethod<[], [void], "nonpayable">;
 
   getEvent(
-    key: 'EventCreated',
+    key: "EventCreated"
   ): TypedContractEvent<
     EventCreatedEvent.InputTuple,
     EventCreatedEvent.OutputTuple,
     EventCreatedEvent.OutputObject
   >;
   getEvent(
-    key: 'EventDeactivated',
+    key: "EventDeactivated"
   ): TypedContractEvent<
     EventDeactivatedEvent.InputTuple,
     EventDeactivatedEvent.OutputTuple,
     EventDeactivatedEvent.OutputObject
   >;
   getEvent(
-    key: 'PlatformFeeRecipientUpdated',
+    key: "PlatformFeeRecipientUpdated"
   ): TypedContractEvent<
     PlatformFeeRecipientUpdatedEvent.InputTuple,
     PlatformFeeRecipientUpdatedEvent.OutputTuple,
     PlatformFeeRecipientUpdatedEvent.OutputObject
   >;
   getEvent(
-    key: 'PlatformFeeUpdated',
+    key: "PlatformFeeUpdated"
   ): TypedContractEvent<
     PlatformFeeUpdatedEvent.InputTuple,
     PlatformFeeUpdatedEvent.OutputTuple,
@@ -686,7 +701,7 @@ export interface EventFactory extends BaseContract {
   >;
 
   filters: {
-    'EventCreated(uint256,address,address,address,string)': TypedContractEvent<
+    "EventCreated(uint256,address,address,address,string)": TypedContractEvent<
       EventCreatedEvent.InputTuple,
       EventCreatedEvent.OutputTuple,
       EventCreatedEvent.OutputObject
@@ -697,7 +712,7 @@ export interface EventFactory extends BaseContract {
       EventCreatedEvent.OutputObject
     >;
 
-    'EventDeactivated(uint256)': TypedContractEvent<
+    "EventDeactivated(uint256)": TypedContractEvent<
       EventDeactivatedEvent.InputTuple,
       EventDeactivatedEvent.OutputTuple,
       EventDeactivatedEvent.OutputObject
@@ -708,7 +723,7 @@ export interface EventFactory extends BaseContract {
       EventDeactivatedEvent.OutputObject
     >;
 
-    'PlatformFeeRecipientUpdated(address)': TypedContractEvent<
+    "PlatformFeeRecipientUpdated(address)": TypedContractEvent<
       PlatformFeeRecipientUpdatedEvent.InputTuple,
       PlatformFeeRecipientUpdatedEvent.OutputTuple,
       PlatformFeeRecipientUpdatedEvent.OutputObject
@@ -719,7 +734,7 @@ export interface EventFactory extends BaseContract {
       PlatformFeeRecipientUpdatedEvent.OutputObject
     >;
 
-    'PlatformFeeUpdated(uint256)': TypedContractEvent<
+    "PlatformFeeUpdated(uint256)": TypedContractEvent<
       PlatformFeeUpdatedEvent.InputTuple,
       PlatformFeeUpdatedEvent.OutputTuple,
       PlatformFeeUpdatedEvent.OutputObject

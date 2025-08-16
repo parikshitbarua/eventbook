@@ -45,7 +45,7 @@ export const hardhatNetwork = defineChain({
 // Configure networks based on environment
 const getNetworks = (): [AppKitNetwork, ...AppKitNetwork[]] => {
   const networkUrl = import.meta.env.VITE_NETWORK_URL;
-
+  console.log("Network URL:", networkUrl);
   // If using Base networks, prioritize them
   if (networkUrl?.includes('base.org')) {
     return [baseSepolia];
@@ -73,7 +73,7 @@ export const appKit = createAppKit({
     analytics: true,
   },
   themeVariables: {
-    '--w3m-accent': '#e43635',
+    '--w3m-accent': '#592DBE',
   },
 });
 

@@ -171,10 +171,11 @@ export const fetchFirstImageFromIPFS = async (
           if (url.startsWith('http')) {
             return decodeURIComponent(url);
           }
-          const fileName = url.split('/').pop();
-          if (!fileName) return null;
+          const rawFileName = url.split('/').pop();
+          if (!rawFileName) return null;
+          const fileName = decodeURIComponent(rawFileName);
           // Otherwise, construct the full URL
-          return `${ipfsDirectoryUrl}/${decodeURIComponent(fileName)}`;
+          return `${ipfsDirectoryUrl}/${fileName}`;
         }
       }
     }
