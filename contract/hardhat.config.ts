@@ -20,6 +20,10 @@ const config: HardhatUserConfig = {
       chainId: 84532,
       accounts: [process.env.PRIVATE_KEY!], // Load from .env
     },
+    baseMainnet: {
+      url: "https://mainnet.base.org", // Base mainnet RPC
+      accounts: [process.env.PRIVATE_KEY!], // your deployer wallet private key
+    },
   },
   solidity: {
     version: "0.8.28",
