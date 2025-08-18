@@ -18,6 +18,7 @@ export const metadata = {
   icons: ['https://avatars.githubusercontent.com/u/179229932'],
 };
 
+// Hardhat network configuration (development only)
 export const hardhatNetwork = defineChain({
   id: 31337,
   name: 'Hardhat',
@@ -44,8 +45,16 @@ export const hardhatNetwork = defineChain({
 
 // Configure networks based on environment
 const getNetworks = (): [AppKitNetwork, ...AppKitNetwork[]] => {
+  const isDevelopment = import.meta.env.MODE === 'development';
+  
+  // In production, only show Base mainnet
+  if (!isDevelopment) {
+    return [base];
+  }
+  
+  // In development, check network URL preference
   const networkUrl = import.meta.env.VITE_NETWORK_URL;
-
+  
   // If using Base networks, prioritize them
   if (networkUrl?.includes('base.org')) {
     return [base];
