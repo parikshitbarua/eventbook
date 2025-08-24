@@ -55,7 +55,7 @@ const EventDetailsPage = () => {
     null,
   );
   const [eventStats, setEventStats] = useState<EventStats | null>(null);
-  const [nftSymbol, setNftSymbol] = useState<string>('');
+  const [nftName, setNftName] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -162,19 +162,19 @@ const EventDetailsPage = () => {
         eventDetails,
       );
 
-      // Fetch NFT symbol
-      let symbol = '';
+      // Fetch NFT name
+      let name = '';
       try {
         const nftContract = new Contract(
           eventDetails.eventInfo.nftContract,
           EventTicketNFTABI.abi,
           provider,
         );
-        symbol = await nftContract.symbol();
+        name = await nftContract.name();
       } catch (err) {
-        console.error('Failed to fetch NFT symbol:', err);
+        console.error('Failed to fetch NFT name:', err);
         // Fallback to using contract address
-        symbol = eventDetails.eventInfo.nftContract;
+        name = eventDetails.eventInfo.nftContract;
       }
 
       const eventData: EventData = {
@@ -201,10 +201,12 @@ const EventDetailsPage = () => {
         eventImages: firstImageUrl || '',
       };
 
+      console.log("eventData", eventData);
+
       setEvent(eventData);
       setEventMetadata(metadata);
       setEventStats(stats);
-      setNftSymbol(symbol);
+      setNftName(name.toLowerCase().replace(/\s+/g, '-'));
     } catch (err) {
       console.error('Failed to fetch event details:', err);
       setError('Failed to load event details');
@@ -867,7 +869,7 @@ const EventDetailsPage = () => {
               </h3>
               <div className="space-y-4">
                 <a
-                  href={`${SECONDARY_MARKET_LINK}collection/${nftSymbol.toLowerCase()}`}
+                  href={`${SECONDARY_MARKET_LINK}collection/${nftName.toLowerCase()}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className={`flex items-center p-4 rounded-xl border-2 transition-all hover:shadow-lg ${
